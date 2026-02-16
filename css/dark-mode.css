@@ -1,0 +1,591 @@
+/* ====== Dark Mode Overrides ====== */
+
+body.dark-mode {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+/* Navbar e Containers */
+body.dark-mode .auth-navbar {
+  background: #1e293b !important; /* Azul muito escuro */
+  border-bottom: 1px solid #334155;
+}
+
+body.dark-mode .auth-navbar-badge {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+/* Cards e Seções */
+body.dark-mode .quiz-card,
+body.dark-mode .resource-header,
+body.dark-mode .resource-section,
+body.dark-mode .login-box,
+body.dark-mode .profile-card,
+body.dark-mode .feature-card {
+  background-color: #1e293b !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Textos */
+body.dark-mode .page-title,
+body.dark-mode .card-title,
+body.dark-mode .resource-title,
+body.dark-mode .login-title,
+body.dark-mode .profile-card-title,
+body.dark-mode .suggestion-section-title {
+  color: #ffffff !important;
+}
+
+body.dark-mode .page-lead,
+body.dark-mode .card-desc,
+body.dark-mode .card-meta,
+body.dark-mode .resource-meta,
+body.dark-mode .resource-section p,
+body.dark-mode .form-label,
+body.dark-mode .profile-header-email,
+body.dark-mode .profile-stat-label,
+body.dark-mode .suggestion-section-description {
+  color: #94a3b8 !important; /* Slate-400 */
+}
+
+/* Inputs */
+body.dark-mode .form-input {
+  background-color: #334155 !important;
+  border-color: #475569 !important;
+  color: #ffffff !important;
+}
+
+/* Elementos de Destaque (Banners e Sugestões) */
+body.dark-mode .game-banner {
+  background: linear-gradient(to right, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+}
+
+body.dark-mode .game-banner-title,
+body.dark-mode .game-banner-description {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .suggestion-section {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Toasts */
+body.dark-mode .toast-container {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+body.dark-mode .toast-message {
+  color: #ffffff !important;
+}
+
+
+
+/* ====== Dark Mode: Resources Page Specifics ====== */
+
+/* Cabeçalho da Página de Recursos */
+body.dark-mode .resources-title {
+    color: #ffffff !important; /* [cite: 110, 112] */
+}
+
+body.dark-mode .resources-subtitle {
+    color: #94a3b8 !important; /* [cite: 111] */
+}
+
+body.dark-mode .resources-section-title {
+    color: #f1f5f9 !important; /* [cite: 112] */
+}
+
+/* Cartões de Recurso */
+body.dark-mode .resource-card {
+    background-color: #1e293b !important; /* [cite: 116, 158] */
+    border: 1px solid #334155 !important; /* [cite: 158] */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important; /* [cite: 116] */
+}
+
+body.dark-mode .resource-card-title {
+    color: #ffffff !important; /* [cite: 124] */
+}
+
+body.dark-mode .resource-card-description,
+body.dark-mode .resource-card-label {
+    color: #94a3b8 !important; /* [cite: 124, 125] */
+}
+
+/* Ajuste dos Botões Secundários nos Cards (Download/Opções) */
+body.dark-mode .resource-card-btn-secondary {
+    background-color: #334155 !important; /* [cite: 129] */
+    color: #f1f5f9 !important; /* [cite: 129] */
+}
+
+body.dark-mode .resource-card-btn-secondary:hover {
+    background-color: #475569 !important; /* [cite: 129] */
+}
+
+/* Ícones dentro dos cards (Garante que o SVG herda a cor correta) */
+body.dark-mode .resource-card-icon i,
+body.dark-mode .resource-card-icon svg {
+    color: #ffffff !important; /* [cite: 121] */
+}
+
+/* Secção de Sugestão (ao fundo da página) */
+body.dark-mode .suggestion-section {
+    background-color: #1e293b !important; /* [cite: 140] */
+    border: 1px solid #334155 !important; /* [cite: 140] */
+}
+
+body.dark-mode .suggestion-section-title {
+    color: #ffffff !important; /* [cite: 140] */
+}
+
+body.dark-mode .suggestion-section-description {
+    color: #94a3b8 !important; /* [cite: 141] */
+}
+
+
+/* ====== Dark Mode: Profile Page ====== */
+
+/* Header do Perfil (Inversão do Gradiente) */
+body.dark-mode .profile-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Avatar e Badges do Header */
+body.dark-mode .profile-avatar {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .profile-header-badge {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* Cards de Conteúdo e Títulos */
+body.dark-mode .profile-card {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-mode .profile-card-title {
+    color: #ffffff !important;
+}
+
+/* Estatísticas (Stats Grid - Cores Vibrantes) */
+body.dark-mode .profile-stat {
+    background-color: #0f172a !important;
+}
+
+body.dark-mode .profile-stat:hover {
+    background-color: #1e293b !important;
+}
+
+body.dark-mode .profile-stat-label {
+    color: #94a3b8 !important;
+}
+
+/* Melhoria de Contraste para os Valores das Estatísticas */
+body.dark-mode .profile-stat-orange {
+    color: #fb923c !important; /* Laranja mais vivo para fundo escuro */
+}
+
+body.dark-mode .profile-stat-blue {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .profile-stat-green {
+    color: #4ade80 !important;
+}
+
+body.dark-mode .profile-stat-purple {
+    color: #a78bfa !important;
+}
+
+/* Atividade Recente */
+body.dark-mode .profile-activity-item {
+    background-color: #0f172a !important;
+}
+
+body.dark-mode .profile-activity-item:hover {
+    background-color: #1e293b !important;
+}
+
+body.dark-mode .profile-activity-title {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .profile-activity-desc {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .profile-activity-points {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .profile-medal-unlocked {
+    background-color: rgba(251, 191, 36, 0.1) !important; /* Brilho de fundo */
+    border: 2px solid #fbbf24 !important; /* Bordo visível */
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.2) !important; /* Glow para destaque */
+}
+
+body.dark-mode .profile-medal-unlocked .profile-medal-title {
+    color: #fbbf24 !important; /* Título em destaque */
+}
+
+body.dark-mode .profile-medal-locked {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    opacity: 0.4 !important; /* Mais apagado para indicar bloqueio */
+}
+
+body.dark-mode .profile-medal-desc {
+    color: #94a3b8 !important;
+}
+
+/* Barra de Progresso no Header */
+body.dark-mode .profile-progress-bar {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .profile-progress-fill {
+    background: #3b82f6 !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+body.dark-mode .profile-medal-title {
+    color: #f1f5f9 !important;
+}
+
+/* --- Profile settings --- */
+
+/* Se o site tiver a classe .dark-mode ou .site-body.dark */
+body.dark-mode .settings-btn {
+    /* Fundo translúcido sobre o azul */
+    background-color: rgba(255, 255, 255, 0.1); 
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.dark-mode .settings-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Mais visível ao passar o rato */
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ====== Dark Mode: Index Page Specifics ====== */
+
+/* Secção Hero (Esquerda) */
+body.dark-mode .index-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .index-subtitle {
+    color: #cbd5e1 !important; /* Slate-300 para suavizar o subtítulo */
+}
+
+body.dark-mode .lead {
+    color: #94a3b8 !important;
+}
+
+/* Painel de Destaque (Direita) */
+body.dark-mode .index-right {
+    background: linear-gradient(135deg, #1e293b, #0f172a) !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-mode .panel-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .panel-desc {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .bubble {
+    background: #2563eb !important; /* Mantém as bolhas azuis mas com brilho no escuro [cite: 49] */
+    opacity: 0.2;
+}
+
+/* Cartões de Funcionalidades (Features) */
+body.dark-mode .feature-card {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .feature-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .feature-desc {
+    color: #94a3b8 !important;
+}
+
+/* Botão Secundário no Hero */
+body.dark-mode .btn-secondary {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: #475569 !important;
+}
+
+/* Footer */
+body.dark-mode .site-footer {
+    background-color: #0f172a !important;
+    border-top: 1px solid #334155 !important;
+}
+
+body.dark-mode .site-footer p {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .cta-panel {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+/* ====== Dark Mode: Register & Login Pages ====== */
+
+/* Fundo da Página (Body) */
+body.dark-mode body.login-page {
+    background-color: #0f172a !important; /* gray-900 */
+}
+
+/* Caixa de Registo/Login */
+body.dark-mode .login-box {
+    background-color: #1e293b !important; /* gray-800 */
+    border: 1px solid #334155 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Títulos e Rótulos */
+body.dark-mode .login-title,
+body.dark-mode .login-subtitle,
+body.dark-mode .form-label {
+    color: #f8fafc !important; /* gray-50 */
+}
+
+/* Campos de Input */
+body.dark-mode .form-input {
+    background-color: #334155 !important; /* gray-700 */
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .form-input:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 1px #2563eb !important;
+}
+
+/* Requisitos da Password */
+body.dark-mode .password-requirements {
+    background-color: #0f172a !important; /* Fundo mais escuro para destaque */
+    border-color: #334155 !important;
+}
+
+body.dark-mode .requirements-title {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .requirement-item {
+    color: #94a3b8 !important;
+}
+
+/* Requisito Válido (Verde) */
+body.dark-mode .requirement-item.valid {
+    color: #4ade80 !important; /* Verde vibrante */
+}
+
+body.dark-mode .requirement-item.valid span {
+    opacity: 0.6;
+}
+
+/* Links e Texto Inferior */
+body.dark-mode .login-link {
+    color: #94a3b8 !important;
+}
+
+/* Texto base do link de voltar */
+body.dark-mode .back-link {
+    color: #94a3b8 !important;
+}
+
+/* Cor do ícone da seta no escuro */
+body.dark-mode .back-link svg {
+    color: #94a3b8 !important;
+}
+
+/* A seta fica azul clara ao passar o rato */
+body.dark-mode .back-link:hover svg {
+    color: #60a5fa !important;
+}
+
+/* Ícones de Olho (Toggle Visibility) */
+body.dark-mode .password-toggle-btn {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .password-toggle-btn:hover {
+    color: #ffffff !important;
+}
+
+/* ====== Dark Mode: Settings Page ====== */
+
+/* Ícones dos cartões (wrappers) */
+body.dark-mode .settings-icon-wrapper.blue { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+body.dark-mode .settings-icon-wrapper.purple { background: rgba(124, 58, 237, 0.2); color: #a78bfa; }
+body.dark-mode .settings-icon-wrapper.red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+/* Linhas divisórias */
+body.dark-mode .settings-card-header {
+    border-bottom-color: #334155;
+}
+
+/* Títulos e Descrições */
+body.dark-mode .settings-card-title { color: #f1f5f9; }
+body.dark-mode .settings-card-desc { color: #94a3b8; }
+body.dark-mode .text-red { color: #f87171; }
+
+/* Inputs (Reutilizando a lógica do login, mas reforçando aqui se necessário) */
+body.dark-mode .form-input {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .form-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+body.dark-mode .form-label {
+    color: #cbd5e1;
+}
+
+/* Link de voltar */
+body.dark-mode .back-link-simple { color: #94a3b8; }
+body.dark-mode .back-link-simple:hover { color: #60a5fa; }
+
+/* Zona de Perigo */
+body.dark-mode .danger-zone {
+    border-color: rgba(239, 68, 68, 0.3);
+    background-color: rgba(239, 68, 68, 0.05) !important; /* Ligeiro tint vermelho */
+}
+
+body.dark-mode .btn-danger-outline {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+body.dark-mode .btn-danger-outline:hover {
+    background-color: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+}
+
+/* Dark Mode para campos bloqueados */
+body.dark-mode .form-input.locked {
+    background-color: #1e293b; /* Azul escuro/cinza */
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+
+/* ====== Dark Mode: Resource Detail Page ====== */
+
+/* Header do Recurso */
+body.dark-mode .resource-header {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+body.dark-mode .resource-category {
+    color: #94a3b8 !important;
+}
+
+/* Secções de Conteúdo */
+body.dark-mode .resource-section {
+    background-color: #1e293b !important;
+    border-left: 4px solid #10b981 !important; /* Mantém a cor verde */
+    border-top: 1px solid #334155 !important;
+    border-right: 1px solid #334155 !important;
+    border-bottom: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .resource-section h2,
+body.dark-mode .resource-section h3 {
+    color: #ffffff !important;
+}
+
+body.dark-mode .resource-section p {
+    color: #cbd5e1 !important; /* Texto de leitura confortável */
+}
+
+/* Caixa de Melhores Práticas (Verde) */
+body.dark-mode .resource-best-practices {
+    background-color: rgba(16, 185, 129, 0.1) !important; /* Verde muito escuro/transparente */
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+body.dark-mode .resource-best-practices h3 {
+    color: #34d399 !important; /* Verde claro vibrante */
+}
+
+body.dark-mode .resource-best-practices li {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .resource-best-practices i {
+    color: #34d399 !important;
+}
+
+/* Caixa de Avisos (Amarela/Laranja) */
+body.dark-mode .resource-warnings {
+    background-color: rgba(245, 158, 11, 0.1) !important; /* Laranja muito escuro/transparente */
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+body.dark-mode .resource-warnings h3 {
+    color: #fbbf24 !important; /* Amarelo vibrante */
+}
+
+body.dark-mode .resource-warnings li {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .resource-warnings i {
+    color: #fbbf24 !important;
+}
+
+/* Botões de Ação */
+body.dark-mode .resource-btn-secondary {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #475569 !important;
+}
+
+body.dark-mode .resource-btn-secondary:hover {
+    background-color: #475569 !important;
+}
+
+/* Caixa CTA Final (Azul) */
+body.dark-mode .resource-cta-box {
+    background-color: rgba(37, 99, 235, 0.1) !important;
+    border: 1px solid rgba(37, 99, 235, 0.3) !important;
+}
+
+body.dark-mode .resource-cta-box h3 {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .resource-cta-box p {
+    color: #cbd5e1 !important;
+}
