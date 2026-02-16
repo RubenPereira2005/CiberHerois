@@ -1,0 +1,191 @@
+<!--Nao esta a ser usada para ja e nao tem css-->
+
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notícias - CiberHeróis</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="news-page">
+
+    <nav class="news-navbar">
+        <div class="news-navbar-inner">
+            <a href="dashboard.html" class="news-brand">CiberHeróis</a>
+            
+            <div class="news-nav-links">
+                <a href="resources.html" class="news-nav-link">Recursos</a>
+                <a href="dashboard.html" class="news-nav-link active">Quizzes</a>
+            </div>
+
+            <div class="news-navbar-actions">
+                <button class="news-navbar-btn" title="Alternar Modo">
+                    <i data-lucide="sun" style="width: 20px; height: 20px;"></i>
+                </button>
+
+                <button class="news-navbar-btn" title="Pesquisar">
+                    <i data-lucide="search" style="width: 20px; height: 20px;"></i>
+                </button>
+
+
+                <!-- Vai ter de ser mudado -->
+                <div class="news-level-badge">
+                    <i data-lucide="trophy" style="width: 16px; height: 16px; color: #fbbf24;"></i>
+                    <div>
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;">Nível 2</div>
+                        <div style="font-size: 10px;">150 pts</div>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="news-navbar-btn" title="Ver Perfil">
+                    <i data-lucide="user" style="width: 20px; height: 20px;"></i>
+                </a>
+
+                <a href="index.html" class="news-navbar-btn" title="Sair">
+                    <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="news-container">
+        <div class="news-header">
+            <h1 class="news-title">Notícias de Cibersegurança</h1>
+            <p class="news-subtitle">
+                Mantenha-se atualizado com as últimas notícias e tendências em segurança digital
+            </p>
+        </div>
+
+        <div class="alert-banner">
+            <div class="alert-content">
+                <i data-lucide="alert-triangle" class="alert-icon"></i>
+                <div class="alert-text">
+                    <h3>Alerta de Segurança</h3>
+                    <p>
+                        Foi identificada uma nova campanha de phishing direcionada a utilizadores portugueses. 
+                        Esteja atento a emails suspeitos e não clique em links desconhecidos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="news-main">
+            <div class="news-feed">
+                
+                <div class="news-card alert">
+                    <div class="news-card-body">
+                        <div class="news-card-header">
+                            <span class="news-badge alert">Alerta</span>
+                            <span class="news-badge-urgent">
+                                <i data-lucide="alert-triangle" style="width: 12px; height: 12px;"></i>
+                                Urgente
+                            </span>
+                        </div>
+                        <h3 class="news-card-title">Nova Vulnerabilidade Descoberta em Browsers Populares</h3>
+                        <p class="news-card-desc">Especialistas em segurança descobriram uma falha crítica que afeta milhões de utilizadores.</p>
+                        <div class="news-card-footer">
+                            <div class="news-card-meta">
+                                <div class="news-card-meta-item">
+                                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i> 5 min
+                                </div>
+                                <span>09/12/2025</span>
+                            </div>
+                            <a href="#" class="news-card-link">Ler mais →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-card-body">
+                        <div class="news-card-header">
+                            <span class="news-badge trend">Tendências</span>
+                        </div>
+                        <h3 class="news-card-title">Aumento de 40% em Ataques de Phishing</h3>
+                        <p class="news-card-desc">Relatório anual mostra crescimento significativo em tentativas de phishing através de email.</p>
+                        <div class="news-card-footer">
+                            <div class="news-card-meta">
+                                <div class="news-card-meta-item">
+                                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i> 7 min
+                                </div>
+                                <span>08/12/2025</span>
+                            </div>
+                            <a href="#" class="news-card-link">Ler mais →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card">
+                    <div class="news-card-body">
+                        <div class="news-card-header">
+                            <span class="news-badge guide">Guias</span>
+                        </div>
+                        <h3 class="news-card-title">Novas Recomendações para Passwords em 2025</h3>
+                        <p class="news-card-desc">Organizações de segurança atualizam diretrizes sobre gestão de passwords e autenticação.</p>
+                        <div class="news-card-footer">
+                            <div class="news-card-meta">
+                                <div class="news-card-meta-item">
+                                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i> 4 min
+                                </div>
+                                <span>07/12/2025</span>
+                            </div>
+                            <a href="#" class="news-card-link">Ler mais →</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="news-sidebar">
+                
+                <div class="news-widget">
+                    <h3 class="news-widget-title">
+                        <i data-lucide="trending-up" style="width: 18px; height: 18px;"></i>
+                        Tópicos em Destaque
+                    </h3>
+                    <div class="news-topics">
+                        <div class="topic-item">
+                            <span class="topic-name">Ransomware</span>
+                            <span class="topic-count">15 artigos</span>
+                        </div>
+                        <div class="topic-item">
+                            <span class="topic-name">Autenticação 2FA</span>
+                            <span class="topic-count">13 artigos</span>
+                        </div>
+                        <div class="topic-item">
+                            <span class="topic-name">Phishing</span>
+                            <span class="topic-count">11 artigos</span>
+                        </div>
+                        <div class="topic-item">
+                            <span class="topic-name">VPN</span>
+                            <span class="topic-count">9 artigos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-widget newsletter-widget">
+                    <h3 class="news-widget-title newsletter-widget-title">Newsletter Semanal</h3>
+                    <p class="newsletter-desc">
+                        Receba as principais notícias de cibersegurança diretamente no seu email
+                    </p>
+                    <input
+                        type="email"
+                        placeholder="seu@email.com"
+                        class="newsletter-input"
+                    />
+                    <button class="newsletter-btn">
+                        Subscrever
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

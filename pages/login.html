@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="login-page">
+
+    <div class="login-wrapper">
+        <div class="login-box">
+            <div class="login-header">
+                <h2 class="login-title">CiberHeróis</h2>
+            </div>
+
+            <h3 class="login-subtitle">Iniciar Sessão</h3>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="loginEmail" required class="form-input" placeholder="exemplo@email.com" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="loginPassword" required class="form-input" placeholder="••••••••" />
+                        <button type="button" onclick="togglePassword()" class="password-toggle-btn">
+                            <i data-lucide="eye" id="eyeIcon" class="icon-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <a href="forgot-password.html" class="forgot-password-link">Esqueci-me da palavra-passe</a>
+
+                <button type="submit" class="login-btn">Entrar</button>
+
+                <p class="login-link">
+                    Não tem uma conta? <a href="register.html" class="link-highlight">Criar conta</a>
+                </p>
+
+                <p class="back-link">
+                    <i data-lucide="arrow-left"></i>
+                    <a href="index.html" class="link-highlight">Voltar à página inicial</a>
+                </p>
+            </form>
+        </div>
+
+        <div id="toast-container" class="toast-container">
+        <div class="toast-content">
+            <i id="toast-icon-element" data-lucide="alert-circle" class="toast-icon"></i>
+            <span id="toast-message-element" class="toast-message">Mensagem Erro login</span>
+        </div>
+        <div class="toast-progress"></div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const toastContainer = document.getElementById('toast-container');
+        const toastMessage = document.getElementById('toast-message-element');
+        const toastIcon = document.getElementById('toast-icon-element');
+
+        // --- FUNÇÃO SHOW TOAST ---
+        function showToast(mensagem, tipo = 'error') {
+            toastMessage.textContent = mensagem;
+            toastContainer.className = `toast-container active ${tipo}`;
+
+            const iconName = tipo === 'success' ? 'check-circle' : 'alert-circle';
+            toastIcon.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toastContainer.classList.remove('active');
+            }, 3300);
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('loginPassword');
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                // Mesmo que o servidor mande erro, não precisamos de ler o JSON para mostrar o erro ao utilizador
+                // Mas lemos caso precises de fazer debug na consola
+                const data = await response.json(); 
+
+                if (response.ok) {
+                    // Sucesso
+                    sessionStorage.setItem('showLoginToast', 'true'); 
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // ERRO DE LOGIN
+                    showToast("Email ou palavra-passe incorretos.", 'error');
+                
+                }
+
+            } catch (err) {
+                // Erro de rede/servidor desligado
+                showToast("Erro de conexão com o servidor.", 'error');
+            }
+        });
+    </script>
+</body>
+</html>

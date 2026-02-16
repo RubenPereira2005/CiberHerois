@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursos Educativos - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="site-body">
+
+    <nav class="auth-navbar">
+        <div class="auth-navbar-inner">
+            
+            <div class="auth-navbar-left">
+                <a href="dashboard.html" class="auth-brand">
+                    CiberHeróis
+                </a>
+                
+                <div class="auth-navbar-menu">
+                    <a href="resources.html" class="auth-navbar-link auth-navbar-link-active">
+                        Recursos
+                    </a>
+                    
+                    <a href="dashboard.html" class="auth-navbar-link">
+                        Quizzes
+                    </a>
+                </div>
+            </div>
+
+            <div class="auth-navbar-right">
+                <button class="auth-navbar-btn" id="theme-toggle">
+                    <i data-lucide="sun" class="auth-navbar-icon"></i>
+                </button>
+
+                <button class="auth-navbar-btn">
+                    <i data-lucide="search" class="auth-navbar-icon"></i>
+                </button>
+
+                <div class="auth-navbar-badge">
+                    <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
+                    <div class="auth-navbar-badge-content">
+                        <span class="auth-navbar-badge-label">Nível 2</span>
+                        <span class="auth-navbar-badge-value">150 pts</span>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
+                    <i data-lucide="user" class="auth-navbar-icon"></i>
+                </a>
+
+                <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
+                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container resources-container">
+        <div class="resources-header">
+            <h1 class="resources-title">Recursos Educativos</h1>
+            <p class="resources-subtitle">
+                Materiais e guias para aprofundar o seu conhecimento em cibersegurança
+            </p>
+        </div>
+
+        <div class="resources-section">
+            <h2 class="resources-section-title">Todos os Recursos</h2>
+            <div class="resources-grid">
+                
+                <div class="resource-card resource-card-green">
+                    <div class="resource-card-top"></div>
+                    <div class="resource-card-content">
+                        <div class="resource-card-header">
+                            <div class="resource-card-icon resource-card-icon-green">
+                                <i data-lucide="book-open"></i>
+                            </div>
+                            <div class="resource-card-text">
+                                <div class="resource-card-label">Guia</div>
+                                <h3 class="resource-card-title">Introdução ao HTTPS</h3>
+                                <p class="resource-card-description">Aprenda como o HTTPS protege as comunicações e certificados SSL.</p>
+                            </div>
+                        </div>
+                        <div class="resource-card-actions">
+                            <a href="resource-detail.html" class="resource-card-btn resource-card-btn-primary">
+                                <i data-lucide="external-link"></i>
+                                Ver
+                            </a>
+                            <button class="resource-card-btn resource-card-btn-secondary">
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card resource-card-blue">
+                    <div class="resource-card-top"></div>
+                    <div class="resource-card-content">
+                        <div class="resource-card-header">
+                            <div class="resource-card-icon resource-card-icon-blue">
+                                <i data-lucide="video"></i>
+                            </div>
+                            <div class="resource-card-text">
+                                <div class="resource-card-label">Vídeo</div>
+                                <h3 class="resource-card-title">Passwords Fortes</h3>
+                                <p class="resource-card-description">Tutorial completo sobre criação de passwords robustas.</p>
+                            </div>
+                        </div>
+                        <div class="resource-card-actions">
+                            <button class="resource-card-btn resource-card-btn-primary">
+                                <i data-lucide="external-link"></i>
+                                Ver
+                            </button>
+                            <button class="resource-card-btn resource-card-btn-secondary">
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card resource-card-red">
+                    <div class="resource-card-top"></div>
+                    <div class="resource-card-content">
+                        <div class="resource-card-header">
+                            <div class="resource-card-icon resource-card-icon-red">
+                                <i data-lucide="book-open"></i>
+                            </div>
+                            <div class="resource-card-text">
+                                <div class="resource-card-label">Guia Interativo</div>
+                                <h3 class="resource-card-title">Evitar Phishing</h3>
+                                <p class="resource-card-description">Aprenda a reconhecer emails e sites fraudulentos.</p>
+                            </div>
+                        </div>
+                        <div class="resource-card-actions">
+                            <button class="resource-card-btn resource-card-btn-primary">
+                                <i data-lucide="external-link"></i>
+                                Ver
+                            </button>
+                            <button class="resource-card-btn resource-card-btn-secondary">
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card resource-card-purple">
+                    <div class="resource-card-top"></div>
+                    <div class="resource-card-content">
+                        <div class="resource-card-header">
+                            <div class="resource-card-icon resource-card-icon-purple">
+                                <i data-lucide="file-text"></i>
+                            </div>
+                            <div class="resource-card-text">
+                                <div class="resource-card-label">Artigo</div>
+                                <h3 class="resource-card-title">Wi-Fi Público</h3>
+                                <p class="resource-card-description">Os perigos das redes públicas e como navegar de forma segura.</p>
+                            </div>
+                        </div>
+                        <div class="resource-card-actions">
+                            <button class="resource-card-btn resource-card-btn-primary">
+                                <i data-lucide="external-link"></i>
+                                Ver
+                            </button>
+                            <button class="resource-card-btn resource-card-btn-secondary">
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card resource-card-yellow">
+                    <div class="resource-card-top"></div>
+                    <div class="resource-card-content">
+                        <div class="resource-card-header">
+                            <div class="resource-card-icon resource-card-icon-yellow">
+                                <i data-lucide="file-text"></i>
+                            </div>
+                            <div class="resource-card-text">
+                                <div class="resource-card-label">PDF</div>
+                                <h3 class="resource-card-title">Proteção de Dados</h3>
+                                <p class="resource-card-description">Compreenda os seus direitos de proteção de dados e RGPD.</p>
+                            </div>
+                        </div>
+                        <div class="resource-card-actions">
+                            <button class="resource-card-btn resource-card-btn-primary">
+                                <i data-lucide="external-link"></i>
+                                Ver
+                            </button>
+                            <button class="resource-card-btn resource-card-btn-secondary">
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card resource-card-orange">
+                    <div class="resource-card-top"></div>
+                    <div class="resource-card-content">
+                        <div class="resource-card-header">
+                            <div class="resource-card-icon resource-card-icon-orange">
+                                <i data-lucide="book-open"></i>
+                            </div>
+                            <div class="resource-card-text">
+                                <div class="resource-card-label">Guia Ilustrado</div>
+                                <h3 class="resource-card-title">Tipos de Malware</h3>
+                                <p class="resource-card-description">Conheça vírus, ransomware, spyware e como se proteger.</p>
+                            </div>
+                        </div>
+                        <div class="resource-card-actions">
+                            <button class="resource-card-btn resource-card-btn-primary">
+                                <i data-lucide="external-link"></i>
+                                Ver
+                            </button>
+                            <button class="resource-card-btn resource-card-btn-secondary">
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="game-banner">
+            <div class="game-banner-inner">
+                <div class="game-banner-avatar">
+                    <div class="game-banner-avatar-icon">
+                        <i data-lucide="gamepad-2"></i>
+                    </div>
+                </div>
+                <div class="game-banner-content">
+                    <h3 class="game-banner-title">
+                        Jogo: Detetor de Phishing
+                    </h3>
+                    <p class="game-banner-description">
+                        Teste as suas habilidades! Analise emails reais e identifique tentativas de phishing. Ganhe pontos por cada identificação correta.
+                    </p>
+                    <a href="phishing.html" class="game-banner-btn">
+                        <i data-lucide="gamepad-2"></i>
+                        Jogar Agora
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="suggestion-section">
+            <h2 class="suggestion-section-title">
+                Tem sugestões de recursos?
+            </h2>
+            <p class="suggestion-section-description">
+                Ajude-nos a melhorar a nossa biblioteca de recursos educativos
+            </p>
+            <button class="suggestion-section-btn">
+                Enviar Sugestão
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

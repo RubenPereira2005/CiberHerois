@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CiberHeróis - Aprenda Cibersegurança</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="site-body">
+
+    <nav class="navbar">
+        <div class="container navbar-inner">
+            <div class="nav-left">
+                <span class="site-title">CiberHeróis</span>
+            </div>
+
+            <div class="nav-right">
+                <button class="icon-btn" id="theme-toggle" title="Alternar Modo">
+                    <i data-lucide="sun" class="icon-sm"></i>
+                </button>
+
+                <button class="icon-btn">
+                    <i data-lucide="search" class="icon-sm"></i>
+                </button>
+
+                <a href="login.html" class="icon-btn">
+                    <i data-lucide="user" class="icon-sm"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-content">
+        <section class="index-section">
+            <div class="index-left">
+                <p class="highlight">A melhor forma de aprender</p>
+                <h1 class="index-title">CiberHeróis</h1>
+                <h2 class="index-subtitle">Aprenda cibersegurança como um verdadeiro herói</h2>
+                <p class="lead">Aprenda cibersegurança de forma interativa e divertida. Complete quizzes, ganhe medalhas e torne-se um expert em segurança digital.</p>
+                <div class="cta-group">
+                    <a href="register.html" class="btn btn-primary">Começar Agora</a>
+                    <a href="login.html" class="btn btn-secondary">Iniciar Sessão</a>
+                </div>
+            </div>
+
+            <aside class="index-right">
+                <div class="panel-bubbles" aria-hidden="true">
+                    <div class="bubble" style="left:20%; top:30%"></div>
+                    <div class="bubble" style="left:80%; top:60%"></div>
+                    <div class="bubble" style="left:50%; top:10%"></div>
+                </div>
+
+                <div class="panel-content">
+                    <div class="shield-circle">
+                        <i data-lucide="shield" class="icon-lg"></i>
+                    </div>
+                    <h3 class="panel-title">Proteção Digital</h3>
+                    <p class="panel-desc">Aprenda a proteger-se online</p>
+                </div>
+            </aside>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon blue">
+                    <i data-lucide="book-open" class="icon-sm white"></i>
+                </div>
+                <h3 class="feature-title">Aprendizagem Interativa</h3>
+                <p class="feature-desc">Quizzes dinâmicos sobre temas essenciais de cibersegurança</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon purple">
+                    <i data-lucide="trophy" class="icon-sm white"></i>
+                </div>
+                <h3 class="feature-title">Sistema de Gamificação</h3>
+                <p class="feature-desc">Ganhe pontos, suba de nível e conquiste medalhas especiais</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon green">
+                    <i data-lucide="award" class="icon-sm white"></i>
+                </div>
+                <h3 class="feature-title">Progresso Personalizado</h3>
+                <p class="feature-desc">Acompanhe o seu desenvolvimento e áreas de melhoria</p>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-panel">
+                <h2 class="cta-title">Pronto para começar?</h2>
+                <p class="cta-text">Junte-se a milhares de utilizadores que já estão a aprender cibersegurança</p>
+                <button onclick="window.location.href='register.html'" class="btn btn-white">Criar Conta Grátis</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>© 2025 CiberHeróis. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

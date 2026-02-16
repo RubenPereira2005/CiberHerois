@@ -1,0 +1,311 @@
+<!--Ainda sem css e a nao ser usado-->
+
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detetor de Phishing - CiberHeróis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="dashboard.html" class="text-xl font-bold tracking-tight hover:opacity-90 transition-opacity">
+                    CiberHeróis
+                </a>
+                <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <a href="resources.html" class="hover:text-blue-200 transition-colors opacity-90">Recursos</a>
+                    <a href="dashboard.html" class="hover:text-blue-200 transition-colors opacity-90">Quizzes</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-3 bg-blue-700 px-4 py-1.5 rounded-lg border border-blue-500/30 shadow-sm">
+                    <i data-lucide="trophy" class="w-4 h-4 text-yellow-300"></i>
+                    <div class="flex flex-col leading-none">
+                        <span class="text-xs font-bold text-blue-100 uppercase tracking-wide">Nível 2</span>
+                        <span class="text-[10px] text-blue-200">150 pts</span>
+                    </div>
+                </div>
+                <a href="profile.html" class="p-2 hover:bg-blue-700 rounded-full transition-colors" title="Ver Perfil">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </a>
+                <a href="index.html" class="p-2 hover:bg-blue-700 rounded-full transition-colors text-blue-200 hover:text-white" title="Sair">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="game-container" class="max-w-4xl mx-auto px-6 py-12">
+        <a href="dashboard.html" class="flex items-center gap-2 mb-6 text-blue-600 hover:text-blue-700 transition-colors font-medium">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            Voltar ao Dashboard
+        </a>
+
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-red-100 p-3 rounded-full">
+                    <i data-lucide="mail" class="text-red-600 w-8 h-8"></i>
+                </div>
+                <h1 class="text-gray-900 text-3xl font-bold">
+                    Detetor de Phishing
+                </h1>
+            </div>
+            <p class="text-gray-600 mb-4 text-lg">
+                Analise cada email e identifique se é <strong>Legítimo</strong> ou <strong>Phishing</strong>.
+            </p>
+
+            <div class="flex items-center justify-between text-sm font-medium mb-2">
+                <span class="text-gray-600" id="progress-text">Email 1 de 5</span>
+                <span class="text-blue-600 font-bold" id="score-text">Pontuação: 0</span>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-blue-600 h-3 rounded-full transition-all duration-300 shadow-md" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-200">
+            <div class="bg-gray-50 border-b border-gray-200 p-5">
+                <div class="mb-3 flex flex-wrap gap-2">
+                    <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider w-16">De:</span>
+                    <span id="email-from" class="text-gray-900 font-mono text-sm bg-gray-200 px-2 py-0.5 rounded">...</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider w-16">Assunto:</span>
+                    <span id="email-subject" class="text-gray-900 font-medium">...</span>
+                </div>
+            </div>
+
+            <div class="p-8 bg-white">
+                <pre id="email-body" class="text-gray-700 whitespace-pre-wrap font-sans text-base leading-relaxed">...</pre>
+            </div>
+        </div>
+
+        <div id="feedback-area" class="hidden border rounded-xl p-6 mb-6 shadow-sm animate-fade-in">
+            <h3 id="feedback-title" class="mb-4 flex items-center gap-2 text-xl font-bold">
+                </h3>
+            <p id="feedback-message" class="text-gray-800 mb-4 font-medium text-lg">
+                </p>
+            <div class="bg-white/50 p-4 rounded-lg">
+                <p class="text-gray-500 mb-3 font-semibold text-xs uppercase tracking-wide">
+                    Análise Detalhada:
+                </p>
+                <ul id="feedback-list" class="space-y-2 text-gray-700">
+                    </ul>
+            </div>
+        </div>
+
+        <div id="action-buttons" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button onclick="checkAnswer(false)" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-3 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+                Email Legítimo
+            </button>
+            <button onclick="checkAnswer(true)" class="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-3 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                É Phishing!
+            </button>
+        </div>
+
+        <button id="next-button" onclick="nextEmail()" class="hidden w-full bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition-colors font-bold shadow-lg text-lg flex items-center justify-center gap-2">
+            Próximo Email <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+
+        <div class="bg-blue-50 rounded-xl p-6 mt-12 border border-blue-100">
+            <h3 class="text-blue-900 mb-3 flex items-center gap-2 font-bold">
+                <i data-lucide="info" class="text-blue-600 w-5 h-5"></i>
+                Dicas Rápidas
+            </h3>
+            <ul class="text-blue-800 space-y-2 text-sm list-disc list-inside opacity-90">
+                <li>Verifique sempre o remetente (erros ortográficos são comuns).</li>
+                <li>Desconfie de urgência ("Sua conta será bloqueada em 24h").</li>
+                <li>Nunca clique em links sem verificar o destino real.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="results-container" class="hidden min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full border border-gray-100 transform transition-all scale-100">
+            <div class="mb-6 flex justify-center animate-bounce">
+                <div class="bg-yellow-100 p-6 rounded-full">
+                    <i data-lucide="trophy" class="w-16 h-16 text-yellow-500"></i>
+                </div>
+            </div>
+
+            <h2 class="text-gray-900 text-3xl mb-2 font-bold">
+                Jogo Completo!
+            </h2>
+            <p id="final-score-text" class="text-gray-500 mb-8 text-lg">
+                Identificou corretamente X de Y emails
+            </p>
+
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 mb-8 shadow-inner text-white">
+                <span class="block text-blue-200 text-sm uppercase tracking-wide font-semibold mb-1">Total Ganho</span>
+                <p id="final-points" class="text-4xl font-bold">
+                    0 pts
+                </p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="location.reload()" class="bg-blue-600 text-white px-6 py-3.5 rounded-xl hover:bg-blue-700 transition-colors font-bold shadow-lg">
+                    Jogar Novamente
+                </button>
+                <a href="dashboard.html" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-6 py-3.5 rounded-xl transition-colors font-medium">
+                    Voltar ao Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos Emails
+        const emails = [
+            {
+                id: 1,
+                from: 'noreply@paypa1-security.com',
+                subject: 'URGENTE: Verifique a sua conta imediatamente!',
+                body: `Prezado cliente,\n\nDetectamos atividade suspeita na sua conta PayPal. A sua conta será suspensa em 24 horas se não verificar os seus dados imediatamente.\n\nClique aqui para verificar: http://paypa1-verify.com/secure\n\nAtenciosamente,\nEquipe PayPal`,
+                isPhishing: true,
+                indicators: ['Domínio suspeito (paypa1 em vez de paypal)', 'Senso de urgência excessivo', 'Link suspeito', 'Ameaça de suspensão']
+            },
+            {
+                id: 2,
+                from: 'notifications@linkedin.com',
+                subject: 'João Silva visualizou o seu perfil',
+                body: `Olá,\n\nJoão Silva e 3 outras pessoas visualizaram o seu perfil esta semana.\n\nVeja quem está interessado no seu perfil profissional.\n\nVer perfil: https://www.linkedin.com/notifications\n\nCumprimentos,\nEquipa LinkedIn`,
+                isPhishing: false,
+                indicators: ['Domínio oficial do LinkedIn', 'Sem senso de urgência', 'Link para o site oficial', 'Formatação profissional']
+            },
+            {
+                id: 3,
+                from: 'suporte@banco-santander.urgent.tk',
+                subject: 'Confirmação de Transferência de €5.000',
+                body: `Caro Cliente,\n\nFoi realizada uma transferência de €5.000 da sua conta.\n\nSe não reconhece esta operação, clique AQUI IMEDIATAMENTE para cancelar.\n\nTEMPO RESTANTE: 15 minutos\n\nBanco Santander\nDepartamento de Segurança`,
+                isPhishing: true,
+                indicators: ['Domínio suspeito (.tk)', 'Urgência extrema', 'Valor alto para causar pânico', 'Solicitação de ação imediata']
+            },
+            {
+                id: 4,
+                from: 'noreply@amazon.pt',
+                subject: 'A sua encomenda #302-8394712 foi enviada',
+                body: `Olá,\n\nA sua encomenda foi enviada e chegará em 2-3 dias úteis.\n\nDetalhes da encomenda:\n- 1x Livro "Cibersegurança para Todos"\n\nPode acompanhar a sua encomenda através da sua conta Amazon.\n\nAcompanhar encomenda: https://www.amazon.pt/orders\n\nObrigado por comprar na Amazon!`,
+                isPhishing: false,
+                indicators: ['Domínio oficial da Amazon', 'Link para o site oficial', 'Sem urgência', 'Formato profissional']
+            },
+            {
+                id: 5,
+                from: 'admin@microsofft-security.net',
+                subject: 'A sua subscrição expirou',
+                body: `Caro utilizador,\n\nA sua password expirou hoje. Para manter o acesso, deve fazer login imediatamente no link abaixo, caso contrário perderá todos os seus ficheiros.\n\nhttp://microsofft-update.net/login\n\nObrigado,\nAdmin`,
+                isPhishing: true,
+                indicators: ['Erro ortográfico (microsofft)', 'Ameaça de perda de dados', 'Link não oficial', 'Urgência desnecessária']
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        // Iniciar Ícones
+        lucide.createIcons();
+
+        // Renderizar primeiro email
+        renderEmail();
+
+        function renderEmail() {
+            const email = emails[currentIndex];
+            document.getElementById('email-from').textContent = email.from;
+            document.getElementById('email-subject').textContent = email.subject;
+            document.getElementById('email-body').textContent = email.body;
+            
+            // Atualizar Progresso
+            document.getElementById('progress-text').textContent = `Email ${currentIndex + 1} de ${emails.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / emails.length) * 100}%`;
+            document.getElementById('score-text').textContent = `Pontuação: ${score}`;
+
+            // Reset da UI
+            document.getElementById('feedback-area').classList.add('hidden');
+            document.getElementById('action-buttons').classList.remove('hidden');
+            document.getElementById('next-button').classList.add('hidden');
+            
+            // Check para ver se o email tem indicadores de formatação especiais
+            if(email.isPhishing) {
+                // Lógica visual opcional aqui
+            }
+            
+            answered = false;
+        }
+
+        function checkAnswer(userSaysPhishing) {
+            if (answered) return;
+            answered = true;
+
+            const email = emails[currentIndex];
+            const isCorrect = userSaysPhishing === email.isPhishing;
+            
+            if (isCorrect) score++;
+
+            // Atualizar UI
+            document.getElementById('action-buttons').classList.add('hidden');
+            document.getElementById('next-button').classList.remove('hidden');
+
+            // Preparar Feedback
+            const feedbackArea = document.getElementById('feedback-area');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const feedbackList = document.getElementById('feedback-list');
+
+            feedbackArea.classList.remove('hidden');
+            // Remove classes antigas e adiciona novas baseadas no resultado
+            feedbackArea.className = `border rounded-xl p-6 mb-6 shadow-sm animate-fade-in ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
+
+            feedbackTitle.innerHTML = isCorrect 
+                ? `<i data-lucide="check-circle" class="text-green-600 w-6 h-6"></i> <span class="text-green-800">Correto!</span>`
+                : `<i data-lucide="x-circle" class="text-red-600 w-6 h-6"></i> <span class="text-red-800">Incorreto!</span>`;
+            
+            feedbackMessage.innerHTML = `Este email é <strong>${email.isPhishing ? 'PHISHING (Perigoso)' : 'LEGÍTIMO (Seguro)'}</strong>.`;
+            
+            if(isCorrect) {
+                feedbackMessage.className = "text-green-800 mb-4 font-medium text-lg";
+            } else {
+                feedbackMessage.className = "text-red-800 mb-4 font-medium text-lg";
+            }
+
+            // Lista de Indicadores
+            feedbackList.innerHTML = email.indicators.map(ind => 
+                `<li class="flex items-start gap-2"><i data-lucide="${email.isPhishing ? 'alert-triangle' : 'check'}" class="${email.isPhishing ? 'text-red-500' : 'text-green-500'} w-4 h-4 mt-1"></i> <span>${ind}</span></li>`
+            ).join('');
+
+            // Re-renderizar ícones para o HTML injetado
+            lucide.createIcons();
+            
+            // Atualizar pontuação no topo imediatamente
+            document.getElementById('score-text').textContent = `Pontuação: ${score}`;
+        }
+
+        function nextEmail() {
+            if (currentIndex < emails.length - 1) {
+                currentIndex++;
+                renderEmail();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('results-container').classList.remove('hidden');
+            
+            document.getElementById('final-score-text').textContent = `Identificou corretamente ${score} de ${emails.length} emails`;
+            document.getElementById('final-points').textContent = `${score * 20} pts`;
+            
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

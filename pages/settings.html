@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Definições - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="site-body">
+
+    <nav class="auth-navbar">
+        <div class="auth-navbar-inner">
+            <div class="auth-navbar-left">
+                <a href="dashboard.html" class="auth-brand">CiberHeróis</a>
+                <div class="auth-navbar-menu">
+                    <a href="resources.html" class="auth-navbar-link">Recursos</a>
+                    <a href="dashboard.html" class="auth-navbar-link">Quizzes</a>
+                </div>
+            </div>
+
+            <div class="auth-navbar-right">
+                <button class="auth-navbar-btn" id="theme-toggle">
+                    <i data-lucide="sun" class="auth-navbar-icon"></i>
+                </button>
+                
+                <div class="auth-navbar-badge">
+                    <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
+                    <div class="auth-navbar-badge-content">
+                        <span class="auth-navbar-badge-label">Nível 2</span>
+                        <span class="auth-navbar-badge-value">150 pts</span>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
+                    <i data-lucide="user" class="auth-navbar-icon"></i>
+                </a>
+
+                <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
+                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        
+        <div class="settings-header">
+            <a href="profile.html" class="back-link-simple">
+                <i data-lucide="arrow-left"></i> Voltar ao Perfil
+            </a>
+            <h1 class="page-title">Definições da Conta</h1>
+            <p class="page-lead">Gere os teus dados pessoais e segurança.</p>
+        </div>
+
+        <div class="settings-grid">
+            
+            <div class="profile-card">
+                <div class="settings-card-header">
+                    <div class="settings-icon-wrapper blue">
+                        <i data-lucide="user"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-card-title">Dados Pessoais</h2>
+                        <p class="settings-card-desc">Atualiza o teu nome e contacto.</p>
+                    </div>
+                </div>
+
+                <form id="profile-form" class="settings-form">
+                    <div class="form-group">
+                        <label class="form-label">Nome de Utilizador</label>
+                        <input type="text" class="form-input" id="settings-name" placeholder="O teu nome" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-wrapper-locked">
+                            <input type="email" class="form-input locked" id="settings-email" readonly>
+                            <i data-lucide="lock" class="lock-icon"></i>
+                        </div>
+                        <p class="field-hint">O email não pode ser alterado por motivos de segurança.</p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="profile-card">
+                <div class="settings-card-header">
+                    <div class="settings-icon-wrapper purple">
+                        <i data-lucide="lock"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-card-title">Segurança</h2>
+                        <p class="settings-card-desc">Altera a tua palavra-passe.</p>
+                    </div>
+                </div>
+
+                <form id="security-form" class="settings-form">
+                    <div class="form-group">
+                        <label class="form-label">Palavra-passe Atual</label>
+                        <input type="password" class="form-input" placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nova Palavra-passe</label>
+                        <input type="password" class="form-input" placeholder="Nova palavra-passe">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Atualizar Senha</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="profile-card danger-zone">
+                <div class="settings-card-header">
+                    <div class="settings-icon-wrapper red">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <div>
+                        <h2 class="settings-card-title text-red">Zona de Perigo</h2>
+                        <p class="settings-card-desc">Ações irreversíveis.</p>
+                    </div>
+                </div>
+                <div class="danger-actions">
+                    <button type="button" id="btn-delete-account" class="btn btn-danger-outline">Apagar Conta</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const nameInput = document.getElementById('settings-name');
+            const emailInput = document.getElementById('settings-email');
+            const profileForm = document.getElementById('profile-form');
+            const btnDelete = document.getElementById('btn-delete-account');
+
+            // --- 1. CARREGAR DADOS DO UTILIZADOR ---
+            try {
+                const response = await fetch('/api/me');
+                if (response.ok) {
+                    const data = await response.json();
+                    nameInput.value = data.nome || '';
+                    emailInput.value = data.email || '';
+                } else {
+                    console.error("Erro ao buscar dados do utilizador");
+                    // Opcional: Redirecionar para login se não estiver autenticado
+                }
+            } catch (e) {
+                console.error("Erro de conexão", e);
+            }
+
+            // --- 2. ATUALIZAR NOME (PUT) ---
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const novoNome = nameInput.value;
+                const btn = profileForm.querySelector('button[type="submit"]');
+                const originalText = btn.innerText;
+
+                // Feedback visual de carregamento
+                btn.innerText = "A guardar...";
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/update', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nome: novoNome })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert("Nome atualizado com sucesso!");
+                    } else {
+                        alert("Erro: " + (result.error || "Não foi possível atualizar."));
+                    }
+                } catch (error) {
+                    alert("Erro de conexão com o servidor.");
+                    console.error(error);
+                } finally {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            });
+
+            // --- 3. APAGAR CONTA (DELETE) ---
+            btnDelete.addEventListener('click', async () => {
+                const confirmacao = confirm("Tens a certeza absoluta?\n\nEsta ação irá apagar a tua conta e todo o teu progresso permanentemente. Não é possível recuperar.");
+
+                if (confirmacao) {
+                    try {
+                        const response = await fetch('/api/delete', {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            alert("A tua conta foi apagada. Esperamos ver-te novamente!");
+                            window.location.href = "index.html"; // Redireciona para a página inicial/login
+                        } else {
+                            const result = await response.json();
+                            alert("Erro ao apagar conta: " + (result.error || "Tenta novamente."));
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        alert("Erro de conexão ao tentar apagar a conta.");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="site-body">
+
+    <nav class="auth-navbar">
+        <div class="auth-navbar-inner">
+            
+            <div class="auth-navbar-left">
+                <a href="dashboard.html" class="auth-brand">CiberHeróis</a>
+                
+                <div class="auth-navbar-menu">
+                    <a href="resources.html" class="auth-navbar-link">Recursos</a>
+                    <a href="dashboard.html" class="auth-navbar-link auth-navbar-link-active">Quizzes</a>
+                </div>
+            </div>
+
+            <div class="auth-navbar-right">
+                <button class="auth-navbar-btn" id="theme-toggle">
+                    <i data-lucide="sun" class="auth-navbar-icon"></i>
+                </button>
+                <button class="auth-navbar-btn">
+                    <i data-lucide="search" class="auth-navbar-icon"></i>
+                </button>
+                <div class="auth-navbar-badge">
+                    <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
+                    <div class="auth-navbar-badge-content">
+                        <span class="auth-navbar-badge-label">Nível 2</span>
+                        <span class="auth-navbar-badge-value">150 pts</span>
+                    </div>
+                </div>
+                <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
+                    <i data-lucide="user" class="auth-navbar-icon"></i>
+                </a>
+                <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
+                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container dashboard-main">
+        <div class="mb-12">
+            <h1 class="page-title">Explora o teu conhecimento</h1>
+            <p class="page-lead">Completa quizzes, ganha pontos e medalhas enquanto aprendes sobre cibersegurança</p>
+        </div>
+
+        <div class="quiz-grid">
+            <div class="quiz-card">
+                <div class="card-top color-blue"></div>
+                <div class="card-body">
+                    <div class="card-row">
+                        <div class="card-icon color-blue"><i data-lucide="lock" class="icon-sm white"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">HTTPS e Protocolos</h3>
+                            <p class="card-desc">Aprende sobre comunicação segura na web</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-meta" id="count-https">A carregar...</span>
+                        <a href="quiz.html?cat=https" class="btn btn-primary btn-sm">Começar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="card-top color-purple"></div>
+                <div class="card-body">
+                    <div class="card-row">
+                        <div class="card-icon color-purple"><i data-lucide="key" class="icon-sm white"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Gestão de Passwords</h3>
+                            <p class="card-desc">Boas práticas para passwords fortes</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-meta" id="count-passwords">A carregar...</span>
+                        <a href="quiz.html?cat=passwords" class="btn btn-primary btn-sm">Começar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="card-top color-red"></div>
+                <div class="card-body">
+                    <div class="card-row">
+                        <div class="card-icon color-red"><i data-lucide="mail" class="icon-sm white"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Phishing</h3>
+                            <p class="card-desc">Identifica e evita ataques de engenharia social</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-meta" id="count-phishing">A carregar...</span>
+                        <a href="quiz.html?cat=phishing" class="btn btn-primary btn-sm">Começar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="card-top color-green"></div>
+                <div class="card-body">
+                    <div class="card-row">
+                        <div class="card-icon color-green"><i data-lucide="globe" class="icon-sm white"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Segurança de Rede</h3>
+                            <p class="card-desc">Protege a tua rede e conexões Wi-Fi</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-meta" id="count-network">A carregar...</span>
+                        <a href="quiz.html?cat=network" class="btn btn-primary btn-sm">Começar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="card-top color-orange"></div>
+                <div class="card-body">
+                    <div class="card-row">
+                        <div class="card-icon color-orange"><i data-lucide="database" class="icon-sm white"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Proteção de Dados</h3>
+                            <p class="card-desc">Mantém os teus dados seguros e privados</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-meta" id="count-data">A carregar...</span>
+                        <a href="quiz.html?cat=data" class="btn btn-primary btn-sm">Começar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="card-top color-pink"></div>
+                <div class="card-body">
+                    <div class="card-row">
+                        <div class="card-icon color-pink"><i data-lucide="shield" class="icon-sm white"></i></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Malware e Vírus</h3>
+                            <p class="card-desc">Defende-te contra software malicioso</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-meta" id="count-malware">A carregar...</span>
+                        <a href="quiz.html?cat=malware" class="btn btn-primary btn-sm">Começar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-banner">
+            <div class="game-banner-inner">
+                <div class="game-banner-avatar">
+                    <div class="game-banner-avatar-icon">
+                        <i data-lucide="gamepad-2"></i>
+                    </div>
+                </div>
+                <div class="game-banner-content">
+                    <h3 class="game-banner-title">Jogo: Detetor de Phishing</h3>
+                    <p class="game-banner-description">Teste as suas habilidades! Analise emails reais e identifique tentativas de phishing. Ganhe pontos por cada identificação correta.</p>
+                    <a href="phishing.html" class="game-banner-btn">
+                        <i data-lucide="gamepad-2"></i> Jogar Agora
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="suggestion-section">
+            <h2 class="suggestion-section-title">Tem sugestões de recursos?</h2>
+            <p class="suggestion-section-description">Ajude-nos a melhorar a nossa biblioteca de recursos educativos</p>
+            <button class="suggestion-section-btn">Enviar Sugestão</button>
+        </div>
+
+        <div id="toast-container" class="toast-container">
+            <div class="toast-content">
+                <i data-lucide="check-circle" class="toast-icon"></i>
+                <span class="toast-message">Login bem-sucedido!</span>
+            </div>
+            <div class="toast-progress"></div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Lógica do Toast de Login
+        document.addEventListener('DOMContentLoaded', () => {
+            const toast = document.getElementById('toast-container');
+            const shouldShow = sessionStorage.getItem('showLoginToast');
+
+            if (shouldShow === 'true' && toast) {
+                setTimeout(() => { toast.classList.add('active'); }, 300);
+                sessionStorage.removeItem('showLoginToast');
+                setTimeout(() => { toast.classList.remove('active'); }, 3500);
+            } else if (toast) {
+                toast.remove();
+            }
+
+            // Arrancar a busca do número de perguntas
+            loadQuizSummary();
+        });
+
+        // Função para ir buscar a contagem de perguntas à Base de Dados
+        async function loadQuizSummary() {
+            try {
+                const response = await fetch('/api/quiz/summary/all');
+                if (!response.ok) throw new Error('Falha ao obter dados');
+                
+                const data = await response.json(); // Array com {categoria, total_questoes}
+                
+                // Atualizar o HTML para cada categoria existente na base de dados
+                data.forEach(item => {
+                    const spanElement = document.getElementById(`count-${item.categoria}`);
+                    if (spanElement) {
+                        // Se houver mais de 5 perguntas, limitamos o texto a 5 (o limite do quiz).
+                        const numQuestoes = item.total_questoes > 5 ? 5 : item.total_questoes;
+                        
+                        // Podes até adicionar um toque especial para o utilizador saber que é dinâmico:
+                        spanElement.textContent = `${numQuestoes} questões`;
+                    }
+                });
+                // Para as categorias que ainda não estão na Base de Dados, colocar 0
+                const allSpans = document.querySelectorAll('.card-meta');
+                allSpans.forEach(span => {
+                    if (span.textContent === 'A carregar...') {
+                        span.textContent = 'Em breve'; // Ou "0 questões"
+                    }
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar resumo dos quizzes:", error);
+                const allSpans = document.querySelectorAll('.card-meta');
+                allSpans.forEach(span => {
+                    if (span.textContent === 'A carregar...') span.textContent = 'Erro ao carregar';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

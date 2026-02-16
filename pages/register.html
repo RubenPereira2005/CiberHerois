@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="login-page">
+
+    <div id="toast-container" class="toast-container">
+        <div class="toast-content">
+            <i id="toast-icon-element" data-lucide="alert-circle" class="toast-icon"></i>
+            <span id="toast-message-element" class="toast-message">Mensagem aqui</span>
+        </div>
+        <div class="toast-progress"></div>
+    </div>
+
+    <div class="login-wrapper">
+        <div class="login-box">
+            <div class="login-header">
+                <h2 class="login-title">CiberHeróis</h2>
+            </div>
+
+            <h3 class="login-subtitle">Criar uma conta</h3>
+            
+            <form id="registerForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="regEmail" required class="form-input" placeholder="exemplo@email.com" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="regUsername" required class="form-input" placeholder="utilizador123" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="password" required class="form-input" placeholder="••••••••" autocomplete="new-password" />
+                        <button type="button" onclick="toggleVisibility('password')" class="password-toggle-btn">
+                            <i data-lucide="eye" class="icon-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="passwordRequirements" class="password-requirements">
+                        <p class="requirements-title">A sua palavra-passe deve conter:</p>
+                        <div class="requirement-item" id="req-length"><span>Pelo menos 8 caracteres</span></div>
+                        <div class="requirement-item" id="req-upper"><span>Uma letra maiúscula</span></div>
+                        <div class="requirement-item" id="req-number"><span>Um número</span></div>
+                        <div class="requirement-item" id="req-symbol"><span>Um símbolo (@, #, $, etc.)</span></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirmar Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="confirmPassword" required class="form-input" placeholder="••••••••" />
+                        <button type="button" onclick="toggleVisibility('confirmPassword')" class="password-toggle-btn">
+                            <i data-lucide="eye" class="icon-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="login-btn">Criar Conta</button>
+
+                <p class="login-link">
+                    Já tem uma conta? <a href="login.html" class="link-highlight">Iniciar sessão</a>
+                </p>
+
+                <p class="back-link">
+                    <i data-lucide="arrow-left"></i>
+                    <a href="index.html" class="link-highlight">Voltar à página inicial</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const passwordInput = document.getElementById('password');
+        const requirementsBox = document.getElementById('passwordRequirements');
+        const toastContainer = document.getElementById('toast-container');
+        const toastMessage = document.getElementById('toast-message-element');
+        const toastIcon = document.getElementById('toast-icon-element');
+        
+        // --- FUNÇÃO PARA MOSTRAR O TOAST ---
+        function showToast(mensagem, tipo = 'error') {
+            // Configura o texto e o estilo
+            toastMessage.textContent = mensagem;
+            toastContainer.className = `toast-container active ${tipo}`;
+            
+            // Troca o ícone (check para sucesso, alert para erro)
+            const iconName = tipo === 'success' ? 'check-circle' : 'alert-circle';
+            toastIcon.setAttribute('data-lucide', iconName);
+            lucide.createIcons();
+
+            // Esconde o toast após o tempo definido no CSS (3.5s - 4s)
+            setTimeout(() => {
+                toastContainer.classList.remove('active');
+            }, 3500);
+        }
+
+        // --- CRITÉRIOS DE VALIDAÇÃO ---
+        const criteria = {
+            length: (val) => val.length >= 8,
+            upper: (val) => /[A-Z]/.test(val),
+            number: (val) => /[0-9]/.test(val),
+            symbol: (val) => /[^A-Za-z0-9]/.test(val)
+        };
+
+        // Mostrar requisitos ao clicar no campo
+        passwordInput.addEventListener('focus', () => {
+            requirementsBox.style.display = 'block';
+        });
+
+        // Validar em tempo real enquanto escreve
+        passwordInput.addEventListener('input', () => {
+            const val = passwordInput.value;
+            
+            Object.keys(criteria).forEach(key => {
+                const element = document.getElementById(`req-${key}`);
+                if (criteria[key](val)) {
+                    element.classList.add('valid');
+                } else {
+                    element.classList.remove('valid');
+                }
+            });
+        });
+
+        function toggleVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        // --- SUBMISSÃO DO FORMULÁRIO ---
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const val = passwordInput.value;
+            const confirmVal = document.getElementById('confirmPassword').value;
+            
+            // 1. Verificação dos Requisitos da Password
+            const isAllValid = Object.values(criteria).every(test => test(val));
+            if (!isAllValid) {
+                showToast('A password não cumpre os requisitos de segurança.', 'error');
+                return;
+            }
+
+            // 2. Verificação de Coincidência
+            if (val !== confirmVal) {
+                showToast('As passwords não coincidem.', 'error');
+                return;
+            }
+
+            // 3. Envio para a API
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: document.getElementById('regEmail').value,
+                        username: document.getElementById('regUsername').value,
+                        password: val 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Conta criada com sucesso! A redirecionar para o login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showToast(data.error || 'Ocorreu um problema ao criar a conta.', 'error');
+                }
+            } catch (err) {
+                showToast('Erro de ligação ao servidor.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

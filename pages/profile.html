@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="site-body">
+
+    <nav class="auth-navbar">
+        <div class="auth-navbar-inner">
+            
+            <div class="auth-navbar-left">
+                <a href="dashboard.html" class="auth-brand">
+                    CiberHeróis
+                </a>
+                
+                <div class="auth-navbar-menu">
+                    <a href="resources.html" class="auth-navbar-link">
+                        Recursos
+                    </a>
+                    
+                    <a href="dashboard.html" class="auth-navbar-link">
+                        Quizzes
+                    </a>
+                </div>
+            </div>
+
+            <div class="auth-navbar-right">
+                <button class="auth-navbar-btn" id="theme-toggle">
+                    <i data-lucide="sun" class="auth-navbar-icon"></i>
+                </button>
+
+                <button class="auth-navbar-btn">
+                    <i data-lucide="search" class="auth-navbar-icon"></i>
+                </button>
+
+                <div class="auth-navbar-badge">
+                    <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
+                    <div class="auth-navbar-badge-content">
+                        <span class="auth-navbar-badge-label">Nível 2</span>
+                        <span class="auth-navbar-badge-value">150 pts</span>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
+                    <i data-lucide="user" class="auth-navbar-icon"></i>
+                </a>
+
+                <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
+                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container profile-main">
+        <div class="profile-header">
+            <div class="profile-header-content">
+                <div class="profile-header-left">
+                    <div class="profile-avatar">
+                        👤
+                    </div>
+                    <div>
+                        <h1 class="profile-header-title">Nome</h1>
+                        <p class="profile-header-email">Email</p>
+                        <div class="profile-header-badges">
+                            <div class="profile-header-badge">
+                                <div class="profile-header-badge-content">
+                                    <i data-lucide="trophy" class="profile-header-icon"></i>
+                                    <span class="profile-header-badge-text">Nível 5</span>
+                                </div>
+                            </div>
+                            <div class="profile-header-badge">
+                                <div class="profile-header-badge-content">
+                                    <i data-lucide="star" class="profile-header-icon"></i>
+                                    <span class="profile-header-badge-text">450 Pontos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-header-right">
+                    <a href="settings.html" class="settings-btn">
+                        <i data-lucide="settings" class="settings-icon"></i>
+                        <span>Definições</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="profile-progress">
+                <div class="profile-progress-label">
+                    <span>Progresso para Nível 6</span>
+                    <span>50 pontos restantes</span>
+                </div>
+                <div class="profile-progress-bar">
+                    <div class="profile-progress-fill" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            <div class="profile-content">
+                
+                <div class="profile-card">
+                    <h2 class="profile-card-title">
+                        <i data-lucide="trending-up" class="profile-card-icon"></i>
+                        Estatísticas
+                    </h2>
+
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-blue">12</div>
+                            <div class="profile-stat-label">Quizzes</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-green">92%</div>
+                            <div class="profile-stat-label">Precisão</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-purple">5</div>
+                            <div class="profile-stat-label">Medalhas</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-orange">145</div>
+                            <div class="profile-stat-label">Respostas</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="profile-card">
+                    <h2 class="profile-card-title">
+                        <i data-lucide="calendar" class="profile-card-icon"></i>
+                        Atividade Recente
+                    </h2>
+
+                    <div class="profile-activity">
+                        <div class="profile-activity-item">
+                            <div>
+                                <div class="profile-activity-title">Quiz: HTTPS e Segurança</div>
+                                <div class="profile-activity-desc">3/3 corretas</div>
+                            </div>
+                            <div class="profile-activity-right">
+                                <div class="profile-activity-points">+30 pts</div>
+                                <div class="profile-activity-time">Hoje</div>
+                            </div>
+                        </div>
+                        <div class="profile-activity-item">
+                            <div>
+                                <div class="profile-activity-title">Jogo: Detetor de Phishing</div>
+                                <div class="profile-activity-desc">4/5 corretas</div>
+                            </div>
+                            <div class="profile-activity-right">
+                                <div class="profile-activity-points">+80 pts</div>
+                                <div class="profile-activity-time">Ontem</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card profile-medals">
+                <h2 class="profile-card-title">
+                    <i data-lucide="award" class="profile-card-icon"></i>
+                    Medalhas
+                </h2>
+
+                <div class="profile-medals-list">
+                    <div class="profile-medal profile-medal-unlocked">
+                        <div class="profile-medal-content">
+                            <div class="profile-medal-emoji">🛡️</div>
+                            <div class="profile-medal-text">
+                                <div class="profile-medal-title">Guardião da Web</div>
+                                <div class="profile-medal-desc">Completou o módulo HTTPS com nota máxima.</div>
+                                <div class="profile-medal-date">Conquistada em 25/01/2026</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-medal profile-medal-unlocked">
+                        <div class="profile-medal-content">
+                            <div class="profile-medal-emoji">🦅</div>
+                            <div class="profile-medal-text">
+                                <div class="profile-medal-title">Olho de Águia</div>
+                                <div class="profile-medal-desc">Identificou 10 emails de phishing corretamente.</div>
+                                <div class="profile-medal-date">Conquistada em 24/01/2026</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-medal profile-medal-locked">
+                        <div class="profile-medal-content">
+                            <div class="profile-medal-emoji">🔒</div>
+                            <div class="profile-medal-text">
+                                <div class="profile-medal-title">Mestre das Passwords</div>
+                                <div class="profile-medal-desc">Crie uma password forte no simulador.</div>
+                                <div class="profile-medal-date profile-medal-status">Bloqueada</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 1. Fazer o pedido à API (ajusta o '/api/me' se a tua rota base for diferente)
+                const response = await fetch('/api/me');
+                
+                // 2. Se não estiver logado (erro 401), manda para o login
+                if (response.status === 401) {
+                    window.location.href = 'index.html'; // ou login.html
+                    return;
+                }
+
+                const data = await response.json();
+
+                // 3. Injetar os dados no HTML
+                if (response.ok) {
+                    // Seleciona os elementos pelos seletores CSS que já tens
+                    const nomeElement = document.querySelector('.profile-header-title');
+                    const emailElement = document.querySelector('.profile-header-email');
+                    const avatarElement = document.querySelector('.profile-avatar');
+
+                    // Atualiza o texto
+                    if (nomeElement) nomeElement.textContent = data.nome;
+                    if (emailElement) emailElement.textContent = data.email;
+
+                    // Opcional: Atualizar avatar se tiveres imagem real
+                    // if (data.foto_perfil && data.foto_perfil !== 'default_avatar.png') {
+                    //     avatarElement.innerHTML = `<img src="${data.foto_perfil}" alt="Avatar">`;
+                    // }
+                }
+
+            } catch (error) {
+                console.error("Erro ao carregar perfil:", error);
+            }
+        });
+    </script>
+</body>
+</html>
