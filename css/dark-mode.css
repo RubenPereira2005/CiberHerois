@@ -147,6 +147,94 @@ body.dark-mode .suggestion-section-description {
 }
 
 
+/* Resource Passwords Page Specifics */
+body.dark-mode .resource-section-icon {
+    color: #60a5fa !important; /* Lighter blue for dark mode */
+}
+
+body.dark-mode .resource-video-caption {
+    color: #94a3b8 !important;
+}
+
+/* Resource Phishing Page Specifics */
+body.dark-mode .interactive-element {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode .quiz-option,
+body.dark-mode .scenario-btn,
+body.dark-mode .site-check {
+    background: #334155 !important;
+    border-color: #475569 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .quiz-option:hover,
+body.dark-mode .scenario-btn:hover,
+body.dark-mode .site-check:hover {
+    background: #475569 !important;
+}
+
+body.dark-mode .email-simulation,
+body.dark-mode .site-item {
+    background: #334155 !important;
+    border-color: #475569 !important;
+}
+
+body.dark-mode .site-check.selected {
+    background: #1e40af !important;
+    border-color: #3b82f6 !important;
+    color: #dbeafe !important;
+}
+
+/* Resource Phishing Page Specifics */
+body.dark-mode .feedback-correct {
+    color: #10b981 !important;
+}
+
+body.dark-mode .feedback-incorrect {
+    color: #ef4444 !important;
+}
+
+/* Resource Phishing Game Dark Mode */
+body.dark-mode .game-header {
+    background: #0c4a6e !important;
+    border-color: #0369a1 !important;
+}
+
+body.dark-mode .game-score {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .email-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+body.dark-mode .email-link {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .email-link:hover {
+    color: #93c5fd !important;
+}
+
+body.dark-mode .practice-btn {
+    background: #1e40af !important;
+}
+
+body.dark-mode .practice-btn:hover {
+    background: #1d4ed8 !important;
+  color: white !important;
+}
+
+body.dark-mode .game-btn-phish {
+    background: #7f1d1d !important;
+    border-color: #dc2626 !important;
+    color: #fecaca !important;
+}
+
 /* ====== Dark Mode: Profile Page ====== */
 
 /* Header do Perfil (Inversão do Gradiente) */
@@ -588,4 +676,33 @@ body.dark-mode .resource-cta-box h3 {
 
 body.dark-mode .resource-cta-box p {
     color: #cbd5e1 !important;
+}
+
+/* Overrides for new classes */
+body.dark-mode .icon-red {
+    color: #f87171 !important; /* lighter red for dark mode */
+}
+
+body.dark-mode .quiz-option-seq {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+body.dark-mode .quiz-option-seq:hover {
+    background: #4b5563 !important;
+    border-color: #6b7280 !important;
+}
+
+body.dark-mode #next-btn {
+    background: #3b82f6 !important;
+}
+
+body.dark-mode #next-btn:hover {
+    background: #2563eb !important;
+}
+
+body.dark-mode .quiz-completed h3,
+body.dark-mode .quiz-completed p {
+    color: #f8fafc !important;
 }
