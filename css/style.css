@@ -802,6 +802,16 @@ body.site-body {
   border-left: 4px solid #10b981;
 }
 
+/* Variação Azul para Passwords */
+.resource-section.border-blue {
+    border-left-color: #3b82f6 !important;
+}
+
+/* Variação Vermelha para Phishing */
+.resource-section.border-red {
+    border-left-color: #ef4444 !important;
+}
+
 .resource-section h2 {
   color: #111827;
   font-size: 24px;

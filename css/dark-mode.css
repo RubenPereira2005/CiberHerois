@@ -617,6 +617,15 @@ body.dark-mode .resource-section p {
     color: #cbd5e1 !important; /* Texto de leitura confortável */
 }
 
+/* Sobrescreve o verde padrão no modo dark quando a classe específica está presente */
+body.dark-mode .resource-section.border-red {
+    border-left-color: #f87171 !important; /* Vermelho mais claro para melhor contraste no escuro */
+}
+
+body.dark-mode .resource-section.border-blue {
+    border-left-color: #60a5fa !important; /* Azul mais claro para o modo dark */
+}
+
 /* Caixa de Melhores Práticas (Verde) */
 body.dark-mode .resource-best-practices {
     background-color: rgba(16, 185, 129, 0.1) !important; /* Verde muito escuro/transparente */
