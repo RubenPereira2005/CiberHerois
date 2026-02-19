@@ -48,6 +48,9 @@ app.use('/api', profileRoutes);
 const quizRoutes = require('./routes/quiz')(db); 
 app.use('/api/quiz', quizRoutes);
 
+//4. Recursos (PDF, Links, etc)
+const pdfRoutes = require('./routes/pdf')(db); 
+app.use('/api/pdf', pdfRoutes);
 
 // Rota principal (Frontend)
 app.get('/', (req, res) => {
