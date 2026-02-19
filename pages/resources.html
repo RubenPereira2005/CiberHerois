@@ -88,7 +88,7 @@
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </a>
-                            <button class="resource-card-btn resource-card-btn-secondary">
+                            <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('resource-https')">
                                 <i data-lucide="download"></i>
                             </button>
                         </div>
@@ -113,7 +113,7 @@
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </a>
-                            <button class="resource-card-btn resource-card-btn-secondary">
+                            <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('resource-passwords')">
                                 <i data-lucide="download"></i>
                             </button>
                         </div>
@@ -138,7 +138,7 @@
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </a>
-                            <button class="resource-card-btn resource-card-btn-secondary">
+                            <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('resource-phishing')">
                                 <i data-lucide="download"></i>
                             </button>
                         </div>
@@ -163,7 +163,7 @@
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </button>
-                            <button class="resource-card-btn resource-card-btn-secondary">
+                            <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('resource-wifi')">
                                 <i data-lucide="download"></i>
                             </button>
                         </div>
@@ -188,7 +188,7 @@
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </button>
-                            <button class="resource-card-btn resource-card-btn-secondary">
+                            <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('resource-data')">
                                 <i data-lucide="download"></i>
                             </button>
                         </div>
@@ -213,7 +213,7 @@
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </button>
-                            <button class="resource-card-btn resource-card-btn-secondary">
+                            <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('resource-malware')">
                                 <i data-lucide="download"></i>
                             </button>
                         </div>
@@ -256,10 +256,56 @@
                 Enviar Sugestão
             </button>
         </div>
+
+        <div id="download-toast" class="toast-container">
+            <div class="toast-content">
+                <i data-lucide="loader" class="toast-icon spin-animation"></i>
+                <span class="toast-message">O seu download foi iniciado, aguarde...</span>
+            </div>
+            <div class="toast-progress"></div>
+        </div>
     </div>
+
+    <style>
+        .spin-animation { 
+            animation: loader-rotate 2s linear infinite; 
+        }
+        @keyframes loader-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        /* Garante visibilidade do Toast se não estiver no CSS principal */
+        .toast-container.active {
+            transform: translateX(0) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    </style>
 
     <script>
         lucide.createIcons();
+
+        function handleDownload(resourceName) {
+            const toast = document.getElementById('download-toast');
+            
+            if (toast) {
+                // 1. Mostrar o popup
+                toast.classList.add('active');
+                
+                // Forçar o Lucide a renderizar o ícone de loader caso ele não apareça
+                lucide.createIcons();
+
+                // 2. Iniciar o download (redirecionar para a API)
+                window.location.href = `/api/pdf/download/${resourceName}`;
+
+                // 3. Esconder o popup após 3.2 segundos
+                setTimeout(() => {
+                    toast.classList.remove('active');
+                }, 3200);
+            } else {
+                window.location.href = `/api/pdf/download/${resourceName}`;
+            }
+        }
     </script>
 </body>
 </html>
