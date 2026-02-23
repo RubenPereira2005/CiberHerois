@@ -524,66 +524,83 @@ body.dark-mode .password-toggle-btn:hover {
     color: #ffffff !important;
 }
 
-/* ====== Dark Mode: Settings Page ====== */
 
-/* Ícones dos cartões (wrappers) */
-body.dark-mode .settings-icon-wrapper.blue { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
-body.dark-mode .settings-icon-wrapper.purple { background: rgba(124, 58, 237, 0.2); color: #a78bfa; }
-body.dark-mode .settings-icon-wrapper.red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
-/* Linhas divisórias */
+/* ====== Dark Mode: Settings Page (Limpo e Otimizado) ====== */
+
+/* Backgrounds e Contentores */
+body.dark-mode .settings-sidebar,
+body.dark-mode .settings-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Divisórias */
+body.dark-mode .settings-sidebar .sidebar-section.danger {
+    border-top: 1px solid #475569 !important;
+}
+
 body.dark-mode .settings-card-header {
-    border-bottom-color: #334155;
+    border-bottom-color: #334155 !important;
 }
 
-/* Títulos e Descrições */
-body.dark-mode .settings-card-title { color: #f1f5f9; }
-body.dark-mode .settings-card-desc { color: #94a3b8; }
-body.dark-mode .text-red { color: #f87171; }
-
-/* Inputs (Reutilizando a lógica do login, mas reforçando aqui se necessário) */
-body.dark-mode .form-input {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #f1f5f9;
+/* Tabs e Navegação Lateral */
+body.dark-mode .settings-tab {
+    color: #94a3b8 !important;
+    background: transparent !important;
 }
 
-body.dark-mode .form-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 1px #3b82f6;
+body.dark-mode .settings-tab:hover,
+body.dark-mode .back-link-simple:hover {
+    color: #60a5fa !important;
+    background: rgba(255, 255, 255, 0.05) !important;
 }
 
-body.dark-mode .form-label {
-    color: #cbd5e1;
+body.dark-mode .settings-tab.active {
+    color: #ffffff !important;
+    background: rgba(59, 130, 246, 0.1) !important;
 }
 
-/* Link de voltar */
-body.dark-mode .back-link-simple { color: #94a3b8; }
-body.dark-mode .back-link-simple:hover { color: #60a5fa; }
+/* Inputs e Campos Bloqueados */
+body.dark-mode .form-input.locked {
+    background-color: #111827 !important;
+    border-color: #334155 !important;
+    color: #4b5563 !important;
+    cursor: not-allowed;
+}
 
-/* Zona de Perigo */
-body.dark-mode .danger-zone {
-    border-color: rgba(239, 68, 68, 0.3);
-    background-color: rgba(239, 68, 68, 0.05) !important; /* Ligeiro tint vermelho */
+/* --- Zona de Perigo (Dark Mode) --- */
+
+body.dark-mode .settings-tab[data-tab="danger"].active {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+}
+
+body.dark-mode .settings-tab[data-tab="danger"].active::after {
+    background: #ef4444 !important;
 }
 
 body.dark-mode .btn-danger-outline {
-    border-color: #f87171;
-    color: #f87171;
+    border: 1px solid #f87171 !important;
+    color: #f87171 !important;
+    background: transparent !important;
 }
 
 body.dark-mode .btn-danger-outline:hover {
-    background-color: #dc2626;
-    color: #fff;
-    border-color: #dc2626;
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
 }
 
-/* Dark Mode para campos bloqueados */
-body.dark-mode .form-input.locked {
-    background-color: #1e293b; /* Azul escuro/cinza */
-    border-color: #334155;
-    color: #94a3b8;
+/* Utilitários e Navegação */
+body.dark-mode .back-link-simple {
+    color: #94a3b8 !important;
 }
+
+body.dark-mode .settings-content .form-group {
+    margin-bottom: 24px;
+}
+
 
 
 /* ====== Dark Mode: Resource Detail Page ====== */
