@@ -46,92 +46,162 @@
     </nav>
 
     <div class="auth-container">
-        
+
         <div class="settings-header">
             <a href="profile.html" class="back-link-simple">
                 <i data-lucide="arrow-left"></i> Voltar ao Perfil
             </a>
             <h1 class="page-title">Definições da Conta</h1>
-            <p class="page-lead">Gere os teus dados pessoais e segurança.</p>
+            <p class="page-lead">Gere os teus dados pessoais, segurança e preferências de herói.</p>
         </div>
 
-        <div class="settings-grid">
-            
-            <div class="profile-card">
-                <div class="settings-card-header">
-                    <div class="settings-icon-wrapper blue">
-                        <i data-lucide="user"></i>
-                    </div>
-                    <div>
-                        <h2 class="settings-card-title">Dados Pessoais</h2>
-                        <p class="settings-card-desc">Atualiza o teu nome e contacto.</p>
-                    </div>
+        <div class="settings-layout">
+            <aside class="settings-sidebar">
+                <div class="sidebar-section">
+                    <button class="settings-tab active" data-tab="account"><i data-lucide="user"></i> Conta</button>
+                    <button class="settings-tab" data-tab="security"><i data-lucide="shield-check"></i> Segurança</button>
+                    <button class="settings-tab" data-tab="notifications"><i data-lucide="bell"></i> Alertas</button>
+                    <button class="settings-tab" data-tab="appearance"><i data-lucide="palette"></i> Aparência</button>
+                    <button class="settings-tab" data-tab="privacy"><i data-lucide="eye-off"></i> Privacidade</button>
                 </div>
 
-                <form id="profile-form" class="settings-form">
-                    <div class="form-group">
-                        <label class="form-label">Nome de Utilizador</label>
-                        <input type="text" class="form-input" id="settings-name" placeholder="O teu nome" required>
-                    </div>
+                <div class="sidebar-section danger">
+                    <button class="settings-tab" data-tab="danger" style="color: #ef4444;"><i data-lucide="alert-triangle"></i> Zona Crítica</button>
+                </div>
+            </aside>
 
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <div class="input-wrapper-locked">
-                            <input type="email" class="form-input locked" id="settings-email" readonly>
-                            <i data-lucide="lock" class="lock-icon"></i>
+            <main class="settings-content">
+                <section class="tab-pane active-pane" id="account">
+                    <div class="settings-card-header">
+                        <div class="settings-icon-wrapper blue"><i data-lucide="user"></i></div>
+                        <div>
+                            <h2 class="settings-card-title">Dados Pessoais</h2>
+                            <p class="settings-card-desc">Como queres ser identificado na academia.</p>
                         </div>
-                        <p class="field-hint">O email não pode ser alterado por motivos de segurança.</p>
                     </div>
+                    <form id="account-form" class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Nome de Herói (Utilizador)</label>
+                            <input type="text" class="form-input" id="settings-name" placeholder="O teu nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email de Contacto</label>
+                            <div class="input-wrapper-locked">
+                                <input type="email" class="form-input locked" id="settings-email" readonly>
+                                <i data-lucide="lock" class="lock-icon"></i>
+                            </div>
+                            <p class="field-hint">O email não pode ser alterado por motivos de segurança.</p>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+                        </div>
+                    </form>
+                </section>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+                <section class="tab-pane hidden" id="security">
+                    <div class="settings-card-header">
+                        <div class="settings-icon-wrapper purple"><i data-lucide="shield-check"></i></div>
+                        <div>
+                            <h2 class="settings-card-title">Segurança da Firewall</h2>
+                            <p class="settings-card-desc">Reforça a proteção da tua conta.</p>
+                        </div>
                     </div>
-                </form>
-            </div>
+                    <form id="security-form" class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Palavra-passe Atual</label>
+                            <input type="password" class="form-input" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nova Palavra-passe</label>
+                            <input type="password" class="form-input" placeholder="Nova palavra-passe">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Autenticação Multi-fator (MFA)</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox"> Ativar Código por App (Recomendado)</label>
+                                <label><input type="checkbox"> Chaves de Segurança Físicas</label>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Atualizar Protocolos</button>
+                        </div>
+                    </form>
+                </section>
 
-            <div class="profile-card">
-                <div class="settings-card-header">
-                    <div class="settings-icon-wrapper purple">
-                        <i data-lucide="lock"></i>
+                <section class="tab-pane hidden" id="notifications">
+                    <div class="settings-card-header">
+                        <div class="settings-icon-wrapper blue"><i data-lucide="bell"></i></div>
+                        <div>
+                            <h2 class="settings-card-title">Centro de Alertas</h2>
+                            <p class="settings-card-desc">Gere como recebes avisos de ameaças.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="settings-card-title">Segurança</h2>
-                        <p class="settings-card-desc">Altera a tua palavra-passe.</p>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Notificações Críticas</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" checked> Tentativas de Login Suspeitas</label>
+                                <label><input type="checkbox" checked> Alertas de Novas Vulnerabilidades</label>
+                                <label><input type="checkbox"> Atualizações da Academia</label>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <form id="security-form" class="settings-form">
-                    <div class="form-group">
-                        <label class="form-label">Palavra-passe Atual</label>
-                        <input type="password" class="form-input" placeholder="••••••••">
+                <section class="tab-pane hidden" id="appearance">
+                    <div class="settings-card-header">
+                        <div class="settings-icon-wrapper blue"><i data-lucide="palette"></i></div>
+                        <div>
+                            <h2 class="settings-card-title">Interface Visual</h2>
+                            <p class="settings-card-desc">Personaliza o aspeto do teu painel de controlo.</p>
+                        </div>
                     </div>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Tema do Painel</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="theme-choice" value="system"> Seguir Sistema</label>
+                                <label><input type="radio" name="theme-choice" value="light"> Modo Diurno (Claro)</label>
+                                <label><input type="radio" name="theme-choice" value="dark"> Modo Noturno (Escuro)</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                    <div class="form-group">
-                        <label class="form-label">Nova Palavra-passe</label>
-                        <input type="password" class="form-input" placeholder="Nova palavra-passe">
+                <section class="tab-pane hidden" id="privacy">
+                    <div class="settings-card-header">
+                        <div class="settings-icon-wrapper purple"><i data-lucide="eye-off"></i></div>
+                        <div>
+                            <h2 class="settings-card-title">Protocolos de Privacidade</h2>
+                            <p class="settings-card-desc">Controla quem pode ver o teu progresso.</p>
+                        </div>
                     </div>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">Visibilidade de Perfil</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" checked> Mostrar as minhas medalhas publicamente</label>
+                                <label><input type="checkbox"> Aparecer no Ranking Global de Heróis</label>
+                                <label><input type="checkbox"> Permitir que outros heróis me enviem mensagens</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Atualizar Senha</button>
+                <section class="tab-pane hidden" id="danger">
+                    <div class="settings-card-header">
+                        <div class="settings-icon-wrapper red"><i data-lucide="alert-triangle"></i></div>
+                        <div>
+                            <h2 class="settings-card-title text-red">Desativar Protocolos</h2>
+                            <p class="settings-card-desc">Ações irreversíveis sobre a tua identidade digital.</p>
+                        </div>
                     </div>
-                </form>
-            </div>
-
-            <div class="profile-card danger-zone">
-                <div class="settings-card-header">
-                    <div class="settings-icon-wrapper red">
-                        <i data-lucide="alert-triangle"></i>
+                    <div class="danger-actions">
+                        <p style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Ao apagar a conta, todos os teus emblemas, pontos e progresso nos quizzes serão permanentemente destruídos.</p>
+                        <button type="button" id="btn-delete-account" class="btn btn-danger-outline">Apagar Identidade de Herói</button>
                     </div>
-                    <div>
-                        <h2 class="settings-card-title text-red">Zona de Perigo</h2>
-                        <p class="settings-card-desc">Ações irreversíveis.</p>
-                    </div>
-                </div>
-                <div class="danger-actions">
-                    <button type="button" id="btn-delete-account" class="btn btn-danger-outline">Apagar Conta</button>
-                </div>
-            </div>
-
+                </section>
+            </main>
         </div>
     </div>
 
@@ -141,82 +211,112 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const nameInput = document.getElementById('settings-name');
             const emailInput = document.getElementById('settings-email');
-            const profileForm = document.getElementById('profile-form');
+            const accountForm = document.getElementById('account-form');
+            const securityForm = document.getElementById('security-form');
             const btnDelete = document.getElementById('btn-delete-account');
 
-            // --- 1. CARREGAR DADOS DO UTILIZADOR ---
+            // --- Tabs: switch panes ---
+            const tabs = Array.from(document.querySelectorAll('.settings-tab'));
+            const panes = Array.from(document.querySelectorAll('.tab-pane'));
+
+            function showTab(id) {
+                panes.forEach(p => {
+                    if (p.id === id) {
+                        p.classList.add('active-pane');
+                        p.classList.remove('hidden');
+                    } else {
+                        p.classList.remove('active-pane');
+                        p.classList.add('hidden');
+                    }
+                });
+                tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+                lucide.createIcons(); // Garante que os ícones dentro das tabs aparecem
+            }
+
+            tabs.forEach(t => t.addEventListener('click', () => {
+                const id = t.dataset.tab;
+                showTab(id);
+                history.replaceState(null, '', '#' + id);
+            }));
+
+            // Hash inicial
+            const hash = (location.hash || '').replace('#', '');
+            const initialTab = (hash && document.getElementById(hash)) ? hash : 'account';
+            showTab(initialTab);
+
+            // --- CARREGAR DADOS ---
             try {
                 const response = await fetch('/api/me');
                 if (response.ok) {
                     const data = await response.json();
-                    nameInput.value = data.nome || '';
-                    emailInput.value = data.email || '';
-                } else {
-                    console.error("Erro ao buscar dados do utilizador");
-                    // Opcional: Redirecionar para login se não estiver autenticado
+                    if (nameInput) nameInput.value = data.nome || '';
+                    if (emailInput) emailInput.value = data.email || '';
                 }
-            } catch (e) {
-                console.error("Erro de conexão", e);
+            } catch (e) { console.error("Erro de conexão", e); }
+
+            // --- ATUALIZAR NOME ---
+            if (accountForm) {
+                accountForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = accountForm.querySelector('button[type="submit"]');
+                    const originalText = btn.innerText;
+                    btn.innerText = "A encriptar...";
+                    btn.disabled = true;
+
+                    try {
+                        const response = await fetch('/api/update', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ nome: nameInput.value })
+                        });
+                        if (response.ok) alert("Perfil atualizado!");
+                        else alert("Erro ao atualizar.");
+                    } catch (error) { alert("Erro de servidor."); }
+                    finally {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }
+                });
             }
 
-            // --- 2. ATUALIZAR NOME (PUT) ---
-            profileForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const novoNome = nameInput.value;
-                const btn = profileForm.querySelector('button[type="submit"]');
-                const originalText = btn.innerText;
-
-                // Feedback visual de carregamento
-                btn.innerText = "A guardar...";
-                btn.disabled = true;
-
-                try {
-                    const response = await fetch('/api/update', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nome: novoNome })
-                    });
-
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        alert("Nome atualizado com sucesso!");
-                    } else {
-                        alert("Erro: " + (result.error || "Não foi possível atualizar."));
+            // --- APAGAR CONTA ---
+            if (btnDelete) {
+                btnDelete.addEventListener('click', async () => {
+                    if (confirm("Tens a certeza absoluta? Esta ação é irreversível.")) {
+                        try {
+                            const response = await fetch('/api/delete', { method: 'DELETE' });
+                            if (response.ok) window.location.href = "index.html";
+                        } catch (e) { alert("Erro ao processar pedido."); }
                     }
-                } catch (error) {
-                    alert("Erro de conexão com o servidor.");
-                    console.error(error);
-                } finally {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+                });
+            }
+
+            // --- LOGICA DE SINCRONIZAÇÃO DE TEMAS ---
+            const themeRadios = Array.from(document.querySelectorAll('input[name="theme-choice"]'));
+
+            function syncThemeRadios() {
+                const stored = localStorage.getItem('theme') || 'system';
+                themeRadios.forEach(r => { 
+                    r.checked = (r.value === stored); 
+                });
+            }
+
+            // Escutar mudanças nos rádios das Definições
+            themeRadios.forEach(r => r.addEventListener('change', (e) => {
+                const val = e.target.value;
+                // Chamar a função global do theme.js
+                if (window.setTheme) {
+                    window.setTheme(val);
                 }
+            }));
+
+            // Escutar evento global disparado pelo theme.js (quando muda no botão da navbar)
+            window.addEventListener('themeChanged', (e) => {
+                syncThemeRadios();
             });
 
-            // --- 3. APAGAR CONTA (DELETE) ---
-            btnDelete.addEventListener('click', async () => {
-                const confirmacao = confirm("Tens a certeza absoluta?\n\nEsta ação irá apagar a tua conta e todo o teu progresso permanentemente. Não é possível recuperar.");
-
-                if (confirmacao) {
-                    try {
-                        const response = await fetch('/api/delete', {
-                            method: 'DELETE'
-                        });
-
-                        if (response.ok) {
-                            alert("A tua conta foi apagada. Esperamos ver-te novamente!");
-                            window.location.href = "index.html"; // Redireciona para a página inicial/login
-                        } else {
-                            const result = await response.json();
-                            alert("Erro ao apagar conta: " + (result.error || "Tenta novamente."));
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        alert("Erro de conexão ao tentar apagar a conta.");
-                    }
-                }
-            });
+            // Inicialização
+            syncThemeRadios();
         });
     </script>
 </body>
