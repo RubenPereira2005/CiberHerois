@@ -92,11 +92,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
-// Rota de teste para forçar um erro
-app.get('/api/teste-erro', (req, res) => {
-    throw new Error('Isto é um teste de falha do sistema!');
-});
-
 // Middleware de Erros Globais (Rede de Segurança)
 app.use((err, req, res, next) => {
     logger.error(`[500] Falha Crítica em ${req.originalUrl} | Motivo: ${err.message} | IP: ${req.ip}`);
@@ -106,6 +101,6 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
     // Vai para o security.log
     logger.info(`[200] Servidor CiberHeróis pronto na porta ${port}`);
-    // Aparece APENAS no CMD
+    // Aparece apenas no CMD
     console.log(`🚀 Servidor CiberHeróis pronto em http://localhost:${port}`); 
 });
