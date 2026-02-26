@@ -6,10 +6,27 @@
     <title>Login - CiberHeróis</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="google.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        .divider-container {
+            display: flex; align-items: center; text-align: center; margin: 20px 0;
+        }
+        .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
+        .divider-text { margin: 0 10px; color: #64748b; font-size: 0.875rem; }
+    </style>
 </head>
 <body class="login-page">
+
+    <div id="toast-container" class="toast-container">
+        <div class="toast-content">
+            <i id="toast-icon-element" data-lucide="alert-circle" class="toast-icon"></i>
+            <span id="toast-message-element" class="toast-message">Mensagem de aviso</span>
+        </div>
+        <div class="toast-progress"></div>
+    </div>
 
     <div class="login-wrapper">
         <div class="login-box">
@@ -38,6 +55,16 @@
 
                 <button type="submit" class="login-btn">Entrar</button>
 
+                <div class="divider-container">
+                    <span class="divider-line"></span>
+                    <span class="divider-text">ou continuar com</span>
+                    <span class="divider-line"></span>
+                </div>
+                
+                <div id="googleBtnContainer" style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <div id="g_id_signin"></div>
+                </div>
+
                 <p class="login-link">
                     Não tem uma conta? <a href="register.html" class="link-highlight">Criar conta</a>
                 </p>
@@ -48,23 +75,16 @@
                 </p>
             </form>
         </div>
-
-        <div id="toast-container" class="toast-container">
-        <div class="toast-content">
-            <i id="toast-icon-element" data-lucide="alert-circle" class="toast-icon"></i>
-            <span id="toast-message-element" class="toast-message">Mensagem Erro login</span>
-        </div>
-        <div class="toast-progress"></div>
     </div>
 
     <script>
         lucide.createIcons();
 
+        // Configuração do Toast
         const toastContainer = document.getElementById('toast-container');
         const toastMessage = document.getElementById('toast-message-element');
         const toastIcon = document.getElementById('toast-icon-element');
 
-        // --- FUNÇÃO SHOW TOAST ---
         function showToast(mensagem, tipo = 'error') {
             toastMessage.textContent = mensagem;
             toastContainer.className = `toast-container active ${tipo}`;
@@ -75,7 +95,7 @@
 
             setTimeout(() => {
                 toastContainer.classList.remove('active');
-            }, 3300);
+            }, 3300); // O balão desaparece após 3.3 segundos
         }
 
         function togglePassword() {
@@ -83,9 +103,9 @@
             input.type = input.type === "password" ? "text" : "password";
         }
 
+        // --- 1. LOGIN TRADICIONAL (Email e Password) ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
@@ -96,25 +116,69 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                // Mesmo que o servidor mande erro, não precisamos de ler o JSON para mostrar o erro ao utilizador
-                // Mas lemos caso precises de fazer debug na consola
                 const data = await response.json(); 
 
                 if (response.ok) {
-                    // Sucesso
                     sessionStorage.setItem('showLoginToast', 'true'); 
                     window.location.href = 'dashboard.html';
                 } else {
-                    // ERRO DE LOGIN
-                    showToast("Email ou palavra-passe incorretos.", 'error');
-                
+                    // Se houver erro (password errada, conta não existe, ou conta do Google) mostra o Toast
+                    showToast(data.error || "Email ou palavra-passe incorretos.", 'error');
                 }
-
             } catch (err) {
-                // Erro de rede/servidor desligado
                 showToast("Erro de conexão com o servidor.", 'error');
             }
         });
+
+        // --- 2. LOGIN COM GOOGLE ---
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com", 
+                callback: handleGoogleResponse
+            });
+
+            google.accounts.id.renderButton(
+            document.getElementById("g_id_signin"), // Usa "g_id_signup" na página de registo
+            { 
+                theme: "filled_black",   // Opções: "outline", "filled_blue", "filled_black"
+                size: "large",           // Opções: "small", "medium", "large"
+                width: "300",            // Podes forçar a largura em pixeis (ex: "300")
+                text: "continue_with",   // Opções: "signin_with", "signup_with", "continue_with"
+                shape: "pill"            // Opções: "rectangular", "pill", "circle", "square"
+            }
+        );
+        };
+
+        // Processar a resposta do Google
+        async function handleGoogleResponse(googleData) {
+            try {
+                const response = await fetch('/api/google-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: googleData.credential, action: 'login' }) 
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Sucesso!
+                    sessionStorage.setItem('showLoginToast', 'true');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Erro: Mostra o Toast de erro (ex: "Conta não encontrada")
+                    showToast(data.error || "Erro ao entrar com o Google", "error");
+
+                    // Se a API indicar que a conta não existe e mandou redirecionar
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = 'register.html';
+                        }, 3000); // Espera 3 segundos para o utilizador ler o balão e depois redireciona
+                    }
+                }
+            } catch (err) {
+                showToast("Erro de ligação ao servidor", "error");
+            }
+        }
     </script>
 </body>
 </html>

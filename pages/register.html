@@ -6,8 +6,17 @@
     <title>Criar Conta - CiberHeróis</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="google.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        .divider-container {
+            display: flex; align-items: center; text-align: center; margin: 20px 0;
+        }
+        .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
+        .divider-text { margin: 0 10px; color: #64748b; font-size: 0.875rem; }
+    </style>
 </head>
 <body class="login-page">
 
@@ -28,6 +37,7 @@
             <h3 class="login-subtitle">Criar uma conta</h3>
             
             <form id="registerForm" class="login-form">
+            
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" id="regEmail" required class="form-input" placeholder="exemplo@email.com" />
@@ -45,16 +55,15 @@
                         <button type="button" onclick="toggleVisibility('password')" class="password-toggle-btn">
                             <i data-lucide="eye" class="icon-eye"></i>
                         </button>
-                    </div>
                     
-                    <div id="passwordRequirements" class="password-requirements">
-                        <p class="requirements-title">A sua palavra-passe deve conter:</p>
-                        <div class="requirement-item" id="req-length"><span>Pelo menos 8 caracteres</span></div>
-                        <div class="requirement-item" id="req-upper"><span>Uma letra maiúscula</span></div>
-                        <div class="requirement-item" id="req-number"><span>Um número</span></div>
-                        <div class="requirement-item" id="req-symbol"><span>Um símbolo (@, #, $, etc.)</span></div>
+                        <div id="passwordRequirements" class="password-requirements">
+                            <p class="requirements-title">A sua palavra-passe deve conter:</p>
+                            <div class="requirement-item" id="req-length"><span>Pelo menos 8 caracteres</span></div>
+                            <div class="requirement-item" id="req-upper"><span>Uma letra maiúscula</span></div>
+                            <div class="requirement-item" id="req-number"><span>Um número</span></div>
+                            <div class="requirement-item" id="req-symbol"><span>Um símbolo (@, #, $, etc.)</span></div>
+                        </div>
                     </div>
-                </div>
 
                 <div class="form-group">
                     <label class="form-label">Confirmar Password</label>
@@ -64,6 +73,16 @@
                             <i data-lucide="eye" class="icon-eye"></i>
                         </button>
                     </div>
+                </div>
+
+                <div class="divider-container">
+                    <span class="divider-line"></span>
+                    <span class="divider-text">ou registar com email</span>
+                    <span class="divider-line"></span>
+                </div>
+
+                <div id="googleBtnContainer" style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <div id="g_id_signin"></div>
                 </div>
 
                 <button type="submit" id="submitBtn" class="login-btn">Criar Conta</button>
@@ -89,24 +108,19 @@
         const toastMessage = document.getElementById('toast-message-element');
         const toastIcon = document.getElementById('toast-icon-element');
         
-        // --- FUNÇÃO PARA MOSTRAR O TOAST ---
         function showToast(mensagem, tipo = 'error') {
-            // Configura o texto e o estilo
             toastMessage.textContent = mensagem;
             toastContainer.className = `toast-container active ${tipo}`;
             
-            // Troca o ícone (check para sucesso, alert para erro)
             const iconName = tipo === 'success' ? 'check-circle' : 'alert-circle';
             toastIcon.setAttribute('data-lucide', iconName);
             lucide.createIcons();
 
-            // Esconde o toast após o tempo definido no CSS (3.5s - 4s)
             setTimeout(() => {
                 toastContainer.classList.remove('active');
             }, 3500);
         }
 
-        // --- CRITÉRIOS DE VALIDAÇÃO ---
         const criteria = {
             length: (val) => val.length >= 8,
             upper: (val) => /[A-Z]/.test(val),
@@ -114,15 +128,16 @@
             symbol: (val) => /[^A-Za-z0-9]/.test(val)
         };
 
-        // Mostrar requisitos ao clicar no campo
         passwordInput.addEventListener('focus', () => {
             requirementsBox.style.display = 'block';
         });
 
-        // Validar em tempo real enquanto escreve
+        passwordInput.addEventListener('blur', () => {
+        requirementsBox.style.display = 'none';
+        });
+
         passwordInput.addEventListener('input', () => {
             const val = passwordInput.value;
-            
             Object.keys(criteria).forEach(key => {
                 const element = document.getElementById(`req-${key}`);
                 if (criteria[key](val)) {
@@ -138,26 +153,23 @@
             input.type = input.type === "password" ? "text" : "password";
         }
 
-        // --- SUBMISSÃO DO FORMULÁRIO ---
+        // Registo Tradicional
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const val = passwordInput.value;
             const confirmVal = document.getElementById('confirmPassword').value;
             
-            // 1. Verificação dos Requisitos da Password
             const isAllValid = Object.values(criteria).every(test => test(val));
             if (!isAllValid) {
                 showToast('A password não cumpre os requisitos de segurança.', 'error');
                 return;
             }
 
-            // 2. Verificação de Coincidência
             if (val !== confirmVal) {
                 showToast('As passwords não coincidem.', 'error');
                 return;
             }
 
-            // 3. Envio para a API
             try {
                 const response = await fetch('/api/register', {
                     method: 'POST',
@@ -183,6 +195,59 @@
                 showToast('Erro de ligação ao servidor.', 'error');
             }
         });
+
+        // Configuração do Google Sign-Up
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com", 
+                callback: handleGoogleResponse
+            });
+
+            google.accounts.id.renderButton(
+            document.getElementById("g_id_signin"), // Usa "g_id_signup" na página de registo
+            { 
+                theme: "filled_black",   // Opções: "outline", "filled_blue", "filled_black"
+                size: "large",           // Opções: "small", "medium", "large"
+                width: "300",            // Podes forçar a largura em pixeis (ex: "300")
+                text: "continue_with",   // Opções: "signin_with", "signup_with", "continue_with"
+                shape: "pill"            // Opções: "rectangular", "pill", "circle", "square"
+            }
+        );
+        };
+
+        // Função que processa a resposta da Google (Registo)
+        async function handleGoogleResponse(googleData) {
+            try {
+                const response = await fetch('/api/google-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // IMPORTANTE: Envia action: 'register' para o backend guardar na DB
+                    body: JSON.stringify({ token: googleData.credential, action: 'register' }) 
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionStorage.setItem('showLoginToast', 'true');
+                    showToast('Conta Google criada com sucesso! A redirecionar...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html'; // Inicia logo a sessão e entra na app
+                    }, 2000);
+                } else {
+                    showToast(data.error || "Erro ao registar com o Google", "error");
+                    
+                    // Se o erro for que a conta já existe, reencaminha para o login passados 3 segundos
+                    if (response.status === 400 && data.error.includes("já está registada")) {
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 3000);
+                    }
+                }
+            } catch (err) {
+                showToast("Erro de ligação ao servidor", "error");
+            }
+        }
     </script>
 </body>
 </html>
