@@ -91,7 +91,9 @@ module.exports = (db) => {
             });
             
             const payload = ticket.getPayload();
-            const { email, name: nome, sub: googleId } = payload;
+            
+            // Vai buscar a foto do Google!
+            const { email, name: nome, sub: googleId, picture } = payload;
 
             // 2. Procurar na BD
             db.query("SELECT * FROM Utilizador WHERE email = ?", [email], (err, results) => {
@@ -106,7 +108,7 @@ module.exports = (db) => {
                     // Email existe, mas não tem google_id (Foi criado pelo formulário com palavra-passe)
                     if (!user.google_id) {
                         return res.status(403).json({ 
-                            error: "Já exsite uma conta criada com este email. Por favor, inicie sessão com a sua palavra-passe." 
+                            error: "Já existe uma conta criada com este email. Por favor, inicie sessão com a sua palavra-passe." 
                         });
                     }
 
@@ -136,10 +138,13 @@ module.exports = (db) => {
 
                     // Se clicou no botão da página de Registo, criamos a conta!
                     if (action === 'register') {
-                        // Insere a senha como NULL e guarda o google_id para identificar que esta conta é do Google
-                        const queryInsert = "INSERT INTO Utilizador (nome, email, senha, google_id) VALUES (?, ?, NULL, ?)";
+                        // Adição da coluna foto_google ao INSERT
+                        const queryInsert = "INSERT INTO Utilizador (nome, email, senha, google_id, foto_perfil, foto_google) VALUES (?, ?, NULL, ?, ?, ?)";
 
-                        db.query(queryInsert, [nome, email, googleId], (err, result) => {
+                        const fotoParaGuardar = picture ? picture : "default_avatar.png";
+
+                        // Passar a picture duas vezes se ela existir (uma para o perfil ativo, outra para a memória do Google)
+                        db.query(queryInsert, [nome, email, googleId, fotoParaGuardar, picture || null], (err, result) => {
                             if (err) {
                                 logger.error(`[500] Erro ao criar conta Google (${email}): ${err.message}`);
                                 return res.status(500).json({ error: "Erro ao criar conta Google" });
