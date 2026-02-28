@@ -1678,6 +1678,26 @@ body.site-body {
   flex-shrink: 0;
 }
 
+/* Botão do Lápis */
+.edit-avatar-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+.edit-avatar-btn:hover { transform: scale(1.1); }
+
 .profile-header-title {
   font-size: 28px;
   margin: 0 0 8px;
@@ -2102,6 +2122,7 @@ body.site-body {
 }
 
 .form-group {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2218,15 +2239,52 @@ body.site-body {
   color: #1d4ed8;
 }
 
+/* Password Requirements (Flutuante) */
+#passwordRequirements { 
+    display: none; 
+    background: #f8fafc; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 8px; 
+    padding: 16px; 
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); 
+    z-index: 50; 
+    width: 270px; 
+}
 
-/* Password Validation List */
-.password-requirements {
-  margin-top: 10px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  display: none;
+/* Nova animação que garante que fica centrada no eixo Y (-50%) */
+@keyframes slideOutRight { 
+    0% { opacity: 0; transform: translate(-20px, -50%); } 
+    100% { opacity: 1; transform: translate(0, -50%); } 
+}
+@keyframes slideDown { 
+    0% { opacity: 0; transform: translateY(-10px); } 
+    100% { opacity: 1; transform: translateY(0); } 
+}
+
+@media (min-width: 768px) {
+    #passwordRequirements { 
+        position: absolute; 
+        top: 50%; /* Centra verticalmente com o input */
+        left: calc(100% + 15px); 
+        animation: slideOutRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards; 
+    }
+    
+    #passwordRequirements::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -6px;
+        transform: translateY(-50%) rotate(45deg);
+        width: 12px;
+        height: 12px;
+        background: #f8fafc;
+        border-left: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+}
+
+@media (max-width: 767px) {
+    #passwordRequirements { position: relative; width: 100%; margin-top: 10px; animation: slideDown 0.3s ease forwards; }
 }
 
 .requirements-title {

@@ -1,0 +1,200 @@
+/* Estilos para o Modal de Seleção de Avatar do perfil*/
+
+
+/* Pop-up (Modal) - Wrapper Principal */
+.avatar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    
+    /* Controla apenas se o modal está ativo ou não */
+    visibility: visible;
+    transition: visibility 0.3s; 
+}
+
+/* Estado FECHADO do Wrapper */
+.avatar-modal.hidden {    
+    visibility: hidden;     
+    pointer-events: none;
+    display: flex !important; 
+}
+
+/* Fundo com Blur! */
+.avatar-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    
+    opacity: 1;
+    transform: translateZ(0); /* Força a criação de uma nova camada para melhor performance */
+    transition: opacity 0.3s ease;
+}
+
+/* Fundo FECHADO */
+.avatar-modal.hidden .avatar-modal-overlay {
+    opacity: 0;
+}
+
+/* Caixa Branca */
+.avatar-modal-content {
+    position: relative;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    z-index: 1001; 
+
+    opacity: 1;
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* Estado FECHADO da Caixa Branca */
+.avatar-modal.hidden .avatar-modal-content {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+/* Modo Escuro */
+body.dark-mode .avatar-modal-content {
+    background: #1e293b;
+    color: white;
+}
+
+.avatar-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.close-modal-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+}
+
+/* Grelha de Imagens */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1.5rem;
+}
+
+.avatar-option {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.avatar-option:hover {
+    transform: scale(1.05);
+    border-color: #3b82f6;
+}
+
+
+/* ====== Avatar Upload Section ====== */
+.upload-divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+.upload-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    border-top: 1px solid #e2e8f0;
+    z-index: 1;
+}
+.upload-divider span {
+    background: white;
+    padding: 0 10px;
+    color: #64748b;
+    position: relative;
+    z-index: 2;
+}
+body.dark-mode .upload-divider span { background: #1e293b; }
+body.dark-mode .upload-divider::before { border-top-color: #334155; }
+
+.avatar-upload-section {
+    display: flex;
+    justify-content: center;
+}
+.upload-btn {
+    display: flex;
+    align-items: center;
+    background: #f1f5f9;
+    color: #3b82f6;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px dashed #cbd5e1;
+}
+.upload-btn:hover { background: #e0f2fe; border-color: #3b82f6; }
+body.dark-mode .upload-btn { background: #334155; border-color: #475569; }
+
+
+/* Secção de Fotos Pessoais (Google e Uploads) */
+.personal-avatars-section {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.personal-avatar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Tamanho fixo para as bolinhas pessoais (um pouco mais pequenas que a grelha) */
+.personal-avatar-wrapper .avatar-option {
+    width: 70px;
+    height: 70px;
+    margin: 0; 
+}
+
+/* Estilo do texto "Google" ou "Último Upload" */
+.personal-avatar-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+body.dark-mode .personal-avatar-label {
+    color: #94a3b8;
+}
+
+
+/* Efeito para o Avatar Atualmente Selecionado */
+.avatar-option.active-avatar {
+    border: 3px solid #3b82f6; /* Azul CiberHeróis */
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+.avatar-option.active-avatar:hover {
+    transform: scale(1.05); 
+}
