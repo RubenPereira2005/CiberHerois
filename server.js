@@ -3,16 +3,28 @@ const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
 const session = require('express-session');
-
-// Importar o morgan e o teu novo logger
+const fs = require('fs'); // Necessário para criar as pastas
 const morgan = require('morgan'); 
 const logger = require('./utils/logger'); 
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// --- GARANTIR QUE AS PASTAS EXISTEM ---
+const imgDir = path.join(__dirname, 'img');
+if (!fs.existsSync(imgDir)){
+    fs.mkdirSync(imgDir);
+    console.log('📁 Pasta "img" criada automaticamente na raiz do projeto!');
+}
+
+// Criar a pasta uploads dentro da pasta img
+const uploadsDir = path.join(__dirname, 'img', 'uploads');
+if (!fs.existsSync(uploadsDir)){
+    fs.mkdirSync(uploadsDir);
+    console.log('📁 Sub-pasta "img/uploads" criada automaticamente!');
+}
+
 // Regista todos os pedidos HTTP (quem visita o quê) no log do sistema
-// Esta parte VAI APENAS PARA O FICHEIRO .LOG
 app.use(morgan((tokens, req, res) => {
     const status = tokens.status(req, res);
     const metodo = tokens.method(req, res);
@@ -46,6 +58,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'css')));
 app.use(express.static(path.join(__dirname, 'js')));
+app.use('/img', express.static(path.join(__dirname, 'img')));
 
 // Ligação BD
 const db = mysql.createConnection({
@@ -57,33 +70,24 @@ const db = mysql.createConnection({
 
 db.connect(err => {
     if (err) {
-        // Vai para o error.log
         logger.error(`[500] Falha na ligação à Base de Dados: ${err.message}`);
-        // Aparece APENAS no CMD
         console.error(`❌ ERRO BD: ${err.message}`); 
     } else {
-        // Vai para o security.log
         logger.info('[200] MySQL Conectado com sucesso!');
-        // Aparece APENAS no CMD
         console.log('✅ MySQL Conectado com sucesso!'); 
     }
 });
 
 // --- IMPORTAR ROTAS ---
-
-// 1. Autenticação (Login e Registo)
 const authRoutes = require('./routes/auth')(db); 
 app.use('/api', authRoutes);
 
-// 2. Perfil (Dados, Atualizar, Apagar)
 const profileRoutes = require('./routes/profile')(db); 
 app.use('/api', profileRoutes);
 
-// 3. Quizzes (Perguntas, Opções, etc)
 const quizRoutes = require('./routes/quiz')(db); 
 app.use('/api/quiz', quizRoutes);
 
-// 4. Recursos (PDF, Links, etc)
 const pdfRoutes = require('./routes/pdf')(db); 
 app.use('/api/pdf', pdfRoutes);
 
@@ -99,8 +103,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-    // Vai para o security.log
     logger.info(`[200] Servidor CiberHeróis pronto na porta ${port}`);
-    // Aparece apenas no CMD
     console.log(`🚀 Servidor CiberHeróis pronto em http://localhost:${port}`); 
 });
