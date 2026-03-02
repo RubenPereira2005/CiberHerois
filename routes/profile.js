@@ -22,7 +22,7 @@ module.exports = (db) => {
     router.get('/me', (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
-        const query = "SELECT nome, email, tipo_utilizador, foto_perfil, foto_google, foto_upload FROM Utilizador WHERE id_utilizador = ?";
+        const query = "SELECT nome, email, role, foto_perfil, foto_google, foto_upload FROM Utilizador WHERE id_utilizador = ?";
         
         db.query(query, [req.session.userId], (err, results) => {
             if (err) return res.status(500).json({ error: "Erro ao carregar perfil." });
