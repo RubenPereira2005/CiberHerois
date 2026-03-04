@@ -77,7 +77,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         lucide.createIcons();
 
         // Configuração do Toast
@@ -103,7 +103,7 @@
             input.type = input.type === "password" ? "text" : "password";
         }
 
-        // --- 1. LOGIN TRADICIONAL (Email e Password) ---
+        // LOGIN TRADICIONAL (Email e Password)
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -120,9 +120,14 @@
 
                 if (response.ok) {
                     sessionStorage.setItem('showLoginToast', 'true'); 
-                    window.location.href = 'dashboard.html';
+
+                    // Lógica de redirecionamento baseada na role do utilizador
+                    if (data.role === 'admin') {
+                        window.location.href = 'gestao.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
                 } else {
-                    // Se houver erro (password errada, conta não existe, ou conta do Google) mostra o Toast
                     showToast(data.error || "Email ou palavra-passe incorretos.", 'error');
                 }
             } catch (err) {
@@ -130,7 +135,7 @@
             }
         });
 
-        // --- 2. LOGIN COM GOOGLE ---
+        // LOGIN COM GOOGLE
         window.onload = function () {
             google.accounts.id.initialize({
                 client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com", 
@@ -138,15 +143,15 @@
             });
 
             google.accounts.id.renderButton(
-            document.getElementById("g_id_signin"), // Usa "g_id_signup" na página de registo
-            { 
-                theme: "filled_black",   // Opções: "outline", "filled_blue", "filled_black"
-                size: "large",           // Opções: "small", "medium", "large"
-                width: "300",            // Podes forçar a largura em pixeis (ex: "300")
-                text: "continue_with",   // Opções: "signin_with", "signup_with", "continue_with"
-                shape: "pill"            // Opções: "rectangular", "pill", "circle", "square"
-            }
-        );
+                document.getElementById("g_id_signin"),
+                { 
+                    theme: "filled_black",   
+                    size: "large",           
+                    width: "300",            
+                    text: "continue_with",   
+                    shape: "pill"            
+                }
+            );
         };
 
         // Processar a resposta do Google
@@ -163,16 +168,20 @@
                 if (response.ok) {
                     // Sucesso!
                     sessionStorage.setItem('showLoginToast', 'true');
-                    window.location.href = 'dashboard.html';
+                    
+                    // Redirecionar com base na role do utilizador
+                    if (data.role === 'admin') {
+                        window.location.href = 'gestao.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
                 } else {
-                    // Erro: Mostra o Toast de erro (ex: "Conta não encontrada")
                     showToast(data.error || "Erro ao entrar com o Google", "error");
 
-                    // Se a API indicar que a conta não existe e mandou redirecionar
                     if (data.redirect) {
                         setTimeout(() => {
                             window.location.href = 'register.html';
-                        }, 3000); // Espera 3 segundos para o utilizador ler o balão e depois redireciona
+                        }, 3000); 
                     }
                 }
             } catch (err) {

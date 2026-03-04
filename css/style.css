@@ -215,7 +215,7 @@ body.site-body {
   stroke-width: 1.5;
 }
 
-/* Main / Dashboard content - Deprecated: use auth-container instead */
+/* Main / quizzes content - Deprecated: use auth-container instead */
 
 .page-title {
   font-size: 36px;
@@ -757,6 +757,18 @@ body.site-body {
   background: #ef4444;
 }
 
+.resource-header-icon-purple {
+  background: #a855f7;
+}
+
+.resource-header-icon-yellow {
+  background: #fbbf24;
+}
+
+.resource-header-icon-orange {
+  background: #f97316;
+}
+
 .resource-header-icon i {
   color: #fff;
 }
@@ -802,14 +814,24 @@ body.site-body {
   border-left: 4px solid #10b981;
 }
 
-/* Variação Azul para Passwords */
+/* Variação Azul */
 .resource-section.border-blue {
     border-left-color: #3b82f6 !important;
 }
 
-/* Variação Vermelha para Phishing */
+/* Variação Vermelha */
 .resource-section.border-red {
     border-left-color: #ef4444 !important;
+}
+
+/* Variação Amarela */
+.resource-section.border-yellow {
+    border-left-color: #eab308 !important;
+}
+
+/* Variação Roxa*/
+.resource-section.border-purple {
+    border-left-color: #a855f7 !important;
 }
 
 .resource-section h2 {
@@ -840,6 +862,26 @@ body.site-body {
 
 .icon-red {
   color: #ef4444;
+  margin-top: 4px;
+}
+
+.icon-blue {
+  color: #3b82f6;
+  margin-top: 4px;
+}
+
+.icon-purple {
+  color: #a855f7;
+  margin-top: 4px;
+}
+
+.icon-yellow {
+  color: #fbbf24;
+  margin-top: 4px;
+}
+
+.icon-orange{
+  color: #f97316;
   margin-top: 4px;
 }
 
@@ -1683,7 +1725,7 @@ body.site-body {
     position: absolute;
     bottom: 0;
     right: 0;
-    background: #3b82f6;
+    background: #3b82f6; /* Azul CiberHeróis */
     color: white;
     border: none;
     border-radius: 50%;
@@ -2238,6 +2280,9 @@ body.site-body {
 .link-highlight:hover {
   color: #1d4ed8;
 }
+
+
+/* Password Validation List */
 
 /* Password Requirements (Flutuante) */
 #passwordRequirements { 

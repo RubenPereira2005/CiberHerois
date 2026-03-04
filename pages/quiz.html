@@ -87,7 +87,7 @@
 
             <div class="quiz-results-actions">
                 <button onclick="window.location.href='dashboard.html'" class="btn btn-primary">
-                    Voltar ao Dashboard
+                    Voltar ao quizzes
                 </button>
                 <button onclick="window.location.href='profile.html'" class="btn btn-secondary">
                     Ver Perfil
@@ -115,10 +115,10 @@
             return array;
         }
 
-        // Função que comunica com a API Node.js
+        // Função que comunica com a API para obter as questões do quiz com base na categoria
         async function loadQuizData() {
             try {
-                // Chama a rota que criaste no Node.js
+                
                 const response = await fetch(`/api/quiz/${category}`);
                 
                 if (!response.ok) throw new Error('Erro na resposta da API');

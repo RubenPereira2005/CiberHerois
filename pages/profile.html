@@ -16,7 +16,7 @@
         <div class="auth-navbar-inner">
             
             <div class="auth-navbar-left">
-                <a href="quizzes.html" class="auth-brand">
+                <a href="dashboard.html" class="auth-brand">
                     CiberHeróis
                 </a>
                 
@@ -25,7 +25,7 @@
                         Recursos
                     </a>
                     
-                    <a href="quizzes.html" class="auth-navbar-link">
+                    <a href="dashboard.html" class="auth-navbar-link">
                         Quizzes
                     </a>
                 </div>
@@ -253,7 +253,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             
-            // Carregar os dados do perfil do utilizador
+            // Carregar os dados do utilizador para mostrar o nome, email e avatar
             try {
                 const response = await fetch('/api/me');
                 
@@ -280,12 +280,12 @@
                                 ? `/img/uploads/${data.foto_perfil}` 
                                 : `/img/${data.foto_perfil}`;
                         }
-                        avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                        avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">`;
                     } else {
                         avatarElement.innerHTML = `<img src="/img/default_avatar.png" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                     }
 
-                    // Adicionar as bolinhas de avatar personalizadas (upload + Google) ao modal
+                    // Adicionar as bolinhas de avatar personalizadas (upload e Google) ao modal
                     const personalSection = document.getElementById('personal-avatars-section');
                     
                     // Bolinha: Último Upload
@@ -294,10 +294,17 @@
                         wrapperUpload.className = 'personal-avatar-wrapper';
 
                         const imgUpload = document.createElement('img');
-                        imgUpload.src = `/img/uploads/${data.foto_upload}`;
+                        
+                        // Nova lógica: Se o link já tiver "http" (Supabase), usa-o direto. Se não, usa a pasta antiga.
+                        let linkUpload = data.foto_upload;
+                        if (!linkUpload.startsWith('http')) {
+                            linkUpload = `/img/uploads/${data.foto_upload}`;
+                        }
+                        
+                        imgUpload.src = linkUpload;
                         imgUpload.className = 'avatar-option';
                         imgUpload.setAttribute('data-avatar', data.foto_upload);
-                        imgUpload.alt = "Meu Upload";
+                        imgUpload.setAttribute('referrerpolicy', 'no-referrer');
 
                         const labelUpload = document.createElement('span');
                         labelUpload.className = 'personal-avatar-label';
@@ -317,6 +324,7 @@
                         imgGoogle.src = data.foto_google;
                         imgGoogle.className = 'avatar-option';
                         imgGoogle.setAttribute('data-avatar', data.foto_google);
+                        imgGoogle.setAttribute('referrerpolicy', 'no-referrer');
                         imgGoogle.alt = "Foto do Google";
 
                         const labelGoogle = document.createElement('span');
@@ -340,7 +348,7 @@
                 console.error("Erro ao carregar perfil:", error);
             }
 
-            // Lógica para abrir e fechar o modal de seleção de avatar
+            // Lógica para abrir e fechar o modal de escolha de avatar
             const modal = document.getElementById('avatar-modal');
             const btnOpen = document.getElementById('edit-avatar-btn');
             const btnClose = document.getElementById('close-avatar-btn');
@@ -350,10 +358,10 @@
             if (btnClose) btnClose.addEventListener('click', () => modal.classList.add('hidden'));
             if (overlay) overlay.addEventListener('click', () => modal.classList.add('hidden'));
 
-            // Lógica para selecionar um avatar e atualizar a imagem de perfil
+            // Clique numa imagem do modal para a tornar o novo avatar
             const modalContent = document.querySelector('.avatar-modal-content');
             modalContent.addEventListener('click', async (e) => {
-                // Só reagir se clicar numa imagem de avatar (e não, por exemplo, na caixa branca do modal)
+                // Se clicou numa imagem que tem a classe 'avatar-option' (em qualquer zona do modal)
                 if (e.target.classList.contains('avatar-option')) {
                     const novoAvatar = e.target.getAttribute('data-avatar');
 
@@ -366,9 +374,9 @@
 
                         if (response.ok) {
 
-                            // Tira a borda azul de todas as imagens
+                            // 1. Tira a borda azul de todas as imagens
                             document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('active-avatar'));
-                            // Adiciona a borda azul à imagem clicada
+                            // 2. Coloca a borda azul na imagem que foi clicada
                             e.target.classList.add('active-avatar');
 
                             // Atualiza a imagem na página
@@ -378,7 +386,7 @@
                             }
                             
                             const avatarElement = document.querySelector('.profile-avatar');
-                            avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                            avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">`;
                             modal.classList.add('hidden');
                         } else {
                             alert('Erro ao atualizar avatar.');
@@ -389,7 +397,7 @@
                 }
             });
 
-            // Lógica para fazer upload de um novo avatar personalizado
+            //Upload de nova imagem personalizada
             const inputUpload = document.getElementById('custom-avatar-input');
             if (inputUpload) {
                 inputUpload.addEventListener('change', async (e) => {
@@ -406,7 +414,8 @@
                         });
 
                         if (response.ok) {
-                            // Após o upload, recarrega os dados do perfil para mostrar a nova imagem e adicioná-la ao modal
+                            // Após fazer o upload, a forma mais segura de desenhar a nova bolinha 
+                            // de upload lá em baixo é fazer reload da página.
                             window.location.reload();
                         } else {
                             alert('Erro ao fazer upload da imagem.');

@@ -472,14 +472,22 @@ body.dark-mode .form-input:focus {
     box-shadow: 0 0 0 1px #2563eb !important;
 }
 
-/* Requisitos da Password */
-body.dark-mode .password-requirements {
-    background-color: #0f172a !important; /* Fundo mais escuro para destaque */
-    border-color: #334155 !important;
+/* Requisitos da Password (Caixa Flutuante) */
+body.dark-mode #passwordRequirements {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Pinta o losango (setinha) com a mesma cor da caixa no Dark Mode */
+body.dark-mode #passwordRequirements::before {
+    background: #1e293b !important; 
+    border-left: 1px solid #334155 !important;
+    border-bottom: 1px solid #334155 !important;
 }
 
 body.dark-mode .requirements-title {
-    color: #cbd5e1 !important;
+  color: #f8fafc !important;
 }
 
 body.dark-mode .requirement-item {
@@ -643,6 +651,19 @@ body.dark-mode .resource-section.border-blue {
     border-left-color: #60a5fa !important; /* Azul mais claro para o modo dark */
 }
 
+body.dark-mode .resource-section.border-yellow {
+    border-left-color: #eab308 !important; /* Amarelo mais claro para o modo dark */
+}
+
+body.dark-mode .resource-section.border-purple {
+    border-left-color: #a855f7 !important; /* Roxo mais claro para o modo dark */
+}
+
+body.dark-mode .resource-section.border-orange {
+    border-left-color: #f97316 !important; /* Laranja mais claro para o modo dark */
+}
+
+
 /* Caixa de Melhores Práticas (Verde) */
 body.dark-mode .resource-best-practices {
     background-color: rgba(16, 185, 129, 0.1) !important; /* Verde muito escuro/transparente */
@@ -707,6 +728,22 @@ body.dark-mode .resource-cta-box p {
 /* Overrides for new classes */
 body.dark-mode .icon-red {
     color: #f87171 !important; /* lighter red for dark mode */
+}
+
+body.dark-mode .icon-blue {
+    color: #60a5fa !important; /* lighter blue for dark mode */
+}
+
+body.dark-mode .icon-purple {
+    color: #a855f7 !important; /* lighter purple for dark mode */
+}
+
+body.dark-mode .icon-yellow {
+    color: #fbbf24 !important; /* lighter yellow for dark mode */
+}
+
+body.dark-mode .icon-orange {
+    color: #f97316 !important; /* lighter orange for dark mode */
 }
 
 body.dark-mode .quiz-option-seq {
