@@ -68,7 +68,8 @@
 
         <div class="resources-section">
             <h2 class="resources-section-title">Todos os Recursos</h2>
-            <div class="resources-grid">
+            
+            <div class="resources-grid" id="grid-recursos">
                 
                 <div class="resource-card resource-card-green">
                     <div class="resource-card-top"></div>
@@ -219,8 +220,7 @@
                         </div>
                     </div>
                 </div>
-
-            </div>
+                </div>
         </div>
 
         <div class="game-banner">
@@ -285,20 +285,14 @@
     <script>
         lucide.createIcons();
 
+        // Função para lidar com o download do recurso
         function handleDownload(resourceName) {
             const toast = document.getElementById('download-toast');
             
             if (toast) {
-                // 1. Mostrar o popup
                 toast.classList.add('active');
-                
-                // Forçar o Lucide a renderizar o ícone de loader caso ele não apareça
                 lucide.createIcons();
-
-                // 2. Iniciar o download (redirecionar para a API)
                 window.location.href = `/api/pdf/download/${resourceName}`;
-
-                // 3. Esconder o popup após 3.2 segundos
                 setTimeout(() => {
                     toast.classList.remove('active');
                 }, 3200);
@@ -306,6 +300,70 @@
                 window.location.href = `/api/pdf/download/${resourceName}`;
             }
         }
+
+        // Função para carregar novos recursos da Base de Dados e adicioná-los à página
+        async function carregarNovosRecursos() {
+            try {
+                const response = await fetch('/api/gestao/resources');
+                if (!response.ok) return;
+
+                const recursosNovos = await response.json();
+                const grid = document.getElementById('grid-recursos');
+
+                recursosNovos.forEach(rec => {
+                    // Garante que o link tem .html para funcionar corretamente
+                    let linkVer = rec.url_conteudo;
+                    if (!linkVer.startsWith('http') && !linkVer.endsWith('.html') && !linkVer.endsWith('.pdf')) {
+                        linkVer += '.html';
+                    }
+
+                    // Previne erros caso a cor ou ícone não venham preenchidos
+                    let cor = rec.cor_card || 'blue';
+                    let icone = rec.icone_card || 'book-open';
+                    let tipoFormatado = rec.tipo.charAt(0).toUpperCase() + rec.tipo.slice(1);
+
+                    // Cria o HTML do novo cartão (Idêntico aos antigos)
+                    const htmlCartao = `
+                        <div class="resource-card resource-card-${cor}">
+                            <div class="resource-card-top"></div>
+                            <div class="resource-card-content">
+                                <div class="resource-card-header">
+                                    <div class="resource-card-icon resource-card-icon-${cor}">
+                                        <i data-lucide="${icone}"></i>
+                                    </div>
+                                    <div class="resource-card-text">
+                                        <div class="resource-card-label">${tipoFormatado}</div>
+                                        <h3 class="resource-card-title">${rec.titulo}</h3>
+                                        <p class="resource-card-description">${rec.descricao}</p>
+                                    </div>
+                                </div>
+                                <div class="resource-card-actions">
+                                    <a href="${linkVer}" class="resource-card-btn resource-card-btn-primary">
+                                        <i data-lucide="external-link"></i>
+                                        Ver
+                                    </a>
+                                    <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('${rec.url_conteudo.replace('.html', '')}')">
+                                        <i data-lucide="download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Insere o novo cartão no final da lista atual
+                    grid.insertAdjacentHTML('beforeend', htmlCartao);
+                });
+
+                // Renderiza os ícones dos novos cartões inseridos
+                lucide.createIcons();
+
+            } catch (error) {
+                console.error("Erro ao carregar os recursos recentes da Base de Dados:", error);
+            }
+        }
+
+        // Executa a função automaticamente assim que a página abrir
+        carregarNovosRecursos();
     </script>
 </body>
 </html>

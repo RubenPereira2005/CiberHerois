@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de gestaoistração - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="gestao.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+</head>
+<body class="site-body">
+
+    <nav class="auth-navbar">
+        <div class="auth-navbar-inner">
+            <div class="auth-navbar-left">
+                <a href="dashboard.html" class="auth-brand">CiberHeróis | <span style="color:#ef4444">gestao</span></a>
+            </div>
+            
+            <div class="auth-navbar-right">
+                <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
+                    <i data-lucide="sun" class="auth-navbar-icon"></i>
+                </button>
+                <a href="dashboard.html" class="btn btn-secondary" style="margin-left: 10px;">Voltar ao Site</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container resources-container">
+        <div class="gestao-header">
+            <h1 class="resources-title">Base de Dados: Gestão</h1>
+        </div>
+
+        <div class="gestao-tabs">
+            <button class="gestao-tab active" onclick="switchTab('recursos')">Tabela de Recursos</button>
+            <button class="gestao-tab" onclick="switchTab('quizzes')">Tabela de Quizzes</button>
+        </div>
+
+        <div id="tab-recursos" class="tab-content active">
+            <div class="gestao-actions-top">
+                <button class="btn btn-primary" onclick="prepararNovoRecurso()">
+                    <i data-lucide="plus"></i> Criar Novo Recurso Visual
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Visual</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>URL / Ficheiro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resources-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-quizzes" class="tab-content">
+            <div class="gestao-actions-top" style="justify-content: space-between;">
+                <button class="btn btn-primary" onclick="prepararNovoQuiz()">
+                    <i data-lucide="plus"></i> Adicionar Pergunta
+                </button>
+                
+                <div class="filter-container">
+                    <label for="filter-categoria" style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">Filtrar Categoria:</label>
+                    <select id="filter-categoria" class="filter-select" onchange="renderQuizzes()">
+                        <option value="todas">Todas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <button class="btn-sort" onclick="toggleSortID()" title="Ordenar ID">
+                                    ID <i data-lucide="arrow-up-down" style="width:14px;height:14px;"></i>
+                                </button>
+                            </th>
+                            <th>Categoria</th>
+                            <th>
+                                <button class="btn-sort" onclick="toggleSortDificuldade()" title="Ordenar Dificuldade">
+                                    Dificuldade <i data-lucide="arrow-up-down" style="width:14px;height:14px;"></i>
+                                </button>
+                            </th>
+                            <th>Pergunta</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quizzes-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-recurso" class="modal">
+        <div class="modal-content modal-large">
+            <h2 id="titulo-modal-recurso">Criar Novo Recurso</h2>
+            <form id="form-recurso" onsubmit="salvarRecurso(event)">
+                <div class="gestao-panel-section">
+                    <h3 class="gestao-panel-title blue">1. Informação do Cartão (Dashboard)</h3>
+                    <div class="gestao-flex-row">
+                        <div class="form-group" style="flex:1;"><label>Título</label><input type="text" id="rec-titulo" required></div>
+                        <div class="form-group" style="flex:1;"><label>Categoria</label><input type="text" id="rec-cat" required></div>
+                    </div>
+                    <div class="form-group"><label>Descrição Curta</label><input type="text" id="rec-desc" required></div>
+                    <label style="color:#64748b; margin-bottom:10px; display:block; font-weight:bold;">Cor do Tema:</label>
+                    <div class="color-selector" id="color-picker">
+                        <div class="color-circle active" data-color="green" style="background:#10b981" onclick="selectColor('green')"></div>
+                        <div class="color-circle" data-color="blue" style="background:#3b82f6" onclick="selectColor('blue')"></div>
+                        <div class="color-circle" data-color="red" style="background:#ef4444" onclick="selectColor('red')"></div>
+                        <div class="color-circle" data-color="purple" style="background:#a855f7" onclick="selectColor('purple')"></div>
+                        <div class="color-circle" data-color="yellow" style="background:#eab308" onclick="selectColor('yellow')"></div>
+                        <div class="color-circle" data-color="orange" style="background:#f97316" onclick="selectColor('orange')"></div>
+                    </div>
+                    <input type="hidden" id="rec-cor" value="green">
+                    <div class="gestao-flex-row">
+                        <div class="form-group" style="flex: 1;"><label>Ícone (Lucide)</label><input type="text" id="rec-icone" value="shield-alert" required></div>
+                        <div class="form-group" style="flex: 1;"><label>Link (Sem .html)</label><input type="text" id="rec-url" required></div>
+                    </div>
+                </div>
+
+                <div class="gestao-panel-section">
+                    <h3 class="gestao-panel-title green">2. Conteúdo da Página HTML</h3>
+                    <div id="seccoes-container"></div>
+                    <div style="text-align: center;"><button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Adicionar Outro Retângulo</button></div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
+                    <button type="submit" id="btn-submit-recurso" class="btn btn-primary">Gravar e Gerar HTML</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-quiz" class="modal">
+        <div class="modal-content">
+            <h2 id="titulo-modal-quiz">Adicionar Pergunta à BD</h2>
+            <form id="form-quiz" onsubmit="salvarPergunta(event)">
+                <div class="form-group"><label>Categoria</label><input type="text" id="quiz-cat" required></div>
+                <div class="form-group">
+                    <label>Dificuldade</label>
+                    <select id="quiz-diff">
+                        <option value="facil">Fácil</option>
+                        <option value="medio">Médio</option>
+                        <option value="dificil">Difícil</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>A Pergunta</label><textarea id="quiz-texto" rows="2" required></textarea></div>
+                <div class="form-group">
+                    <label>Opções de Resposta (Marque a certa)</label>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio0" value="0" required> <input type="text" id="op0" placeholder="Opção 1" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input type="text" id="op1" placeholder="Opção 2" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input type="text" id="op2" placeholder="Opção 3" required></div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quiz')">Cancelar</button>
+                    <button type="submit" id="btn-submit-quiz" class="btn btn-primary">Guardar Pergunta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let editandoRecursoId = null;
+        let editandoQuizId = null;
+        let editandoQuizAtividadeId = null;
+
+        // Variaveis de Controlo de Filtro e Ordenação dos Quizzes
+        let allQuizzes = []; 
+        let sortDiffDir = null; // Pode ser 'asc' (fácil -> difícil) ou 'desc' (difícil -> fácil)
+        let sortIdDir = null; // Pode ser 'asc' (ID crescente) ou 'desc' (ID decrescente)
+        const diffWeights = { 'facil': 1, 'medio': 2, 'dificil': 3 };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.gestao-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function selectColor(color) {
+            document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.color-circle[data-color="${color}"]`).classList.add('active');
+            document.getElementById('rec-cor').value = color;
+        }
+
+        // ==========================================
+        // RECURSOS
+        // ==========================================
+        async function carregarRecursos() {
+            const res = await fetch('/api/gestao/resources');
+            const dados = await res.json();
+            const tbody = document.getElementById('resources-tbody');
+            tbody.innerHTML = '';
+            
+            dados.forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#${r.id_material}</strong></td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--color-${r.cor_card || 'blue'});"></span> 
+                                <i data-lucide="${r.icone_card || 'book'}" style="width:18px; height:18px; color:var(--text-secondary);"></i>
+                            </div>
+                        </td>
+                        <td><strong>${r.titulo}</strong></td>
+                        <td>${r.tipo}</td>
+                        <td><code>${r.url_conteudo}</code></td>
+                        <td>
+                            <button class="btn-edit" onclick="editarRecurso(${r.id_material})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width:16px;height:16px;"></i></button>
+                            <button class="btn-danger" onclick="apagarRecurso(${r.id_material})" title="Apagar"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function adicionarSeccao(icone = 'info', titulo = '', texto = '') {
+            const container = document.getElementById('seccoes-container');
+            const html = `
+                <div class="form-group seccao-item">
+                    <div class="gestao-flex-row">
+                        <div style="flex:1;"><label>Ícone</label><input type="text" class="sec-icon" value="${icone}" required></div>
+                        <div style="flex:3;"><label>Título</label><input type="text" class="sec-title" value="${titulo}" required></div>
+                    </div>
+                    <label>Texto</label><textarea class="sec-text" rows="3" required>${texto}</textarea>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function prepararNovoRecurso() {
+            editandoRecursoId = null;
+            document.getElementById('form-recurso').reset();
+            document.getElementById('seccoes-container').innerHTML = '';
+            adicionarSeccao();
+            document.getElementById('titulo-modal-recurso').textContent = 'Criar Novo Recurso';
+            document.getElementById('btn-submit-recurso').textContent = 'Gravar e Gerar HTML';
+            openModal('modal-recurso');
+        }
+
+        async function editarRecurso(id) {
+            editandoRecursoId = id;
+            const res = await fetch(`/api/gestao/resources/${id}`);
+            const r = await res.json();
+            document.getElementById('rec-titulo').value = r.titulo;
+            document.getElementById('rec-cat').value = r.tipo || '';
+            document.getElementById('rec-desc').value = r.descricao;
+            document.getElementById('rec-cor').value = r.cor_card;
+            document.getElementById('rec-icone').value = r.icone_card;
+            document.getElementById('rec-url').value = r.url_conteudo.replace('.html', '');
+            
+            document.querySelectorAll('.color-circle').forEach(c => {
+                c.classList.remove('active');
+                if(c.getAttribute('data-color') === r.cor_card) {
+                    c.classList.add('active');
+                }
+            });
+
+            const container = document.getElementById('seccoes-container');
+            container.innerHTML = '';
+            let seccoesGuardadas = [];
+            if(r.seccoes) { try { seccoesGuardadas = JSON.parse(r.seccoes); } catch (e) {} }
+            if(seccoesGuardadas.length > 0) {
+                seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto));
+            } else { adicionarSeccao(); }
+
+            document.getElementById('titulo-modal-recurso').textContent = 'Editar Recurso #' + id;
+            document.getElementById('btn-submit-recurso').textContent = 'Atualizar Recurso';
+            openModal('modal-recurso');
+        }
+
+        async function salvarRecurso(e) {
+            e.preventDefault();
+            let seccoesArray = [];
+            const icones = document.querySelectorAll('.sec-icon');
+            const titulos = document.querySelectorAll('.sec-title');
+            const textos = document.querySelectorAll('.sec-text');
+            for(let i = 0; i < titulos.length; i++) {
+                seccoesArray.push({ icone: icones[i].value, titulo: titulos[i].value, texto: textos[i].value });
+            }
+
+            const payload = {
+                titulo: document.getElementById('rec-titulo').value,
+                tipo: document.getElementById('rec-cat').value,
+                descricao: document.getElementById('rec-desc').value,
+                cor_card: document.getElementById('rec-cor').value,
+                icone_card: document.getElementById('rec-icone').value,
+                url_conteudo: document.getElementById('rec-url').value,
+                seccoes: seccoesArray
+            };
+
+            const btn = document.getElementById('btn-submit-recurso');
+            btn.textContent = 'A gravar...'; btn.disabled = true;
+            const url = editandoRecursoId ? `/api/gestao/resources/${editandoRecursoId}` : '/api/gestao/resources';
+            const metodo = editandoRecursoId ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if(res.ok) { closeModal('modal-recurso'); carregarRecursos(); }
+            } catch (err) { alert("Erro de ligação."); } 
+            finally { btn.textContent = editandoRecursoId ? 'Atualizar Recurso' : 'Gravar e Gerar HTML'; btn.disabled = false; }
+        }
+
+        async function apagarRecurso(id) {
+            if(confirm('Tem a certeza? Isto apaga a página HTML do servidor e o cartão.')) {
+                await fetch(`/api/gestao/resources/${id}`, { method: 'DELETE' });
+                carregarRecursos();
+            }
+        }
+
+        // ==========================================
+        // QUIZZES (FILTRO, ORDENAÇÃO E LÓGICA)
+        // ==========================================
+        async function carregarQuizzes() {
+            const res = await fetch('/api/gestao/quizzes');
+            allQuizzes = await res.json();
+            
+            // Popula as opções do Filtro Categoria com os dados recebidos
+            const categoriasUnicas = [...new Set(allQuizzes.map(q => q.categoria))];
+            const filterSelect = document.getElementById('filter-categoria');
+            
+            // Mantém a categoria que já estava escolhida, senão escolhe "todas"
+            const valorAtual = filterSelect.value || 'todas';
+            filterSelect.innerHTML = '<option value="todas">Todas</option>';
+            categoriasUnicas.forEach(cat => {
+                filterSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+            filterSelect.value = valorAtual;
+
+            renderQuizzes();
+        }
+
+        function toggleSortDificuldade() {
+            sortIdDir = null; // Limpa a ordenação do ID
+            // Alterna a direção da ordenação: asc -> desc -> asc...
+            if (sortDiffDir === 'asc') sortDiffDir = 'desc';
+            else sortDiffDir = 'asc';
+            
+            renderQuizzes();
+        }
+
+        function toggleSortID() {
+            sortDiffDir = null; // Limpa a ordenação da Dificuldade
+            // Alterna a direção da ordenação: asc -> desc -> asc...
+            if (sortIdDir === 'asc') sortIdDir = 'desc';
+            else sortIdDir = 'asc';
+            
+            renderQuizzes();
+        }
+
+        function renderQuizzes() {
+            const tbody = document.getElementById('quizzes-tbody');
+            tbody.innerHTML = '';
+            
+            const categoriaSelecionada = document.getElementById('filter-categoria').value;
+            
+            // 1. Aplicar o Filtro
+            let quizzesFiltrados = [...allQuizzes]; // Fazer uma cópia para não alterar o array original
+            if (categoriaSelecionada !== 'todas') {
+                quizzesFiltrados = quizzesFiltrados.filter(q => q.categoria === categoriaSelecionada);
+            }
+
+            // 2. Aplicar a Ordenação (Dificuldade)
+            if (sortDiffDir !== null) {
+                quizzesFiltrados.sort((a, b) => {
+                    const pesoA = diffWeights[a.dificuldade] || 0;
+                    const pesoB = diffWeights[b.dificuldade] || 0;
+                    
+                    if (sortDiffDir === 'asc') return pesoA - pesoB; // Fácil -> Difícil
+                    return pesoB - pesoA; // Difícil -> Fácil
+                });
+            }
+
+            // 3. Aplicar a Ordenação (ID)
+            if (sortIdDir !== null) {
+                quizzesFiltrados.sort((a, b) => {
+                    if (sortIdDir === 'asc') return a.id_pergunta - b.id_pergunta; // Menor -> Maior
+                    return b.id_pergunta - a.id_pergunta; // Maior -> Menor
+                });
+            }
+
+            // 4. Renderizar o HTML
+            quizzesFiltrados.forEach(q => {
+                let badge = q.dificuldade === 'facil' ? '🟢' : q.dificuldade === 'medio' ? '🟡' : '🔴';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#${q.id_pergunta}</strong></td>
+                        <td><span style="background:var(--bg-card); border:1px solid var(--border-color); padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">${q.categoria}</span></td>
+                        <td>${badge} <span style="text-transform:capitalize;">${q.dificuldade}</span></td>
+                        <td style="max-width:350px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${q.texto_pergunta}">${q.texto_pergunta}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarQuiz(${q.id_pergunta})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width:16px;height:16px;"></i></button>
+                            <button class="btn-danger" onclick="apagarQuiz(${q.id_pergunta})" title="Apagar"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function prepararNovoQuiz() {
+            editandoQuizId = null; editandoQuizAtividadeId = null;
+            document.getElementById('form-quiz').reset();
+            document.getElementById('titulo-modal-quiz').textContent = 'Adicionar Pergunta à BD';
+            document.getElementById('btn-submit-quiz').textContent = 'Guardar Pergunta';
+            openModal('modal-quiz');
+        }
+
+        async function editarQuiz(id) {
+            editandoQuizId = id;
+            const res = await fetch(`/api/gestao/quizzes/${id}`);
+            const data = await res.json();
+            const q = data.pergunta;
+            editandoQuizAtividadeId = q.id_atividade;
+
+            document.getElementById('quiz-cat').value = q.categoria;
+            document.getElementById('quiz-diff').value = q.dificuldade;
+            document.getElementById('quiz-texto').value = q.texto_pergunta;
+            document.querySelectorAll('input[name="correta"]').forEach(r => r.checked = false);
+            data.opcoes.forEach((op, index) => {
+                const inputTexto = document.getElementById('op' + index);
+                if (inputTexto) {
+                    inputTexto.value = op.texto_opcao;
+                    if (op.e_correta === 1) document.getElementById('radio' + index).checked = true;
+                }
+            });
+
+            document.getElementById('titulo-modal-quiz').textContent = 'Editar Pergunta #' + id;
+            document.getElementById('btn-submit-quiz').textContent = 'Atualizar Pergunta';
+            openModal('modal-quiz');
+        }
+
+        async function salvarPergunta(e) {
+            e.preventDefault();
+            let opcoesArray = [ document.getElementById('op0').value, document.getElementById('op1').value, document.getElementById('op2').value ];
+            if(document.getElementById('op3') && document.getElementById('op3').value !== '') opcoesArray.push(document.getElementById('op3').value);
+
+            const payload = {
+                texto_pergunta: document.getElementById('quiz-texto').value, categoria: document.getElementById('quiz-cat').value,
+                dificuldade: document.getElementById('quiz-diff').value, opcoes: opcoesArray,
+                corretaIndex: document.querySelector('input[name="correta"]:checked').value, id_atividade: editandoQuizAtividadeId
+            };
+
+            const url = editandoQuizId ? `/api/gestao/quizzes/${editandoQuizId}` : '/api/gestao/quiz';
+            const metodo = editandoQuizId ? 'PUT' : 'POST';
+            const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if(res.ok) { closeModal('modal-quiz'); carregarQuizzes(); }
+        }
+
+        async function apagarQuiz(id) {
+            if(confirm('Tem a certeza? As opções ligadas a esta pergunta também serão apagadas.')) {
+                await fetch(`/api/gestao/quizzes/${id}`, { method: 'DELETE' });
+                carregarQuizzes();
+            }
+        }
+
+        carregarRecursos();
+        carregarQuizzes();
+    </script>
+</body>
+</html>
