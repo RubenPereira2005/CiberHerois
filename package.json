@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
@@ -18,7 +19,6 @@
     "google-auth-library": "^10.6.1",
     "morgan": "^1.10.1",
     "multer": "^2.1.0",
-    "mysql2": "^3.16.3",
     "puppeteer": "^24.37.4",
     "winston": "^3.19.0"
   }
