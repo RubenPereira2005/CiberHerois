@@ -1,9 +1,10 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql2');
+const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
 const session = require('express-session');
-const fs = require('fs'); // Necessário para criar as pastas
+const fs = require('fs'); 
+
 const morgan = require('morgan'); 
 const logger = require('./utils/logger'); 
 
@@ -17,14 +18,7 @@ if (!fs.existsSync(imgDir)){
     console.log('📁 Pasta "img" criada automaticamente na raiz do projeto!');
 }
 
-// Criar a pasta uploads dentro da pasta img
-const uploadsDir = path.join(__dirname, 'img', 'uploads');
-if (!fs.existsSync(uploadsDir)){
-    fs.mkdirSync(uploadsDir);
-    console.log('📁 Sub-pasta "img/uploads" criada automaticamente!');
-}
-
-// Regista todos os pedidos HTTP (quem visita o quê) no log do sistema
+// Regista todos os pedidos HTTP
 app.use(morgan((tokens, req, res) => {
     const status = tokens.status(req, res);
     const metodo = tokens.method(req, res);
@@ -54,55 +48,74 @@ app.use(session({
     saveUninitialized: false
 }));
 
+// Proteção gestao
+app.get('/gestao.html', (req, res, next) => {
+    if (req.session && req.session.role === 'admin') {
+        next(); 
+    } else {
+        res.status(404).send(`<h1>404</h1><p>Acesso Negado</p>`);
+    }
+});
+
 // Servir Estáticos
 app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'css')));
 app.use(express.static(path.join(__dirname, 'js')));
 app.use('/img', express.static(path.join(__dirname, 'img')));
 
-// Ligação BD
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-});
+// ==========================================
+// LIGAÇÃO AO SUPABASE
+// ==========================================
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
 
-db.connect(err => {
-    if (err) {
-        logger.error(`[500] Falha na ligação à Base de Dados: ${err.message}`);
-        console.error(`❌ ERRO BD: ${err.message}`); 
-    } else {
-        logger.info('[200] MySQL Conectado com sucesso!');
-        console.log('✅ MySQL Conectado com sucesso!'); 
+if (!supabaseUrl || !supabaseKey) {
+    console.error('❌ ERRO CRÍTICO: Variáveis SUPABASE_URL ou SUPABASE_KEY não foram encontradas no ficheiro .env!'); 
+    logger.error('❌ ERRO CRÍTICO: Variáveis em falta no .env');
+    process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Testar a ligação
+async function testarLigacaoSupabase() {
+    try {
+        const { error } = await supabase.from('utilizador').select('id_utilizador').limit(1);
+        if (error) throw error;
+        logger.info('[200] Supabase Conectado com sucesso!');
+        console.log('✅ Supabase Conectado com sucesso!'); 
+    } catch (err) {
+        console.error(`❌ ERRO SUPABASE: ${err.message}`); 
     }
-});
+}
+testarLigacaoSupabase();
 
 // --- IMPORTAR ROTAS ---
-const authRoutes = require('./routes/auth')(db); 
+const authRoutes = require('./routes/auth')(supabase); 
 app.use('/api', authRoutes);
 
-const profileRoutes = require('./routes/profile')(db); 
+const profileRoutes = require('./routes/profile')(supabase); 
 app.use('/api', profileRoutes);
 
-const quizRoutes = require('./routes/quiz')(db); 
+const quizRoutes = require('./routes/quiz')(supabase); 
 app.use('/api/quiz', quizRoutes);
 
-const pdfRoutes = require('./routes/pdf')(db); 
+const pdfRoutes = require('./routes/pdf')(supabase); 
 app.use('/api/pdf', pdfRoutes);
+
+const gestaoRoutes = require('./routes/gestao')(supabase);
+app.use('/api/gestao', gestaoRoutes);
 
 // Rota principal (Frontend)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
-// Middleware de Erros Globais (Rede de Segurança)
+// Middleware de Erros Globais
 app.use((err, req, res, next) => {
-    logger.error(`[500] Falha Crítica em ${req.originalUrl} | Motivo: ${err.message} | IP: ${req.ip}`);
-    res.status(500).json({ erro: 'Ups! Ocorreu um erro interno. A nossa equipa de segurança foi notificada.' });
+    res.status(500).json({ erro: 'Ups! Ocorreu um erro interno.' });
 });
 
 app.listen(port, () => {
-    logger.info(`[200] Servidor CiberHeróis pronto na porta ${port}`);
     console.log(`🚀 Servidor CiberHeróis pronto em http://localhost:${port}`); 
 });
