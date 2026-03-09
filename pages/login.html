@@ -1,29 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CiberHeróis</title>
+    <title>Iniciar Sessão - CiberHeróis</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="google.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         .divider-container {
-            display: flex; align-items: center; text-align: center; margin: 20px 0;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
         }
-        .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
-        .divider-text { margin: 0 10px; color: #64748b; font-size: 0.875rem; }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider-text {
+            margin: 0 10px;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        /* Estilos do botão de Reenviar */
+        #resendBtn:disabled {
+            cursor: not-allowed;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        #resendBtn:not(:disabled) {
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        /* Estilos das Caixinhas do Código (OTP) - CORRIGIDO PARA DARK MODE */
+        .otp-boxes-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .otp-box {
+            width: 40px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 8px;
+            /* Borda semi-transparente que se nota em qualquer fundo */
+            border: 2px solid rgba(148, 163, 184, 0.4);
+            /* Fundo ligeiramente destacado do fundo da página */
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-color);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .otp-box:focus {
+            /* O teu verde de destaque quando clica na caixa */
+            border-color: #10b981;
+            background: transparent;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Responsividade para telemóveis muito pequenos */
+        @media (max-width: 400px) {
+            .otp-box {
+                width: 32px;
+                height: 45px;
+                font-size: 1.2rem;
+                gap: 4px;
+            }
+        }
     </style>
 </head>
+
 <body class="login-page">
 
     <div id="toast-container" class="toast-container">
         <div class="toast-content">
             <i id="toast-icon-element" data-lucide="alert-circle" class="toast-icon"></i>
-            <span id="toast-message-element" class="toast-message">Mensagem de aviso</span>
+            <span id="toast-message-element" class="toast-message">Mensagem aqui</span>
         </div>
         <div class="toast-progress"></div>
     </div>
@@ -34,53 +103,100 @@
                 <h2 class="login-title">CiberHeróis</h2>
             </div>
 
-            <h3 class="login-subtitle">Iniciar Sessão</h3>
-            
+            <h3 class="login-subtitle" id="formSubtitle">Iniciar sessão</h3>
+            <p id="mfaInstructions"
+                style="display: none; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+                Identidade verificada! <br>Enviámos um código de 8 dígitos para o teu e-mail por motivos de segurança
+                (MFA ativo).
+            </p>
+
             <form id="loginForm" class="login-form">
-                <div class="form-group">
+
+                <div class="form-group" id="emailGroup">
                     <label class="form-label">Email</label>
                     <input type="email" id="loginEmail" required class="form-input" placeholder="exemplo@email.com" />
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Password</label>
+                <div class="form-group" id="passwordGroup">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label class="form-label">Password</label>
+                        <a href="forgot-password.html" class="link-highlight"
+                            style="font-size: 0.8rem;">Esqueceu-se?</a>
+                    </div>
                     <div class="password-input-wrapper">
                         <input type="password" id="loginPassword" required class="form-input" placeholder="••••••••" />
-                        <button type="button" onclick="togglePassword()" class="password-toggle-btn">
-                            <i data-lucide="eye" id="eyeIcon" class="icon-eye"></i>
+                        <button type="button" onclick="toggleVisibility('loginPassword')" class="password-toggle-btn">
+                            <i data-lucide="eye" class="icon-eye"></i>
                         </button>
                     </div>
                 </div>
-                <a href="forgot-password.html" class="forgot-password-link">Esqueci-me da palavra-passe</a>
 
-                <button type="submit" class="login-btn">Entrar</button>
+                <div class="form-group" id="codeGroup" style="display: none;">
+                    <label class="form-label" style="color:#10b981; text-align: left; display: block; margin-bottom: 10px;">Código de Segurança (8 dígitos)</label>
 
-                <div class="divider-container">
-                    <span class="divider-line"></span>
-                    <span class="divider-text">ou continuar com</span>
-                    <span class="divider-line"></span>
+                    <div class="otp-boxes-container">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                        <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
+                    </div>
+
+                    <input type="hidden" id="otpCode" />
                 </div>
-                
-                <div id="googleBtnContainer" style="display: flex; justify-content: center; margin-bottom: 15px;">
-                    <div id="g_id_signin"></div>
+
+                <button type="submit" id="submitBtn" class="login-btn">Entrar</button>
+
+                <div id="resendContainer" style="display: none; text-align: center; margin-top: 15px;">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                        Não recebeste o código?
+                        <button type="button" id="resendBtn" disabled
+                            style="background: none; border: none; font-weight: bold; padding: 0; font-family: inherit;">
+                            Reenviar em 02:00
+                        </button>
+                    </p>
+                    <p style="margin-top: 15px;">
+                        <a href="#" onclick="location.reload()" class="link-highlight" style="font-size: 0.85rem;"><i
+                                data-lucide="arrow-left" style="width:14px; height:14px; vertical-align:middle;"></i>
+                            Voltar e tentar outro e-mail</a>
+                    </p>
                 </div>
 
-                <p class="login-link">
-                    Não tem uma conta? <a href="register.html" class="link-highlight">Criar conta</a>
-                </p>
+                <div id="extraLinks">
+                    <div class="divider-container">
+                        <span class="divider-line"></span>
+                        <span class="divider-text">ou entrar com Google</span>
+                        <span class="divider-line"></span>
+                    </div>
 
-                <p class="back-link">
-                    <i data-lucide="arrow-left"></i>
-                    <a href="index.html" class="link-highlight">Voltar à página inicial</a>
-                </p>
+                    <div id="googleBtnContainer" style="display: flex; justify-content: center; margin-bottom: 15px;">
+                        <div id="g_id_signin"></div>
+                    </div>
+
+                    <p class="login-link">
+                        Novo recruta? <a href="register.html" class="link-highlight">Criar conta</a>
+                    </p>
+
+                    <p class="back-link">
+                        <i data-lucide="arrow-left"></i>
+                        <a href="index.html" class="link-highlight">Voltar à página inicial</a>
+                    </p>
+                </div>
             </form>
         </div>
     </div>
 
-<script>
+    <script>
         lucide.createIcons();
 
-        // Configuração do Toast
+        // --- CHAVES DO SUPABASE (Aviso: Coloca aqui as tuas chaves!) ---
+        const supabaseUrl = 'https://xpmdiqqbgpzdditkbuzz.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwbWRpcXFiZ3B6ZGRpdGtidXp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDY5MzMsImV4cCI6MjA4ODIyMjkzM30.mwWcvrNrnLO_EjgbY9V1Ozdcfs9SBk0S4nWKxagiuUU';
+        const db = supabase.createClient(supabaseUrl, supabaseKey);
+
         const toastContainer = document.getElementById('toast-container');
         const toastMessage = document.getElementById('toast-message-element');
         const toastIcon = document.getElementById('toast-icon-element');
@@ -88,106 +204,251 @@
         function showToast(mensagem, tipo = 'error') {
             toastMessage.textContent = mensagem;
             toastContainer.className = `toast-container active ${tipo}`;
-
             const iconName = tipo === 'success' ? 'check-circle' : 'alert-circle';
             toastIcon.setAttribute('data-lucide', iconName);
             lucide.createIcons();
-
-            setTimeout(() => {
-                toastContainer.classList.remove('active');
-            }, 3300); // O balão desaparece após 3.3 segundos
+            setTimeout(() => { toastContainer.classList.remove('active'); }, 4000);
         }
 
-        function togglePassword() {
-            const input = document.getElementById('loginPassword');
+        function toggleVisibility(inputId) {
+            const input = document.getElementById(inputId);
             input.type = input.type === "password" ? "text" : "password";
         }
 
-        // LOGIN TRADICIONAL (Email e Password)
+        // --- LÓGICA DO TEMPORIZADOR DE REENVIO ---
+        let resendInterval;
+        const resendBtn = document.getElementById('resendBtn');
+
+        function startResendTimer(seconds) {
+            clearInterval(resendInterval);
+            resendBtn.disabled = true;
+            let timeLeft = seconds;
+
+            function updateBtnText() {
+                const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const s = (timeLeft % 60).toString().padStart(2, '0');
+                resendBtn.textContent = `Reenviar em ${m}:${s}`;
+            }
+
+            updateBtnText();
+            timeLeft--;
+
+            resendInterval = setInterval(() => {
+                if (timeLeft < 0) {
+                    clearInterval(resendInterval);
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = 'Reenviar Código';
+                } else {
+                    updateBtnText();
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        resendBtn.addEventListener('click', async () => {
+            if (resendBtn.disabled) return;
+            const email = document.getElementById('loginEmail').value;
+
+            resendBtn.textContent = 'A enviar...';
+            resendBtn.disabled = true;
+
+            try {
+                const { error } = await db.auth.signInWithOtp({ email: email });
+                if (error) {
+                    showToast(error.message, 'error');
+                    resendBtn.textContent = 'Reenviar Código';
+                    resendBtn.disabled = false;
+                } else {
+                    showToast('Novo código enviado! Verifica o e-mail.', 'success');
+                    startResendTimer(120);
+                }
+            } catch (err) {
+                showToast('Erro ao reenviar o código.', 'error');
+                resendBtn.textContent = 'Reenviar Código';
+                resendBtn.disabled = false;
+            }
+        });
+
+        // --- LÓGICA DAS CAIXINHAS DO CÓDIGO (OTP BOXES) ---
+        const otpBoxes = document.querySelectorAll('.otp-box');
+        const hiddenOtpInput = document.getElementById('otpCode');
+
+        function updateHiddenOtp() {
+            let code = '';
+            otpBoxes.forEach(box => code += box.value);
+            hiddenOtpInput.value = code;
+        }
+
+        otpBoxes.forEach((box, index) => {
+            box.addEventListener('input', (e) => {
+                box.value = box.value.replace(/[^0-9]/g, ''); // Apenas números
+
+                if (box.value.length === 1 && index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+                updateHiddenOtp();
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && box.value === '' && index > 0) {
+                    otpBoxes[index - 1].focus();
+                }
+            });
+
+            box.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 8);
+
+                if (pastedData) {
+                    for (let i = 0; i < pastedData.length; i++) {
+                        if (otpBoxes[index + i]) {
+                            otpBoxes[index + i].value = pastedData[i];
+                        }
+                    }
+                    const lastFilledIndex = Math.min(index + pastedData.length - 1, otpBoxes.length - 1);
+                    otpBoxes[lastFilledIndex].focus();
+                    updateHiddenOtp();
+                }
+            });
+        });
+
+        // --- FUNÇÃO PARA MUDAR A INTERFACE PARA O PASSO DE MFA ---
+        let currentStep = 1;
+        function transitionToMFA(email) {
+            document.getElementById('loginEmail').value = email;
+
+            document.getElementById('emailGroup').style.display = 'none';
+            document.getElementById('passwordGroup').style.display = 'none';
+            document.getElementById('extraLinks').style.display = 'none';
+
+            document.getElementById('formSubtitle').textContent = "Verificação de Segurança";
+            document.getElementById('mfaInstructions').style.display = 'block';
+            document.getElementById('codeGroup').style.display = 'block';
+            document.getElementById('resendContainer').style.display = 'block';
+
+            // Ocultamente tornamos o input invisível obrigatório e focamos na primeira caixinha
+            hiddenOtpInput.required = true;
+            otpBoxes[0].focus();
+
+            startResendTimer(120);
+            currentStep = 2;
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = "Validar Código";
+            submitBtn.disabled = false;
+        }
+
+        // --- SUBMISSÃO NORMAL ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            const code = document.getElementById('otpCode').value;
+            const submitBtn = document.getElementById('submitBtn');
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+            if (currentStep === 1) {
+                submitBtn.textContent = "A verificar...";
+                submitBtn.disabled = true;
 
-                const data = await response.json(); 
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
 
-                if (response.ok) {
-                    sessionStorage.setItem('showLoginToast', 'true'); 
-
-                    // Lógica de redirecionamento baseada na role do utilizador
-                    if (data.role === 'admin') {
-                        window.location.href = 'gestao.html';
+                    if (response.ok) {
+                        if (data.step === 'mfa') {
+                            showToast('Código enviado para o e-mail!', 'success');
+                            transitionToMFA(data.email);
+                        } else if (data.step === 'done') {
+                            sessionStorage.setItem('showLoginToast', 'true');
+                            window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                        }
                     } else {
-                        window.location.href = 'dashboard.html';
+                        showToast(data.error || 'Erro no login.', 'error');
+                        submitBtn.textContent = "Entrar";
+                        submitBtn.disabled = false;
                     }
-                } else {
-                    showToast(data.error || "Email ou palavra-passe incorretos.", 'error');
+                } catch (err) {
+                    showToast('Erro de ligação ao servidor.', 'error');
+                    submitBtn.textContent = "Entrar";
+                    submitBtn.disabled = false;
                 }
-            } catch (err) {
-                showToast("Erro de conexão com o servidor.", 'error');
+            }
+
+            else if (currentStep === 2) {
+                // Validação extra caso o utilizador não preencha os 8 quadrados
+                if (code.length < 8) {
+                    showToast('Por favor, insere os 8 dígitos.', 'error');
+                    return;
+                }
+
+                submitBtn.textContent = "A validar...";
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/verify-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, code })
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        sessionStorage.setItem('showLoginToast', 'true');
+                        window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                    } else {
+                        showToast(data.error || 'Código inválido.', 'error');
+                        // Limpa as caixas se o código estiver errado
+                        otpBoxes.forEach(box => box.value = '');
+                        hiddenOtpInput.value = '';
+                        otpBoxes[0].focus();
+                        submitBtn.textContent = "Validar Código";
+                        submitBtn.disabled = false;
+                    }
+                } catch (err) {
+                    showToast('Erro de ligação ao servidor.', 'error');
+                    submitBtn.textContent = "Validar Código";
+                    submitBtn.disabled = false;
+                }
             }
         });
 
-        // LOGIN COM GOOGLE
+        // --- GOOGLE LOGIN ---
         window.onload = function () {
             google.accounts.id.initialize({
-                client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com", 
+                client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com",
                 callback: handleGoogleResponse
             });
-
             google.accounts.id.renderButton(
                 document.getElementById("g_id_signin"),
-                { 
-                    theme: "filled_black",   
-                    size: "large",           
-                    width: "300",            
-                    text: "continue_with",   
-                    shape: "pill"            
-                }
+                { theme: "filled_black", size: "large", width: "300", text: "signin_with", shape: "pill" }
             );
         };
 
-        // Processar a resposta do Google
         async function handleGoogleResponse(googleData) {
             try {
                 const response = await fetch('/api/google-login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: googleData.credential, action: 'login' }) 
+                    body: JSON.stringify({ token: googleData.credential })
                 });
-
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Sucesso!
-                    sessionStorage.setItem('showLoginToast', 'true');
-                    
-                    // Redirecionar com base na role do utilizador
-                    if (data.role === 'admin') {
-                        window.location.href = 'gestao.html';
-                    } else {
-                        window.location.href = 'dashboard.html';
+                    if (data.step === 'mfa') {
+                        showToast('MFA Ativo. Verifica o teu e-mail!', 'success');
+                        transitionToMFA(data.email);
+                    } else if (data.step === 'done') {
+                        sessionStorage.setItem('showLoginToast', 'true');
+                        window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
                     }
-                } else {
-                    showToast(data.error || "Erro ao entrar com o Google", "error");
-
-                    if (data.redirect) {
-                        setTimeout(() => {
-                            window.location.href = 'register.html';
-                        }, 3000); 
-                    }
-                }
-            } catch (err) {
-                showToast("Erro de ligação ao servidor", "error");
-            }
+                } else { showToast(data.error || "Falha na autenticação Google", "error"); }
+            } catch (err) { showToast("Erro de ligação.", "error"); }
         }
     </script>
 </body>
+
 </html>
