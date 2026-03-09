@@ -15,14 +15,14 @@
     <nav class="auth-navbar">
         <div class="auth-navbar-inner">
             <div class="auth-navbar-left">
-                <a href="dashboard.html" class="auth-brand">CiberHeróis | <span style="color:#ef4444">gestao</span></a>
+                <a href="quizzes.html" class="auth-brand">CiberHeróis | <span style="color:#ef4444">gestao</span></a>
             </div>
             
             <div class="auth-navbar-right">
                 <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
                 </button>
-                <a href="dashboard.html" class="btn btn-secondary" style="margin-left: 10px;">Voltar ao Site</a>
+                <a href="quizzes.html" class="btn btn-secondary" style="margin-left: 10px;">Voltar ao Site</a>
             </div>
         </div>
     </nav>
@@ -436,7 +436,7 @@
                 const inputTexto = document.getElementById('op' + index);
                 if (inputTexto) {
                     inputTexto.value = op.texto_opcao;
-                    if (op.e_correta === 1) document.getElementById('radio' + index).checked = true;
+                    if (op.e_correta === true) document.getElementById('radio' + index).checked = true;
                 }
             });
 

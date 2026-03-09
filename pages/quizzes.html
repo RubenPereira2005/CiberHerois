@@ -14,11 +14,11 @@
         <div class="auth-navbar-inner">
             
             <div class="auth-navbar-left">
-                <a href="dashboard.html" class="auth-brand">CiberHeróis</a>
+                <a href="quizzes.html" class="auth-brand">CiberHeróis</a>
                 
                 <div class="auth-navbar-menu">
                     <a href="resources.html" class="auth-navbar-link">Recursos</a>
-                    <a href="dashboard.html" class="auth-navbar-link auth-navbar-link-active">Quizzes</a>
+                    <a href="quizzes.html" class="auth-navbar-link auth-navbar-link-active">Quizzes</a>
                 </div>
             </div>
 
@@ -50,6 +50,26 @@
         <div class="mb-12">
             <h1 class="page-title">Explora o teu conhecimento</h1>
             <p class="page-lead">Completa quizzes, ganha pontos e medalhas enquanto aprendes sobre cibersegurança</p>
+        </div>
+
+        <div id="mfaMissionBanner" class="mfa-banner" style="display: none;">
+            <div class="mfa-banner-icon">
+                <i data-lucide="shield-alert"></i>
+            </div>
+            <div class="mfa-banner-content">
+                <h3 class="mfa-banner-title">Missão Especial: Fortalece as tuas Defesas!</h3>
+                <p class="mfa-banner-desc">A tua base de operações ainda não tem a Autenticação de 2 Passos (MFA) ativa. Protege a tua conta contra ciberataques e desbloqueia recompensas exclusivas.</p>
+                <div class="mfa-banner-rewards">
+                    <span class="reward-pill"><i data-lucide="star" class="icon-xs"></i> +50 Pontos XP</span>
+                    <span class="reward-pill"><i data-lucide="shield-check" class="icon-xs" style="color: #10b981;"></i> Medalha: Guardião</span>
+                </div>
+            </div>
+            <div class="mfa-banner-actions">
+                <a href="settings.html#security" class="btn btn-primary" id="btn-activate-mfa-banner" style="background-color: #f59e0b; color: #fff; border: none;">Ativar MFA</a>
+            </div>
+            <button id="closeMfaBanner" class="btn-close-banner" title="Ignorar por agora">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
         </div>
 
         <div class="quiz-grid">
@@ -181,8 +201,8 @@
 
         <div id="toast-container" class="toast-container">
             <div class="toast-content">
-                <i data-lucide="check-circle" class="toast-icon"></i>
-                <span class="toast-message">Login bem-sucedido!</span>
+                <i data-lucide="check-circle" class="toast-icon" id="toast-icon-element"></i>
+                <span class="toast-message" id="toast-message-element">Login bem-sucedido!</span>
             </div>
             <div class="toast-progress"></div>
         </div>
@@ -192,47 +212,83 @@
     <script>
         lucide.createIcons();
 
-        // Lógica do Toast de Login
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Mostrar o Toast de Login se existir
             const toast = document.getElementById('toast-container');
             const shouldShow = sessionStorage.getItem('showLoginToast');
 
             if (shouldShow === 'true' && toast) {
+                toast.classList.add('success');
                 setTimeout(() => { toast.classList.add('active'); }, 300);
                 sessionStorage.removeItem('showLoginToast');
-                setTimeout(() => { toast.classList.remove('active'); }, 3500);
-            } else if (toast) {
-                toast.remove();
+                
+                setTimeout(() => { 
+                    toast.classList.remove('active'); 
+                    setTimeout(() => toast.classList.remove('success'), 400); 
+                }, 3500);
             }
 
-            // Arrancar a busca do número de perguntas
+            // 2. Carregar informações
             loadQuizSummary();
+            checkMFAStatus();
         });
 
-        // Função para ir buscar a contagem de perguntas à Base de Dados
+        // --- LÓGICA DO BANNER MFA ---
+        async function checkMFAStatus() {
+            try {
+                // Chama a rota que vai devolver o perfil do utilizador logado
+                const response = await fetch('/api/me');
+                if (!response.ok) throw new Error('Falha ao obter perfil');
+                
+                const userData = await response.json();
+                
+                const mfaBanner = document.getElementById('mfaMissionBanner');
+                const closeMfaBtn = document.getElementById('closeMfaBanner');
+                const bannerDismissed = sessionStorage.getItem('mfaBannerDismissed');
+
+                // Se o mfa_ativo for false E o utilizador não tiver fechado o banner nesta sessão
+                if (userData.mfa_ativo === false && bannerDismissed !== 'true') {
+                    mfaBanner.style.display = 'flex';
+                }
+
+                // Lógica do botão de fechar (X)
+                closeMfaBtn.addEventListener('click', () => {
+                    mfaBanner.style.display = 'none';
+                    sessionStorage.setItem('mfaBannerDismissed', 'true');
+                });
+                
+                // Quando o utilizador clicar em "Ativar MFA", guardamos uma flag para destacar a secção de MFA nas definições
+                const btnActivateMfaBanner = document.getElementById('btn-activate-mfa-banner');
+                if (btnActivateMfaBanner) {
+                    btnActivateMfaBanner.addEventListener('click', () => {
+                        sessionStorage.setItem('highlightMFA', 'true');
+                    });
+                }
+            } catch (error) {
+                console.error("Erro ao verificar o estado do MFA:", error);
+            }
+        }
+
+        // --- LÓGICA DA CONTAGEM DOS QUIZZES ---
         async function loadQuizSummary() {
             try {
                 const response = await fetch('/api/quiz/summary/all');
                 if (!response.ok) throw new Error('Falha ao obter dados');
                 
-                const data = await response.json(); // Array com {categoria, total_questoes}
+                const data = await response.json(); 
                 
-                // Atualizar o HTML para cada categoria existente na base de dados
                 data.forEach(item => {
                     const spanElement = document.getElementById(`count-${item.categoria}`);
                     if (spanElement) {
-                        // Se houver mais de 5 perguntas, limitamos o texto a 5 (o limite do quiz).
                         const numQuestoes = item.total_questoes > 5 ? 5 : item.total_questoes;
-                        
-                        // Podes até adicionar um toque especial para o utilizador saber que é dinâmico:
                         spanElement.textContent = `${numQuestoes} questões`;
                     }
                 });
-                // Para as categorias que ainda não estão na Base de Dados, colocar 0
+                
                 const allSpans = document.querySelectorAll('.card-meta');
                 allSpans.forEach(span => {
                     if (span.textContent === 'A carregar...') {
-                        span.textContent = 'Em breve'; // Ou "0 questões"
+                        span.textContent = 'Em breve'; 
                     }
                 });
 

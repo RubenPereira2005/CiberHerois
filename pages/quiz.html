@@ -3,32 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - CiberHeróis</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Perfil - CiberHeróis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="popup_modal.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
 </head>
-<body class="quiz-page-body">
-
-    <div id="stars-container" class="stars-container"></div>
+<body class="site-body">
 
     <nav class="auth-navbar">
         <div class="auth-navbar-inner">
+            
             <div class="auth-navbar-left">
-                <a href="dashboard.html" class="auth-brand">CiberHeróis</a>
+                <a href="quizzes.html" class="auth-brand">
+                    CiberHeróis
+                </a>
+                
                 <div class="auth-navbar-menu">
-                    <a href="resources.html" class="auth-navbar-link">Recursos</a>
-                    <a href="dashboard.html" class="auth-navbar-link auth-navbar-link-active">Quizzes</a>
+                    <a href="resources.html" class="auth-navbar-link">
+                        Recursos
+                    </a>
+                    
+                    <a href="quizzes.html" class="auth-navbar-link">
+                        Quizzes
+                    </a>
                 </div>
             </div>
 
             <div class="auth-navbar-right">
-                <button class="auth-navbar-btn">
+                <button class="auth-navbar-btn" id="theme-toggle">
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
                 </button>
+
                 <button class="auth-navbar-btn">
                     <i data-lucide="search" class="auth-navbar-icon"></i>
                 </button>
-                
+
                 <div class="auth-navbar-badge">
                     <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
                     <div class="auth-navbar-badge-content">
@@ -40,6 +51,7 @@
                 <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
                     <i data-lucide="user" class="auth-navbar-icon"></i>
                 </a>
+
                 <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
                     <i data-lucide="log-out" class="auth-navbar-icon"></i>
                 </a>
@@ -47,221 +59,373 @@
         </div>
     </nav>
 
-    <div id="quiz-ui" class="quiz-play-container">
-        <div class="quiz-play-header">
-            <div class="quiz-play-stats">
-                <span id="question-counter">A carregar questões...</span>
-                <span id="score-counter">Pontuação: 0</span>
+    <div class="auth-container profile-main">
+        <div class="profile-header">
+            <div class="profile-header-content">
+                <div class="profile-header-left">
+                    <div class="profile-avatar-container" style="position: relative; display: inline-block;">
+                        <div class="profile-avatar">
+                            </div>
+                        <button id="edit-avatar-btn" class="edit-avatar-btn" title="Mudar Avatar">
+                            <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <h1 class="profile-header-title">A carregar...</h1>
+                        <p class="profile-header-email">A carregar...</p>
+                        <div class="profile-header-badges">
+                            <div class="profile-header-badge">
+                                <div class="profile-header-badge-content">
+                                    <i data-lucide="trophy" class="profile-header-icon"></i>
+                                    <span class="profile-header-badge-text">Nível 5</span>
+                                </div>
+                            </div>
+                            <div class="profile-header-badge">
+                                <div class="profile-header-badge-content">
+                                    <i data-lucide="star" class="profile-header-icon"></i>
+                                    <span class="profile-header-badge-text">450 Pontos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-header-right">
+                    <a href="settings.html" class="settings-btn">
+                        <i data-lucide="settings" class="settings-icon"></i>
+                        <span>Definições</span>
+                    </a>
+                </div>
             </div>
-            <div class="quiz-progress-track">
-                <div id="progress-bar" class="quiz-progress-fill" style="width: 0%"></div>
+
+            <div class="profile-progress">
+                <div class="profile-progress-label">
+                    <span>Progresso para Nível 6</span>
+                    <span>50 pontos restantes</span>
+                </div>
+                <div class="profile-progress-bar">
+                    <div class="profile-progress-fill" style="width: 85%"></div>
+                </div>
             </div>
         </div>
 
-        <div class="quiz-question-box">
-            <h2 id="question-text" class="quiz-question-text">A ligar à Base de Dados...</h2>
-            
-            <div id="options-container" class="quiz-options-container">
+        <div class="profile-grid">
+            <div class="profile-content">
+                
+                <div class="profile-card">
+                    <h2 class="profile-card-title">
+                        <i data-lucide="trending-up" class="profile-card-icon"></i>
+                        Estatísticas
+                    </h2>
+
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-blue">12</div>
+                            <div class="profile-stat-label">Quizzes</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-green">92%</div>
+                            <div class="profile-stat-label">Precisão</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-purple">5</div>
+                            <div class="profile-stat-label">Medalhas</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="profile-stat-value profile-stat-orange">145</div>
+                            <div class="profile-stat-label">Respostas</div>
+                        </div>
+                    </div>
                 </div>
 
-            <button id="next-btn" onclick="nextQuestion()" class="btn btn-primary quiz-next-btn quiz-hidden">
-                Próxima Questão
-            </button>
+
+                <div class="profile-card">
+                    <h2 class="profile-card-title">
+                        <i data-lucide="calendar" class="profile-card-icon"></i>
+                        Atividade Recente
+                    </h2>
+
+                    <div class="profile-activity">
+                        <div class="profile-activity-item">
+                            <div>
+                                <div class="profile-activity-title">Quiz: HTTPS e Segurança</div>
+                                <div class="profile-activity-desc">3/3 corretas</div>
+                            </div>
+                            <div class="profile-activity-right">
+                                <div class="profile-activity-points">+30 pts</div>
+                                <div class="profile-activity-time">Hoje</div>
+                            </div>
+                        </div>
+                        <div class="profile-activity-item">
+                            <div>
+                                <div class="profile-activity-title">Jogo: Detetor de Phishing</div>
+                                <div class="profile-activity-desc">4/5 corretas</div>
+                            </div>
+                            <div class="profile-activity-right">
+                                <div class="profile-activity-points">+80 pts</div>
+                                <div class="profile-activity-time">Ontem</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card profile-medals">
+                <h2 class="profile-card-title">
+                    <i data-lucide="award" class="profile-card-icon"></i>
+                    Medalhas
+                </h2>
+
+                <div class="profile-medals-list">
+                    <div class="profile-medal profile-medal-unlocked">
+                        <div class="profile-medal-content">
+                            <div class="profile-medal-emoji">🛡️</div>
+                            <div class="profile-medal-text">
+                                <div class="profile-medal-title">Guardião da Web</div>
+                                <div class="profile-medal-desc">Completou o módulo HTTPS com nota máxima.</div>
+                                <div class="profile-medal-date">Conquistada em 25/01/2026</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-medal profile-medal-unlocked">
+                        <div class="profile-medal-content">
+                            <div class="profile-medal-emoji">🦅</div>
+                            <div class="profile-medal-text">
+                                <div class="profile-medal-title">Olho de Águia</div>
+                                <div class="profile-medal-desc">Identificou 10 emails de phishing corretamente.</div>
+                                <div class="profile-medal-date">Conquistada em 24/01/2026</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-medal profile-medal-locked">
+                        <div class="profile-medal-content">
+                            <div class="profile-medal-emoji">🔒</div>
+                            <div class="profile-medal-text">
+                                <div class="profile-medal-title">Mestre das Passwords</div>
+                                <div class="profile-medal-desc">Crie uma password forte no simulador.</div>
+                                <div class="profile-medal-date profile-medal-status">Bloqueada</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="results-ui" class="quiz-results-overlay quiz-hidden">
-        <div class="quiz-results-card">
-            <div id="result-icon" class="quiz-results-icon"></div>
+    <div id="avatar-modal" class="avatar-modal hidden">
+        <div class="avatar-modal-overlay" id="close-modal-overlay"></div>
+        
+        <div class="avatar-modal-content">
+            <div class="avatar-modal-header">
+                <h2>Escolhe o teu Herói</h2>
+                <button id="close-avatar-btn" class="close-modal-btn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
             
-            <h2 class="quiz-results-title">Quiz Completo!</h2>
-            <p id="result-text" class="quiz-results-text">Acertou X de Y questões</p>
-            
-            <div class="quiz-results-score-box">
-                <p id="result-points" class="quiz-results-score-text">Ganhou 0 pontos!</p>
+            <div class="avatar-grid">
+                <img src="/img/avatar1.avif" class="avatar-option" data-avatar="avatar1.avif" alt="Avatar 1">
+                <img src="/img/avatar2.jpg" class="avatar-option" data-avatar="avatar2.jpg" alt="Avatar 2">
+                <img src="/img/avatar3.avif" class="avatar-option" data-avatar="avatar3.avif" alt="Avatar 3">
+                <img src="/img/default_avatar.png" class="avatar-option" data-avatar="default_avatar.png" alt="Avatar Default">
             </div>
 
-            <p id="perfect-score-msg" class="quiz-perfect-msg quiz-hidden">
-                🎉 Pontuação Perfeita!
-            </p>
-
-            <div class="quiz-results-actions">
-                <button onclick="window.location.href='dashboard.html'" class="btn btn-primary">
-                    Voltar ao quizzes
-                </button>
-                <button onclick="window.location.href='profile.html'" class="btn btn-secondary">
-                    Ver Perfil
-                </button>
+            <div class="upload-divider">
+                <span>As Tuas Fotografias</span>
+            </div>
+            
+            <div id="personal-avatars-section" class="personal-avatars-section"></div>
+            
+            <div class="avatar-upload-section">
+                <input type="file" id="custom-avatar-input" accept="image/png, image/jpeg, image/jpg" hidden>
+                <label for="custom-avatar-input" class="upload-btn">
+                    <i data-lucide="upload" style="margin-right: 8px;"></i>
+                    Nova fotografia
+                </label>
             </div>
         </div>
     </div>
 
     <script>
-        // SETUP DO JOGO
-        const urlParams = new URLSearchParams(window.location.search);
-        const category = urlParams.get('cat') || 'https'; // Ex: '?cat=https'
+        lucide.createIcons();
 
-        let questions = [];
-        let currentQIndex = 0;
-        let score = 0;
-        let answered = false;
-
-        // Função para baralhar apenas as opções de resposta
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // Função que comunica com a API para obter as questões do quiz com base na categoria
-        async function loadQuizData() {
+        document.addEventListener('DOMContentLoaded', async () => {
+            
+            // Carregar os dados do utilizador para mostrar o nome, email e avatar
             try {
+                const response = await fetch('/api/me');
                 
-                const response = await fetch(`/api/quiz/${category}`);
-                
-                if (!response.ok) throw new Error('Erro na resposta da API');
-                
-                questions = await response.json();
+                if (response.status === 401) {
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-                // Baralhar apenas as opções (para a resposta certa não estar sempre no mesmo sítio)
-                questions.forEach(q => {
-                    if(q.options) {
-                        q.options = shuffleArray(q.options);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const nomeElement = document.querySelector('.profile-header-title');
+                    const emailElement = document.querySelector('.profile-header-email');
+                    const avatarElement = document.querySelector('.profile-avatar');
+
+                    if (nomeElement) nomeElement.textContent = data.nome;
+                    if (emailElement) emailElement.textContent = data.email;
+
+                    // Mostrar a Imagem de Perfil Ativa na página
+                    if (data.foto_perfil) {
+                        let caminhoImagem = data.foto_perfil;
+                        if (!caminhoImagem.startsWith('http')) {
+                            caminhoImagem = caminhoImagem.startsWith('upload-') 
+                                ? `/img/uploads/${data.foto_perfil}` 
+                                : `/img/${data.foto_perfil}`;
+                        }
+                        avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">`;
+                    } else {
+                        avatarElement.innerHTML = `<img src="/img/default_avatar.png" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    }
+
+                    // Adicionar as bolinhas de avatar personalizadas (upload e Google) ao modal
+                    const personalSection = document.getElementById('personal-avatars-section');
+                    
+                    // Bolinha: Último Upload
+                    if (data.foto_upload) {
+                        const wrapperUpload = document.createElement('div');
+                        wrapperUpload.className = 'personal-avatar-wrapper';
+
+                        const imgUpload = document.createElement('img');
+                        
+                        // Nova lógica: Se o link já tiver "http" (Supabase), usa-o direto. Se não, usa a pasta antiga.
+                        let linkUpload = data.foto_upload;
+                        if (!linkUpload.startsWith('http')) {
+                            linkUpload = `/img/uploads/${data.foto_upload}`;
+                        }
+                        
+                        imgUpload.src = linkUpload;
+                        imgUpload.className = 'avatar-option';
+                        imgUpload.setAttribute('data-avatar', data.foto_upload);
+                        imgUpload.setAttribute('referrerpolicy', 'no-referrer');
+
+                        const labelUpload = document.createElement('span');
+                        labelUpload.className = 'personal-avatar-label';
+                        labelUpload.textContent = 'Último Upload';
+
+                        wrapperUpload.appendChild(imgUpload);
+                        wrapperUpload.appendChild(labelUpload);
+                        personalSection.appendChild(wrapperUpload);
+                    }
+
+                    // Bolinha: Conta Google
+                    if (data.foto_google) {
+                        const wrapperGoogle = document.createElement('div');
+                        wrapperGoogle.className = 'personal-avatar-wrapper';
+
+                        const imgGoogle = document.createElement('img');
+                        imgGoogle.src = data.foto_google;
+                        imgGoogle.className = 'avatar-option';
+                        imgGoogle.setAttribute('data-avatar', data.foto_google);
+                        imgGoogle.setAttribute('referrerpolicy', 'no-referrer');
+                        imgGoogle.alt = "Foto do Google";
+
+                        const labelGoogle = document.createElement('span');
+                        labelGoogle.className = 'personal-avatar-label';
+                        labelGoogle.textContent = 'Conta Google';
+
+                        wrapperGoogle.appendChild(imgGoogle);
+                        wrapperGoogle.appendChild(labelGoogle);
+                        personalSection.appendChild(wrapperGoogle);
+                    }
+
+                    // Marcar o avatar atual com uma borda ou destaque no modal
+                    document.querySelectorAll('.avatar-option').forEach(img => {
+                        // Se o data-avatar da imagem for igual à foto_perfil da base de dados...
+                        if (img.getAttribute('data-avatar') === data.foto_perfil) {
+                            img.classList.add('active-avatar');
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Erro ao carregar perfil:", error);
+            }
+
+            // Lógica para abrir e fechar o modal de escolha de avatar
+            const modal = document.getElementById('avatar-modal');
+            const btnOpen = document.getElementById('edit-avatar-btn');
+            const btnClose = document.getElementById('close-avatar-btn');
+            const overlay = document.getElementById('close-modal-overlay');
+
+            if (btnOpen) btnOpen.addEventListener('click', () => modal.classList.remove('hidden'));
+            if (btnClose) btnClose.addEventListener('click', () => modal.classList.add('hidden'));
+            if (overlay) overlay.addEventListener('click', () => modal.classList.add('hidden'));
+
+            // Clique numa imagem do modal para a tornar o novo avatar
+            const modalContent = document.querySelector('.avatar-modal-content');
+            modalContent.addEventListener('click', async (e) => {
+                // Se clicou numa imagem que tem a classe 'avatar-option' (em qualquer zona do modal)
+                if (e.target.classList.contains('avatar-option')) {
+                    const novoAvatar = e.target.getAttribute('data-avatar');
+
+                    try {
+                        const response = await fetch('/api/update-avatar', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ avatar: novoAvatar })
+                        });
+
+                        if (response.ok) {
+
+                            // 1. Tira a borda azul de todas as imagens
+                            document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('active-avatar'));
+                            // 2. Coloca a borda azul na imagem que foi clicada
+                            e.target.classList.add('active-avatar');
+
+                            // Atualiza a imagem na página
+                            let caminho = novoAvatar;
+                            if (!caminho.startsWith('http')) {
+                                caminho = caminho.startsWith('upload-') ? `/img/uploads/${novoAvatar}` : `/img/${novoAvatar}`;
+                            }
+                            
+                            const avatarElement = document.querySelector('.profile-avatar');
+                            avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">`;
+                            modal.classList.add('hidden');
+                        } else {
+                            alert('Erro ao atualizar avatar.');
+                        }
+                    } catch (error) {
+                        console.error("Erro:", error);
+                    }
+                }
+            });
+
+            //Upload de nova imagem personalizada
+            const inputUpload = document.getElementById('custom-avatar-input');
+            if (inputUpload) {
+                inputUpload.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append('ficheiroAvatar', file); 
+
+                    try {
+                        const response = await fetch('/api/upload-avatar', {
+                            method: 'POST',
+                            body: formData 
+                        });
+
+                        if (response.ok) {
+                            // Após fazer o upload, a forma mais segura de desenhar a nova bolinha 
+                            // de upload lá em baixo é fazer reload da página.
+                            window.location.reload();
+                        } else {
+                            alert('Erro ao fazer upload da imagem.');
+                        }
+                    } catch (error) {
+                        console.error("Erro no upload:", error);
                     }
                 });
-
-                renderQuestion();
-
-            } catch (error) {
-                console.error("Erro:", error);
-                document.getElementById('question-text').textContent = "Erro ao carregar o quiz da Base de Dados.";
-                document.getElementById('question-counter').textContent = "Erro";
             }
-        }
-
-        function renderQuestion() {
-            if (questions.length === 0) return;
-
-            const q = questions[currentQIndex];
-            
-            // Mostrar em que nível de dificuldade estamos (Fácil, Médio, Difícil)
-            let diffText = q.dificuldade === 'facil' ? '🟢 Fácil' : q.dificuldade === 'medio' ? '🟡 Médio' : '🔴 Difícil';
-            
-            document.getElementById('question-counter').textContent = `Questão ${currentQIndex + 1} de ${questions.length} | ${diffText}`;
-            document.getElementById('score-counter').textContent = `Pontuação: ${score}`;
-            document.getElementById('progress-bar').style.width = `${((currentQIndex + 1) / questions.length) * 100}%`;
-            document.getElementById('question-text').textContent = q.question;
-            
-            document.getElementById('next-btn').classList.add('quiz-hidden');
-            
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
-            
-            // Usamos os IDs reais (id_opcao) que vêm da Base de Dados
-            q.options.forEach((opt, index) => {
-                const letras = ['A', 'B', 'C', 'D', 'E']; // Apenas para exibição visual
-                const btn = document.createElement('button');
-                btn.className = `quiz-option-btn`;
-                btn.innerHTML = `<span class="quiz-option-label">${letras[index]})</span> ${opt.text}`;
-                
-                // GUARDAR NO DATASET SE É A CORRETA OU NÃO (usando == para evitar problemas de tipos)
-                btn.dataset.isCorrect = (opt.id == q.correctAnswer) ? "true" : "false";
-                
-                // Passamos o botão, o id da opção escolhida, e o id da opção correta
-                btn.onclick = () => handleAnswer(btn, opt.id, q.correctAnswer);
-                
-                optionsContainer.appendChild(btn);
-            });
-            
-            answered = false;
-        }
-
-        function handleAnswer(btn, selectedId, correctId) {
-            if (answered) return;
-            answered = true;
-
-            // COMPARAÇÃO SEGURA (usando ==)
-            const isCorrect = (selectedId == correctId);
-            if (isCorrect) score++;
-
-            const buttons = document.getElementById('options-container').children;
-            for (let b of buttons) {
-                b.disabled = true;
-                
-                // MOSTRAR A CORRETA BASEADO NO DATASET
-                if (b.dataset.isCorrect === "true") {
-                    b.classList.add('correct');
-                }
-                
-                // Marcar de vermelho se o utilizador clicou na errada
-                if (b === btn && !isCorrect) {
-                    b.classList.add('wrong');
-                }
-            }
-
-            const nextBtn = document.getElementById('next-btn');
-            nextBtn.textContent = currentQIndex < questions.length - 1 ? 'Próxima Questão' : 'Ver Resultados';
-            nextBtn.classList.remove('quiz-hidden');
-        }
-
-        function nextQuestion() {
-            if (currentQIndex < questions.length - 1) {
-                currentQIndex++;
-                renderQuestion();
-            } else {
-                showResults();
-            }
-        }
-
-        function showResults() {
-            document.getElementById('quiz-ui').classList.add('quiz-hidden');
-            document.getElementById('results-ui').classList.remove('quiz-hidden');
-            
-            const percentage = (score / questions.length) * 100;
-            
-            const iconContainer = document.getElementById('result-icon');
-            if (percentage === 100) {
-                iconContainer.innerHTML = '<i data-lucide="trophy" style="width: 80px; height: 80px; color: #eab308; stroke-width: 1.5;"></i>';
-                document.getElementById('perfect-score-msg').classList.remove('quiz-hidden');
-            } else if (percentage >= 70) {
-                iconContainer.innerHTML = '<i data-lucide="award" style="width: 80px; height: 80px; color: #3b82f6; stroke-width: 1.5;"></i>';
-            } else {
-                iconContainer.innerHTML = '<i data-lucide="x-circle" style="width: 80px; height: 80px; color: #9ca3af; stroke-width: 1.5;"></i>';
-            }
-            
-            document.getElementById('result-text').textContent = `Acertou ${score} de ${questions.length} questões`;
-            document.getElementById('result-points').textContent = `Ganhou ${score * 10} pontos!`;
-            
-            // Recriar ícones para o ecrã de resultados ser renderizado corretamente
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        }
-
-        // Efeitos visuais (Estrelas no fundo)
-        const starsContainer = document.getElementById('stars-container');
-        if (starsContainer) {
-            for(let i=0; i<30; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = Math.random() * 3 + 'px';
-                star.style.height = star.style.width;
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
-        // Inicializar ícones da Navbar
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-        
-        // INICIAR O QUIZ: Vai buscar os dados e arranca!
-        loadQuizData();
+        });
     </script>
 </body>
 </html>
