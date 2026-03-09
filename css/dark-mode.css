@@ -769,3 +769,8 @@ body.dark-mode .quiz-completed h3,
 body.dark-mode .quiz-completed p {
     color: #f8fafc !important;
 }
+
+/* Banner de MFA */
+.dark-mode .mfa-banner {
+    background: linear-gradient(to right, rgba(245, 158, 11, 0.15), rgba(30, 41, 59, 0.8));
+}
