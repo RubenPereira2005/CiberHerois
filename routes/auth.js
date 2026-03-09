@@ -1,183 +1,149 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const logger = require('../utils/logger');
-const { OAuth2Client } = require('google-auth-library');
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 module.exports = (supabase) => {
     
-    // Rota de Registo (Tradicional)
+    // --- ROTA DE REGISTO (EMAIL/PASSWORD) ---
     router.post('/register', async (req, res) => {
         const { email, username, password } = req.body;
         const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
         try {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            
-            // Supabase: Insert
-            const { data, error } = await supabase
-                .from('utilizador')
-                .insert([
-                    { nome: username, email: email, senha: hashedPassword, role: 'aluno' } 
-                ]);
+            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
 
-            if (error) {
-                // Erro 23505 no Postgres é "Unique violation" (Email repetido)
-                if (error.code === '23505') {
-                    return res.status(400).json({ error: "Este e-mail já está em uso." });
-                }
-                throw error; // Vai para o catch block
+            if (authError) {
+                logger.error(`[400] Erro Auth no registo: ${authError.message} | IP: ${userIp}`);
+                return res.status(400).json({ error: authError.message });
+            }
+
+            const { error: dbError } = await supabase.from('utilizador').insert([{ 
+                id_utilizador: authData.user.id, 
+                nome: username, 
+                email: email, 
+                role: 'aluno',
+                foto_perfil: 'default_avatar.png' 
+            }]);
+
+            if (dbError) {
+                logger.error(`[500] Erro DB ao criar perfil: ${dbError.message}`);
+                return res.status(500).json({ error: "Erro ao criar perfil de utilizador." });
             }
                 
             logger.info(`[200] Novo Herói Registado: ${username} (${email}) | IP: ${userIp}`);
-            res.status(200).json({ success: true });
+            res.status(200).json({ success: true, message: "Registo efetuado! Verifica o teu e-mail para confirmar a conta." });
 
         } catch (e) {
-            logger.error(`[500] Erro interno no registo de (${email}) | IP: ${userIp}: ${e.message}`);
+            logger.error(`[500] Erro inesperado no registo: ${e.message}`);
             res.status(500).json({ error: "Erro interno no servidor." });
         }
     });
 
-    // Rota de Login (Tradicional)
+    // --- ROTA DE LOGIN INTELIGENTE (EMAIL/PASSWORD) ---
     router.post('/login', async (req, res) => {
         const { email, password } = req.body;
-        const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        
+
         try {
-            // Supabase: Select
-            const { data: results, error } = await supabase
-                .from('utilizador')
-                .select('*')
-                .eq('email', email);
-
-            if (error) throw error;
-
-            if (!results || results.length === 0) {
-                logger.warn(`[401] Tentativa de login falhada (Email inexistente): ${email} | IP: ${userIp}`);
-                return res.status(401).json({ error: "Credenciais inválidas." });
-            }
-
-            const user = results[0];
-
-            if (!user.senha) {
-                return res.status(403).json({ error: "Esta conta foi criada com o Google. Por favor, utilize o botão 'Continuar com o Google'." });
-            }
-
-            const match = await bcrypt.compare(password, user.senha);
-
-            if (!match) {
-                logger.warn(`[401] Tentativa de login falhada (Password errada): ${email} | IP: ${userIp}`);
-                return res.status(401).json({ error: "Credenciais inválidas." });
-            }
-
-            // Sucesso
-            req.session.userId = user.id_utilizador;
-            req.session.userName = user.nome;
-            req.session.role = user.role;
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
             
-            logger.info(`[200] Herói Autenticado: ${user.nome} (Role: ${user.role}) | IP: ${userIp}`);
-            res.status(200).json({ success: true, role: user.role });
+            if (authError) {
+                // A MÁGICA: Se o erro do Supabase falar em confirmação, mandamos essa mensagem específica
+                if (authError.message.toLowerCase().includes('confirm')) {
+                    return res.status(401).json({ error: "Ainda não confirmaste o teu e-mail!" });
+                }
+                return res.status(401).json({ error: "Email ou palavra-passe incorretos." });
+            }
 
+            const userId = authData.user.id;
+            const { data: userData } = await supabase.from('utilizador').select('*').eq('id_utilizador', userId).single();
+
+            if (userData && userData.mfa_ativo === true) {
+                const { error: otpError } = await supabase.auth.signInWithOtp({ email });
+                if (otpError) return res.status(500).json({ error: "Erro ao enviar código MFA." });
+                return res.json({ step: 'mfa', email: userData.email, message: "Password correta. Código enviado." });
+            } else {
+                req.session.userId = userData.id_utilizador;
+                req.session.userName = userData.nome;
+                req.session.role = userData.role;
+                return res.json({ step: 'done', role: userData.role, message: "Login efetuado!" });
+            }
         } catch (e) {
-            logger.error(`[500] Erro ao processar login (${email}) | IP: ${userIp}: ${e.message}`);
-            res.status(500).json({ error: "Erro ao processar login." });
+            res.status(500).json({ error: "Erro interno no servidor." });
         }
     });
 
-    // Rota de Login/Registo com Google
+    // --- ROTA DE LOGIN INTELIGENTE COM GOOGLE ---
     router.post('/google-login', async (req, res) => {
-        const { token, action } = req.body; 
+        const { token } = req.body;
         const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
         try {
-            const ticket = await googleClient.verifyIdToken({
-                idToken: token,
-                audience: process.env.GOOGLE_CLIENT_ID
-            });
-            
-            const payload = ticket.getPayload();
-            const { email, name: nome, sub: googleId, picture } = payload;
+            if (!token) return res.status(400).json({ error: "Token Google em falta." });
 
-            // Supabase: Select
-            const { data: results, error } = await supabase
-                .from('utilizador')
-                .select('*')
-                .eq('email', email);
+            const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({ provider: 'google', token: token });
+            if (authError) throw authError;
 
-            if (error) throw error;
+            const user = authData.user;
+            const { data: existingUser } = await supabase.from('utilizador').select('*').eq('id_utilizador', user.id).single();
 
-            if (results && results.length > 0) {
-                const user = results[0];
-
-                if (!user.google_id) {
-                    return res.status(403).json({ 
-                        error: "Já existe uma conta criada com este email. Por favor, inicie sessão com a sua palavra-passe." 
-                    });
-                }
-
-                if (action === 'register') {
-                    return res.status(400).json({ 
-                        error: "Esta conta Google já está registada. Por favor, faça Login." 
-                    });
-                }
-
-                // Iniciar Sessão
-                req.session.userId = user.id_utilizador;
-                req.session.userName = user.nome;
-                req.session.role = user.role;
-                logger.info(`[200] Herói Autenticado (Google): ${user.nome} (Role: ${user.role}) | IP: ${userIp}`);
-                
-                return res.status(200).json({ success: true, role: user.role });
-
+            let finalUser;
+            if (!existingUser) {
+                const googlePicture = user.user_metadata?.picture || user.user_metadata?.avatar_url || null;
+                const { data: newUser, error: insertError } = await supabase.from('utilizador').insert([{
+                    id_utilizador: user.id,
+                    nome: user.user_metadata?.full_name || "Herói Google",
+                    email: user.email,
+                    foto_perfil: googlePicture || 'default_avatar.png',
+                    foto_google: googlePicture,
+                    role: 'aluno'
+                }]).select().single();
+                if (insertError) throw insertError;
+                finalUser = newUser;
             } else {
-                // UTILIZADOR NÃO EXISTE
-                if (action === 'login') {
-                    return res.status(404).json({ 
-                        redirect: true, 
-                        error: "Conta não encontrada. A redirecionar para o registo..." 
-                    });
-                }
+                finalUser = existingUser;
+            }
 
-                if (action === 'register') {
-                    const fotoParaGuardar = picture ? picture : "default_avatar.png";
-
-                    // Supabase: Insert
-                    // Retornamos os dados inseridos (select()) para podermos guardar o ID na sessão
-                    const { data: newUser, error: insertError } = await supabase
-                        .from('utilizador')
-                        .insert([
-                            { 
-                                nome: nome, 
-                                email: email, 
-                                google_id: googleId, 
-                                foto_perfil: fotoParaGuardar, 
-                                foto_google: picture || null,
-                                role: 'aluno'
-                            }
-                        ])
-                        .select(); // Pede ao supabase para devolver a linha inserida
-
-                    if (insertError) {
-                        logger.error(`[500] Erro ao criar conta Google (${email}): ${insertError.message}`);
-                        return res.status(500).json({ error: "Erro ao criar conta Google" });
-                    }
-
-                    const insertedUser = newUser[0];
-
-                    req.session.userId = insertedUser.id_utilizador;
-                    req.session.userName = insertedUser.nome;
-                    req.session.role = insertedUser.role; 
-                    
-                    logger.info(`[200] Novo Herói Registado (Google): ${nome} | IP: ${userIp}`);
-                    res.status(200).json({ success: true, role: insertedUser.role });
-                }
+            if (finalUser.mfa_ativo === true) {
+                const { error: otpError } = await supabase.auth.signInWithOtp({ email: finalUser.email });
+                if (otpError) throw otpError;
+                return res.json({ step: 'mfa', email: finalUser.email, message: "Google verificado. Código enviado." });
+            } else {
+                req.session.userId = finalUser.id_utilizador;
+                req.session.userName = finalUser.nome;
+                req.session.role = finalUser.role;
+                logger.info(`[200] Google Auth Sucesso: ${finalUser.email} | IP: ${userIp}`);
+                return res.status(200).json({ step: 'done', role: finalUser.role });
             }
         } catch (error) {
-            logger.error(`[400] Token Google Inválido ou Erro DB | IP: ${userIp} | Erro: ${error.message}`);
             res.status(400).json({ error: "Falha na autenticação com a Google" });
         }
     });
-    
+
+    // --- ROTA DE VERIFICAÇÃO DO CÓDIGO (OTP) ---
+    router.post('/verify-otp', async (req, res) => {
+        const { email, code } = req.body;
+        const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+        try {
+            if (!email || !code) return res.status(400).json({ error: "Email e código são obrigatórios." });
+
+            const { data: authData, error: authError } = await supabase.auth.verifyOtp({ email, token: code, type: 'magiclink' });
+            if (authError) return res.status(401).json({ error: "Código inválido ou expirado." });
+
+            const user = authData.user;
+            const { data: existingUser } = await supabase.from('utilizador').select('*').eq('id_utilizador', user.id).single();
+
+            req.session.userId = existingUser.id_utilizador;
+            req.session.userName = existingUser.nome;
+            req.session.role = existingUser.role;
+
+            logger.info(`[200] MFA Autenticado com Sucesso: ${existingUser.nome} | IP: ${userIp}`);
+            res.status(200).json({ success: true, role: existingUser.role });
+
+        } catch (e) {
+            res.status(500).json({ error: "Erro interno ao validar código." });
+        }
+    });
+
     return router;
 };

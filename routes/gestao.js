@@ -17,7 +17,7 @@ module.exports = (supabase) => {
         <script src="theme.js"></script>
     </head>
     <body class="site-body">
-        <nav class="auth-navbar"><div class="auth-navbar-inner"><div class="auth-navbar-left"><a href="dashboard.html" class="auth-brand">CiberHeróis</a><div class="auth-navbar-menu"><a href="resources.html" class="auth-navbar-link auth-navbar-link-active">Recursos</a><a href="dashboard.html" class="auth-navbar-link">Quizzes</a></div></div><div class="auth-navbar-right"><a href="profile.html" class="auth-navbar-btn" title="Ver Perfil"><i data-lucide="user" class="auth-navbar-icon"></i></a></div></div></nav>
+        <nav class="auth-navbar"><div class="auth-navbar-inner"><div class="auth-navbar-left"><a href="quizzes.html" class="auth-brand">CiberHeróis</a><div class="auth-navbar-menu"><a href="resources.html" class="auth-navbar-link auth-navbar-link-active">Recursos</a><a href="quizzes.html" class="auth-navbar-link">Quizzes</a></div></div><div class="auth-navbar-right"><a href="profile.html" class="auth-navbar-btn" title="Ver Perfil"><i data-lucide="user" class="auth-navbar-icon"></i></a></div></div></nav>
 
         <div class="auth-container resource-detail-container">
             <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>

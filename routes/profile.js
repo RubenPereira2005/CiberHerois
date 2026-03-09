@@ -18,7 +18,7 @@ module.exports = (supabase) => {
 
         const { data, error } = await supabase
             .from('utilizador')
-            .select('nome, email, role, foto_perfil, foto_google, foto_upload')
+            .select('nome, email, role, mfa_ativo, foto_perfil, foto_google, foto_upload')
             .eq('id_utilizador', req.session.userId)
             .single();
 
@@ -41,13 +41,25 @@ module.exports = (supabase) => {
     // --- ROTA 3: Apagar Conta ---
     router.delete('/delete', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
-        const { error } = await supabase.from('utilizador').delete().eq('id_utilizador', req.session.userId);
-        if (error) return res.status(500).json({ error: "Erro ao apagar conta." });
+        
+        try {
+            // 1. Apagar o utilizador diretamente do Supabase Auth.
+            // Como usas a Service Role Key, tens permissão para fazer isto.
+            // Graças ao "ON DELETE CASCADE", o Postgres apaga automaticamente o perfil na tabela 'utilizador'.
+            const { data, error } = await supabase.auth.admin.deleteUser(req.session.userId);
+            
+            if (error) throw error;
 
-        req.session.destroy((err) => {
-            if (err) return res.status(500).json({ error: "Conta apagada, mas erro ao terminar sessão." });
-            res.json({ message: "Conta eliminada permanentemente." });
-        });
+            // 2. Destruir a sessão local do Node.js
+            req.session.destroy((err) => {
+                if (err) return res.status(500).json({ error: "Conta apagada, mas erro ao limpar a sessão no browser." });
+                res.json({ message: "Conta eliminada permanentemente de todo o sistema." });
+            });
+
+        } catch (error) {
+            console.error("Erro ao apagar conta (Supabase Admin):", error);
+            res.status(500).json({ error: "Erro ao apagar conta permanentemente." });
+        }
     });
 
     // --- ROTA 4: Atualizar Avatar (Clicando nos Bonecos) ---
@@ -106,6 +118,21 @@ module.exports = (supabase) => {
             console.error("Erro no upload do Supabase:", error);
             res.status(500).json({ error: "Erro ao guardar a imagem na nuvem." });
         }
+    });
+
+    // --- ROTA 6: Ligar/Desligar MFA ---
+    router.put('/update-mfa', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+
+        const { mfa_ativo } = req.body;
+
+        const { error } = await supabase
+            .from('utilizador')
+            .update({ mfa_ativo: mfa_ativo })
+            .eq('id_utilizador', req.session.userId);
+
+        if (error) return res.status(500).json({ error: "Erro ao atualizar estado MFA." });
+        res.json({ message: "Estado MFA atualizado com sucesso!" });
     });
 
     return router;
