@@ -5,13 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sessão - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="google.css">
+    <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="global-init.js"></script>
     <style>
         .divider-container {
             display: flex;
@@ -88,6 +91,10 @@
 </head>
 
 <body class="login-page">
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
 
     <div id="toast-container" class="toast-container">
         <div class="toast-content">

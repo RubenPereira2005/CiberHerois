@@ -4,47 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quizzes - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
+    <script src="global-init.js"></script>
 </head>
 <body class="site-body">
-    <nav class="auth-navbar">
-        <div class="auth-navbar-inner">
-            
-            <div class="auth-navbar-left">
-                <a href="quizzes.html" class="auth-brand">CiberHeróis</a>
-                
-                <div class="auth-navbar-menu">
-                    <a href="resources.html" class="auth-navbar-link">Recursos</a>
-                    <a href="quizzes.html" class="auth-navbar-link auth-navbar-link-active">Quizzes</a>
-                </div>
-            </div>
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
 
-            <div class="auth-navbar-right">
-                <button class="auth-navbar-btn" id="theme-toggle">
-                    <i data-lucide="sun" class="auth-navbar-icon"></i>
-                </button>
-                <button class="auth-navbar-btn">
-                    <i data-lucide="search" class="auth-navbar-icon"></i>
-                </button>
-                <div class="auth-navbar-badge">
-                    <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
-                    <div class="auth-navbar-badge-content">
-                        <span class="auth-navbar-badge-label">Nível 2</span>
-                        <span class="auth-navbar-badge-value">150 pts</span>
-                    </div>
-                </div>
-                <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
-                    <i data-lucide="user" class="auth-navbar-icon"></i>
-                </a>
-                <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
-                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
-                </a>
-            </div>
-        </div>
-    </nav>
+    <div id="includedContent"></div>
 
     <div class="auth-container quizzes-main">
         <div class="mb-12">
@@ -61,6 +35,7 @@
                 <p class="mfa-banner-desc">A tua base de operações ainda não tem a Autenticação de 2 Passos (MFA) ativa. Protege a tua conta contra ciberataques e desbloqueia recompensas exclusivas.</p>
                 <div class="mfa-banner-rewards">
                     <span class="reward-pill"><i data-lucide="star" class="icon-xs"></i> +50 Pontos XP</span>
+                    <span class="reward-pill"><i data-lucide="coins" class="icon-xs" style="color: #1061bd;"></i> +10 Moedas</span>
                     <span class="reward-pill"><i data-lucide="shield-check" class="icon-xs" style="color: #10b981;"></i> Medalha: Guardião</span>
                 </div>
             </div>
