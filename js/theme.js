@@ -1,13 +1,34 @@
+// =========================================================================
+// 1. ANTI-FLASH (Corre imediatamente mal o browser lê este ficheiro no <head>)
+// =========================================================================
+(function() {
+    const theme = localStorage.getItem('theme') || 'system';
+    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark-mode');
+    }
+})();
+
+
+// =========================================================================
+// 2. LÓGICA DO TEMA (Espera que o HTML esteja pronto para encontrar os botões)
+// =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
+    
+    // Passar a classe do <html> (que o Anti-Flash colocou) para o <body>
+    if (document.documentElement.classList.contains('dark-mode')) {
+        body.classList.add('dark-mode');
+    }
 
     // Função para atualizar o ícone na Navbar
     function updateNavbarIcon(isDark) {
-        if (!themeToggle) return;
-        const icon = themeToggle.querySelector('i, svg');
-        if (icon) {
-            icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+        const currentThemeToggle = document.getElementById('theme-toggle');
+        if (!currentThemeToggle) return;
+        
+        const iconName = isDark ? 'moon' : 'sun';
+        currentThemeToggle.innerHTML = `<i data-lucide="${iconName}" class="auth-navbar-icon"></i>`;
+        
+        if (typeof lucide !== 'undefined') {
             lucide.createIcons(); 
         }
     }
@@ -24,30 +45,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (shouldBeDark) {
+            document.documentElement.classList.add('dark-mode');
             body.classList.add('dark-mode');
         } else {
+            document.documentElement.classList.remove('dark-mode');
             body.classList.remove('dark-mode');
         }
 
         updateNavbarIcon(shouldBeDark);
-        
-        // Disparar evento para as Definições saberem que mudou
         window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: choice } }));
     };
 
-    // Clique no botão da Navbar (Alterna apenas entre Light/Dark fixo)
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
+    // Delegação do clique
+    document.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('#theme-toggle');
+        if (toggleBtn) {
             const isCurrentlyDark = body.classList.contains('dark-mode');
             window.setTheme(isCurrentlyDark ? 'light' : 'dark');
-        });
-    }
+        }
+    });
 
-    // Inicialização ao carregar a página
+    // Inicialização ao carregar a página (Apenas para garantir que os ícones ficam corretos)
     const savedTheme = localStorage.getItem('theme') || 'system';
-    window.setTheme(savedTheme);
+    let isDark = savedTheme === 'dark' || (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    updateNavbarIcon(isDark);
 
-    // Escutar mudança de tema do sistema (Windows/Mac) em tempo real
+    // Escutar mudança de tema do sistema em tempo real
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (localStorage.getItem('theme') === 'system') {
             window.setTheme('system');
