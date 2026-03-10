@@ -1,29 +1,30 @@
-/* --- ECRÃ DE CARREGAMENTO (PRELOADER) --- */
+/* --- ECRÃ DE CARREGAMENTO (PRELOADER) - MODO CLARO (Default) --- */
 #global-loader {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: #0f172a; /* Fundo escuro oficial */
+    background-color: #f8fafc;
     z-index: 99999; /* Fica por cima de TUDO */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
+    transition: opacity 0.5s ease, visibility 0.5s ease, background-color 0.3s ease;
 }
 
 .loader-logo {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #ffffff;
+    color: #0f172a;
     letter-spacing: 1px;
     animation: pulseText 1.5s infinite;
+    transition: color 0.3s ease;
 }
 
 .loader-logo span {
-    color: #10b981; /* Verde CiberHeróis */
+    color: #10b981;
 }
 
 .loader-spinner {
@@ -34,6 +35,17 @@
     border-top-color: #10b981;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+}
+
+/* --- ADAPTAÇÃO PARA O DARK MODE --- */
+html.dark-mode #global-loader,
+body.dark-mode #global-loader {
+    background-color: #0f172a; 
+}
+
+html.dark-mode .loader-logo,
+body.dark-mode .loader-logo {
+    color: #ffffff; 
 }
 
 @keyframes pulseText {
