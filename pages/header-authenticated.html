@@ -1,16 +1,16 @@
 <nav class="auth-navbar">
     <div class="auth-navbar-inner">
-        
+
         <div class="auth-navbar-left">
             <a href="quizzes.html" class="auth-brand">
                 CiberHeróis
             </a>
-            
+
             <div class="auth-navbar-menu">
                 <a href="resources.html" class="auth-navbar-link">
                     Recursos
                 </a>
-                
+
                 <a href="quizzes.html" class="auth-navbar-link">
                     Quizzes
                 </a>
@@ -22,15 +22,27 @@
                 <i data-lucide="sun" class="auth-navbar-icon"></i>
             </button>
 
+            <a href="leaderboard.html" class="auth-navbar-btn" title="Ver Leaderboard">
+                <i data-lucide="chart-no-axes-column" class="auth-navbar-icon"></i>
+            </a>
+
             <button class="auth-navbar-btn">
                 <i data-lucide="search" class="auth-navbar-icon"></i>
             </button>
 
+            <div class="auth-navbar-badge" title="O teu saldo de Ciber-Moedas"  style="margin-right: 5px;">
+                <img src="../img/coin.svg" alt="Moeda CiberHeróis" class="auth-navbar-badge-icon"  style="width: 21px !important; height: 21px !important; margin-right: 4px; object-fit: contain;">
+                <div class="auth-navbar-badge-content">
+                    <span class="auth-navbar-badge-label">Saldo</span>
+                    <span class="auth-navbar-badge-value" id="nav-coin-balance">150 CC</span>
+                </div>
+            </div>
+
             <div class="auth-navbar-badge">
                 <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
                 <div class="auth-navbar-badge-content">
-                    <span class="auth-navbar-badge-label">Nível 2</span>
-                    <span class="auth-navbar-badge-value">150 pts</span>
+                    <span class="auth-navbar-badge-label" id="nav-global-level">Nível --</span>
+                    <span class="auth-navbar-badge-value" id="nav-global-points">-- pts</span>
                 </div>
             </div>
 

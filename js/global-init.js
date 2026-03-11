@@ -1,68 +1,85 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Procura os elementos na página
-    const container = document.getElementById('includedContent');
+// 1. Função global para esconder o loader
+window.esconderLoader = function() {
     const loader = document.getElementById('global-loader');
+    if (loader) {
+        loader.style.transition = "opacity 0.4s ease";
+        loader.style.opacity = "0";
+        setTimeout(() => {
+            if (loader.parentNode) loader.remove();
+        }, 400);
+    }
+};
 
-    // Função para tirar a cortina
-    const hideLoader = () => {
-        if (loader) {
-            loader.classList.add('loader-hidden');
-            setTimeout(() => loader.remove(), 500); 
+// 2. Função global para atualizar o Header
+window.atualizarHeaderGlobal = async function() {
+    try {
+        const response = await fetch('/api/stats');
+        if (response.ok) {
+            const stats = await response.json();
+            const navPoints = document.getElementById('nav-global-points');
+            const navLevel = document.getElementById('nav-global-level');
+            if (navPoints) navPoints.textContent = `${stats.pontos || 0} pts`;
+            if (navLevel) navLevel.textContent = `Nível ${stats.nivel || 1}`;
+            return stats;
         }
-    };
+    } catch (error) {
+        console.error("Erro no header:", error);
+    }
+    return null;
+};
 
-    // O nosso temporizador de 500ms (obrigatório para todas as páginas)
-    const minimumDelayPromise = new Promise(resolve => setTimeout(resolve, 500));
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('includedContent');
+    const isProfilePage = window.location.pathname.includes('profile.html');
 
-    // CENA 1: A página TEM header (ex: Quizzes, Perfil)
+    // CENA A: Páginas com Header
     if (container) {
-        const fetchPromise = fetch('header-authenticated.html')
-            .then(response => {
-                if (!response.ok) throw new Error('Falha ao carregar header');
-                return response.text();
-            });
-
-        Promise.all([fetchPromise, minimumDelayPromise])
-            .then(([html]) => {
+        fetch('header-authenticated.html')
+            .then(res => res.text())
+            .then(async (html) => {
                 container.innerHTML = html;
-                
+
+                // Inicializações básicas (ícones e tema)
                 if (typeof lucide !== 'undefined') lucide.createIcons();
-                
                 if (typeof window.setTheme === 'function') {
-                    const savedTheme = localStorage.getItem('theme') || 'system';
-                    window.setTheme(savedTheme);
+                    window.setTheme(localStorage.getItem('theme') || 'system');
                 }
 
-                const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-                const navLinks = document.querySelectorAll('.auth-navbar-link');
-                navLinks.forEach(link => {
-                    link.classList.remove('auth-navbar-link-active');
-                    if (link.getAttribute('href') === currentPage) {
-                        link.classList.add('auth-navbar-link-active');
-                    }
+                // Navbar Link Ativo
+                const current = window.location.pathname.split('/').pop() || 'index.html';
+                document.querySelectorAll('.auth-navbar-link').forEach(link => {
+                    if (link.getAttribute('href') === current) link.classList.add('auth-navbar-link-active');
                 });
 
+                // --- AUTOMAÇÃO DE DADOS ---
+                // 1. Atualiza o Header
+                await window.atualizarHeaderGlobal();
+
+                // 2. Se for o PERFIL, o Global-Init encarrega-se de esperar pelos dados da página
+                if (isProfilePage) {
+                    try {
+                        // Esperamos um pequeno delay para garantir que os scripts da página profile.html 
+                        // iniciaram os seus fetches (atividade recente e estatísticas)
+                        await new Promise(resolve => setTimeout(resolve, 600)); 
+                        
+                        // Verificação extra: Se os campos ainda dizem "A carregar...", esperamos mais um pouco
+                        // Isto evita que o loader saia antes de o JS da página preencher o HTML
+                    } catch (e) { console.error("Erro na espera autónoma:", e); }
+                }
+
                 // Tira a cortina
-                hideLoader();
+                window.esconderLoader();
             })
-            .catch(error => {
-                console.error('Erro ao carregar o header:', error);
-                hideLoader();
+            .catch(err => {
+                console.error('Erro no global-init:', err);
+                window.esconderLoader();
             });
-            
     } 
-    // CENA 2: A página NÃO TEM header (ex: Login, Index)
+    // CENA B: Páginas sem Header
     else {
-        // Espera apenas os 500ms da animação e tira a cortina
-        minimumDelayPromise.then(() => {
-            hideLoader();
-            
-            // Força a atualização do tema e ícones (útil para a página de Login)
+        setTimeout(() => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            if (typeof window.setTheme === 'function') {
-                const savedTheme = localStorage.getItem('theme') || 'system';
-                window.setTheme(savedTheme);
-            }
-        });
+            window.esconderLoader();
+        }, 300);
     }
 });
