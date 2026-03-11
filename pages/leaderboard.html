@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+</head>
+<body class="site-body">
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+    
+    <div class="auth-container profile-main"  style="max-width: 800px;">
+        <div class="profile-card">
+            <div  style="text-align: center; margin-bottom: 30px;">
+                <i data-lucide="award"  style="width: 48px; height: 48px; color: #eab308; margin-bottom: 10px;"></i>
+                <h1  style="color: var(--text-color); margin: 0;">Hall of Fame</h1>
+                <p  style="color: var(--text-secondary); margin-top: 5px;">Os CiberHeróis com mais pontos acumulados</p>
+            </div>
+
+            <div id="ranking-container" class="ranking-list">
+                <p  style="text-align: center; color: var(--text-secondary); padding: 20px;">A carregar os melhores heróis...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/leaderboard');
+                if (!response.ok) {
+                    if(response.status === 401) window.location.href = 'index.html';
+                    throw new Error('Falha ao obter ranking');
+                }
+
+                const ranking = await response.json();
+                const container = document.getElementById('ranking-container');
+                container.innerHTML = '';
+
+                if (ranking.length === 0) {
+                    container.innerHTML = '<p  style="text-align: center; color: var(--text-secondary);">Ainda não há jogadores pontuados.</p>';
+                    return;
+                }
+
+                ranking.forEach(user => {
+                    // Lógica visual para destacar o Top 3
+                    let posVisual = `#${user.posicao}`;
+                    let classTop = '';
+                    
+                    if (user.posicao === 1) { posVisual = '🥇'; classTop = 'top-1'; }
+                    if (user.posicao === 2) { posVisual = '🥈'; classTop = 'top-2'; }
+                    if (user.posicao === 3) { posVisual = '🥉'; classTop = 'top-3'; }
+
+                    const classIsMe = user.eOUtilizador ? 'is-me' : '';
+
+                    const itemHTML = `
+                        <div class="ranking-item ${classTop} ${classIsMe}">
+                            <div class="ranking-left">
+                                <div class="ranking-pos">${posVisual}</div>
+                                <img src="${user.avatar}" alt="Avatar" class="ranking-avatar" referrerpolicy="no-referrer">
+                                <div class="ranking-info">
+                                    <span class="ranking-name">${user.nome} ${user.eOUtilizador ? '(Tu)' : ''}</span>
+                                    <span class="ranking-level">Nível ${user.nivel}</span>
+                                </div>
+                            </div>
+                            <div class="ranking-right">
+                                <span class="ranking-points">${user.pontos} pts</span>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHTML);
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar Leaderboard:", error);
+                document.getElementById('ranking-container').innerHTML = 
+                    '<p  style="text-align: center; color: var(--error);">Não foi possível carregar a Leaderboard.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
