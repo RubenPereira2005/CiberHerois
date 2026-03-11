@@ -55,7 +55,7 @@
                 <span id="score-counter">Pontuação: 0</span>
             </div>
             <div class="quiz-progress-track">
-                <div id="progress-bar" class="quiz-progress-fill" style="width: 0%"></div>
+                <div id="progress-bar" class="quiz-progress-fill"  style="width: 0%;"></div>
             </div>
         </div>
 
@@ -216,28 +216,54 @@
             }
         }
 
-        function showResults() {
+        // NOVA FUNÇÃO SHOWRESULTS
+        async function showResults() {
             document.getElementById('quiz-ui').classList.add('quiz-hidden');
             document.getElementById('results-ui').classList.remove('quiz-hidden');
             
             const percentage = (score / questions.length) * 100;
+            const pontosGanhos = score * 10; // Calcula os pontos
             
             const iconContainer = document.getElementById('result-icon');
             if (percentage === 100) {
-                iconContainer.innerHTML = '<i data-lucide="trophy" style="width: 80px; height: 80px; color: #eab308; stroke-width: 1.5;"></i>';
+                iconContainer.innerHTML = '<i data-lucide="trophy"  style="width: 80px; height: 80px; color: #eab308; stroke-width: 1.5;"></i>';
                 document.getElementById('perfect-score-msg').classList.remove('quiz-hidden');
             } else if (percentage >= 70) {
-                iconContainer.innerHTML = '<i data-lucide="award" style="width: 80px; height: 80px; color: #3b82f6; stroke-width: 1.5;"></i>';
+                iconContainer.innerHTML = '<i data-lucide="award"  style="width: 80px; height: 80px; color: #3b82f6; stroke-width: 1.5;"></i>';
             } else {
-                iconContainer.innerHTML = '<i data-lucide="x-circle" style="width: 80px; height: 80px; color: #9ca3af; stroke-width: 1.5;"></i>';
+                iconContainer.innerHTML = '<i data-lucide="x-circle"  style="width: 80px; height: 80px; color: #9ca3af; stroke-width: 1.5;"></i>';
             }
             
             document.getElementById('result-text').textContent = `Acertou ${score} de ${questions.length} questões`;
-            document.getElementById('result-points').textContent = `Ganhou ${score * 10} pontos!`;
+            document.getElementById('result-points').textContent = `Ganhou ${pontosGanhos} pontos!`;
             
             // Recriar ícones para o ecrã de resultados ser renderizado corretamente
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+            }
+
+            // --- ENVIAR PARA A BASE DE DADOS ---
+            try {
+                const response = await fetch('/api/quiz/save-score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        categoria: category,
+                        pontos: pontosGanhos,
+                        respostas_corretas: score,
+                        total_perguntas: questions.length
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error("Falha ao guardar a pontuação no servidor.");
+                } else {
+                    console.log("Pontuação guardada na base de dados com sucesso!");
+                }
+            } catch (erro) {
+                console.error("Erro de rede ao tentar guardar a pontuação:", erro);
             }
         }
 
