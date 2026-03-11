@@ -13,7 +13,7 @@
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
 </head>
-<body class="site-body">
+<body class="site-body">    
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
         <div class="loader-spinner"></div>
@@ -25,11 +25,11 @@
         <div class="profile-header">
             <div class="profile-header-content">
                 <div class="profile-header-left">
-                    <div class="profile-avatar-container" style="position: relative; display: inline-block;">
+                    <div class="profile-avatar-container"  style="position: relative; display: inline-block;">
                         <div class="profile-avatar">
-                            </div>
+                        </div>
                         <button id="edit-avatar-btn" class="edit-avatar-btn" title="Mudar Avatar">
-                            <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="pencil"  style="width: 14px; height: 14px;"></i>
                         </button>
                     </div>
                     <div>
@@ -39,13 +39,13 @@
                             <div class="profile-header-badge">
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="trophy" class="profile-header-icon"></i>
-                                    <span class="profile-header-badge-text">Nível 5</span>
+                                    <span class="profile-header-badge-text" id="profile-level-badge">Nível --</span>
                                 </div>
                             </div>
                             <div class="profile-header-badge">
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="star" class="profile-header-icon"></i>
-                                    <span class="profile-header-badge-text">450 Pontos</span>
+                                    <span class="profile-header-badge-text" id="profile-points-badge">-- Pontos</span>
                                 </div>
                             </div>
                         </div>
@@ -62,18 +62,18 @@
 
             <div class="profile-progress">
                 <div class="profile-progress-label">
-                    <span>Progresso para Nível 6</span>
-                    <span>50 pontos restantes</span>
+                    <span id="profile-progress-text">Progresso para Nível --</span>
+                    <span id="profile-progress-remaining">-- pontos restantes</span>
                 </div>
                 <div class="profile-progress-bar">
-                    <div class="profile-progress-fill" style="width: 85%"></div>
+                    <div id="profile-progress-bar-fill" class="profile-progress-fill"  style="width: 0%;"></div>
                 </div>
             </div>
         </div>
 
         <div class="profile-grid">
             <div class="profile-content">
-                
+
                 <div class="profile-card">
                     <h2 class="profile-card-title">
                         <i data-lucide="trending-up" class="profile-card-icon"></i>
@@ -82,54 +82,39 @@
 
                     <div class="profile-stats-grid">
                         <div class="profile-stat">
-                            <div class="profile-stat-value profile-stat-blue">12</div>
+                            <div class="profile-stat-value profile-stat-blue" id="stat-quizzes">0</div>
                             <div class="profile-stat-label">Quizzes</div>
                         </div>
                         <div class="profile-stat">
-                            <div class="profile-stat-value profile-stat-green">92%</div>
+                            <div class="profile-stat-value profile-stat-green" id="stat-precisao">0%</div>
                             <div class="profile-stat-label">Precisão</div>
                         </div>
                         <div class="profile-stat">
-                            <div class="profile-stat-value profile-stat-purple">5</div>
+                            <div class="profile-stat-value profile-stat-purple" id="stat-medalhas">0</div>
                             <div class="profile-stat-label">Medalhas</div>
                         </div>
                         <div class="profile-stat">
-                            <div class="profile-stat-value profile-stat-orange">145</div>
+                            <div class="profile-stat-value profile-stat-orange" id="stat-respostas">0</div>
                             <div class="profile-stat-label">Respostas</div>
                         </div>
                     </div>
                 </div>
 
-
                 <div class="profile-card">
-                    <h2 class="profile-card-title">
-                        <i data-lucide="calendar" class="profile-card-icon"></i>
-                        Atividade Recente
-                    </h2>
+                    <div  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="profile-card-title"  style="margin: 0;">
+                            <i data-lucide="calendar" class="profile-card-icon"></i>
+                            Atividade Recente
+                        </h2>
+                        <a href="historico.html"  style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                            Ver Tudo <i data-lucide="chevron-right"  style="width: 16px; height: 16px;"></i>
+                        </a>
+                    </div>
 
                     <div class="profile-activity">
-                        <div class="profile-activity-item">
-                            <div>
-                                <div class="profile-activity-title">Quiz: HTTPS e Segurança</div>
-                                <div class="profile-activity-desc">3/3 corretas</div>
-                            </div>
-                            <div class="profile-activity-right">
-                                <div class="profile-activity-points">+30 pts</div>
-                                <div class="profile-activity-time">Hoje</div>
-                            </div>
-                        </div>
-                        <div class="profile-activity-item">
-                            <div>
-                                <div class="profile-activity-title">Jogo: Detetor de Phishing</div>
-                                <div class="profile-activity-desc">4/5 corretas</div>
-                            </div>
-                            <div class="profile-activity-right">
-                                <div class="profile-activity-points">+80 pts</div>
-                                <div class="profile-activity-time">Ontem</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="profile-card profile-medals">
@@ -174,11 +159,11 @@
                 </div>
             </div>
         </div>
-    </div>
-
+    </div> 
+    
     <div id="avatar-modal" class="avatar-modal hidden">
         <div class="avatar-modal-overlay" id="close-modal-overlay"></div>
-        
+
         <div class="avatar-modal-content">
             <div class="avatar-modal-header">
                 <h2>Escolhe o teu Herói</h2>
@@ -186,24 +171,25 @@
                     <i data-lucide="x"></i>
                 </button>
             </div>
-            
+
             <div class="avatar-grid">
                 <img src="/img/avatar1.avif" class="avatar-option" data-avatar="avatar1.avif" alt="Avatar 1">
                 <img src="/img/avatar2.jpg" class="avatar-option" data-avatar="avatar2.jpg" alt="Avatar 2">
                 <img src="/img/avatar3.avif" class="avatar-option" data-avatar="avatar3.avif" alt="Avatar 3">
-                <img src="/img/default_avatar.png" class="avatar-option" data-avatar="default_avatar.png" alt="Avatar Default">
+                <img src="/img/default_avatar.png" class="avatar-option" data-avatar="default_avatar.png"
+                    alt="Avatar Default">
             </div>
 
             <div class="upload-divider">
                 <span>As Tuas Fotografias</span>
             </div>
-            
+
             <div id="personal-avatars-section" class="personal-avatars-section"></div>
-            
+
             <div class="avatar-upload-section">
                 <input type="file" id="custom-avatar-input" accept="image/png, image/jpeg, image/jpg" hidden>
                 <label for="custom-avatar-input" class="upload-btn">
-                    <i data-lucide="upload" style="margin-right: 8px;"></i>
+                    <i data-lucide="upload"  style="margin-right: 8px;"></i>
                     Nova fotografia
                 </label>
             </div>
@@ -214,11 +200,11 @@
         lucide.createIcons();
 
         document.addEventListener('DOMContentLoaded', async () => {
-            
+
             // Carregar os dados do utilizador para mostrar o nome, email e avatar
             try {
                 const response = await fetch('/api/me');
-                
+
                 if (response.status === 401) {
                     window.location.href = 'index.html';
                     return;
@@ -238,31 +224,29 @@
                     if (data.foto_perfil) {
                         let caminhoImagem = data.foto_perfil;
                         if (!caminhoImagem.startsWith('http')) {
-                            caminhoImagem = caminhoImagem.startsWith('upload-') 
-                                ? `/img/uploads/${data.foto_perfil}` 
+                            caminhoImagem = caminhoImagem.startsWith('upload-')
+                                ? `/img/uploads/${data.foto_perfil}`
                                 : `/img/${data.foto_perfil}`;
                         }
-                        avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">`;
+                        avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                     } else {
-                        avatarElement.innerHTML = `<img src="/img/default_avatar.png" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                        avatarElement.innerHTML = `<img src="/img/default_avatar.png" alt="Avatar"  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                     }
 
-                    // Adicionar as bolinhas de avatar personalizadas (upload e Google) ao modal
+                    // Adicionar as bolinhas de avatar personalizadas
                     const personalSection = document.getElementById('personal-avatars-section');
-                    
-                    // Bolinha: Último Upload
+
                     if (data.foto_upload) {
                         const wrapperUpload = document.createElement('div');
                         wrapperUpload.className = 'personal-avatar-wrapper';
 
                         const imgUpload = document.createElement('img');
-                        
-                        // Nova lógica: Se o link já tiver "http" (Supabase), usa-o direto. Se não, usa a pasta antiga.
+
                         let linkUpload = data.foto_upload;
                         if (!linkUpload.startsWith('http')) {
                             linkUpload = `/img/uploads/${data.foto_upload}`;
                         }
-                        
+
                         imgUpload.src = linkUpload;
                         imgUpload.className = 'avatar-option';
                         imgUpload.setAttribute('data-avatar', data.foto_upload);
@@ -277,7 +261,6 @@
                         personalSection.appendChild(wrapperUpload);
                     }
 
-                    // Bolinha: Conta Google
                     if (data.foto_google) {
                         const wrapperGoogle = document.createElement('div');
                         wrapperGoogle.className = 'personal-avatar-wrapper';
@@ -298,9 +281,7 @@
                         personalSection.appendChild(wrapperGoogle);
                     }
 
-                    // Marcar o avatar atual com uma borda ou destaque no modal
                     document.querySelectorAll('.avatar-option').forEach(img => {
-                        // Se o data-avatar da imagem for igual à foto_perfil da base de dados...
                         if (img.getAttribute('data-avatar') === data.foto_perfil) {
                             img.classList.add('active-avatar');
                         }
@@ -320,10 +301,8 @@
             if (btnClose) btnClose.addEventListener('click', () => modal.classList.add('hidden'));
             if (overlay) overlay.addEventListener('click', () => modal.classList.add('hidden'));
 
-            // Clique numa imagem do modal para a tornar o novo avatar
             const modalContent = document.querySelector('.avatar-modal-content');
             modalContent.addEventListener('click', async (e) => {
-                // Se clicou numa imagem que tem a classe 'avatar-option' (em qualquer zona do modal)
                 if (e.target.classList.contains('avatar-option')) {
                     const novoAvatar = e.target.getAttribute('data-avatar');
 
@@ -335,20 +314,16 @@
                         });
 
                         if (response.ok) {
-
-                            // 1. Tira a borda azul de todas as imagens
                             document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('active-avatar'));
-                            // 2. Coloca a borda azul na imagem que foi clicada
                             e.target.classList.add('active-avatar');
 
-                            // Atualiza a imagem na página
                             let caminho = novoAvatar;
                             if (!caminho.startsWith('http')) {
                                 caminho = caminho.startsWith('upload-') ? `/img/uploads/${novoAvatar}` : `/img/${novoAvatar}`;
                             }
-                            
+
                             const avatarElement = document.querySelector('.profile-avatar');
-                            avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" referrerpolicy="no-referrer">`;
+                            avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                             modal.classList.add('hidden');
                         } else {
                             alert('Erro ao atualizar avatar.');
@@ -359,7 +334,6 @@
                 }
             });
 
-            //Upload de nova imagem personalizada
             const inputUpload = document.getElementById('custom-avatar-input');
             if (inputUpload) {
                 inputUpload.addEventListener('change', async (e) => {
@@ -367,17 +341,15 @@
                     if (!file) return;
 
                     const formData = new FormData();
-                    formData.append('ficheiroAvatar', file); 
+                    formData.append('ficheiroAvatar', file);
 
                     try {
                         const response = await fetch('/api/upload-avatar', {
                             method: 'POST',
-                            body: formData 
+                            body: formData
                         });
 
                         if (response.ok) {
-                            // Após fazer o upload, a forma mais segura de desenhar a nova bolinha 
-                            // de upload lá em baixo é fazer reload da página.
                             window.location.reload();
                         } else {
                             alert('Erro ao fazer upload da imagem.');
@@ -387,7 +359,107 @@
                     }
                 });
             }
+
+            // --- FUNÇÃO: CARREGAR ATIVIDADES RECENTES ---
+            async function carregarAtividadeRecente() {
+                try {
+                    const response = await fetch('/api/recent-activity');
+                    if (!response.ok) throw new Error('Falha ao obter atividades');
+
+                    const atividades = await response.json();
+                    const contentorAtividade = document.querySelector('.profile-activity');
+
+                    contentorAtividade.innerHTML = '';
+
+                    if (atividades.length === 0) {
+                        contentorAtividade.innerHTML = '<p  style="color: var(--text-secondary); padding: 10px;">Ainda não tens atividades registadas. Começa a jogar!</p>';
+                        return;
+                    }
+
+                    atividades.forEach(act => {
+                        const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
+
+                        const dataRealizacao = new Date(act.data_realizacao);
+                        const hoje = new Date();
+                        const ontem = new Date(hoje);
+                        ontem.setDate(ontem.getDate() - 1);
+
+                        let textoData = dataRealizacao.toLocaleDateString('pt-PT');
+
+                        if (dataRealizacao.toDateString() === hoje.toDateString()) {
+                            textoData = 'Hoje';
+                        } else if (dataRealizacao.toDateString() === ontem.toDateString()) {
+                            textoData = 'Ontem';
+                        }
+
+                        let textoDescricao = 'Concluído';
+                        if (act.respostas_corretas !== null && act.total_perguntas !== null && act.total_perguntas > 0) {
+                            textoDescricao = `${act.respostas_corretas}/${act.total_perguntas} corretas`;
+                        }
+
+                        const itemHTML = `
+                            <div class="profile-activity-item">
+                                <div>
+                                    <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
+                                    <div class="profile-activity-desc">${textoDescricao}</div>
+                                </div>
+                                <div class="profile-activity-right">
+                                    <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
+                                    <div class="profile-activity-time">${textoData}</div>
+                                </div>
+                            </div>
+                        `;
+
+                        contentorAtividade.insertAdjacentHTML('beforeend', itemHTML);
+                    });
+
+                } catch (error) {
+                    console.error("Erro ao carregar o histórico:", error);
+                    const contentorAtividade = document.querySelector('.profile-activity');
+                    contentorAtividade.innerHTML = '<p  style="color: var(--error);">Não foi possível carregar as atividades recentes.</p>';
+                }
+            }
+
+            // --- CARREGAR ESTATÍSTICAS, PONTOS E NÍVEIS ---
+            async function carregarEstatisticas() {
+                try {
+                    const response = await fetch('/api/stats');
+                    if (!response.ok) throw new Error('Falha ao obter estatísticas');
+
+                    const stats = await response.json();
+
+                    // 1. Atualizar estatísticas dos retângulos
+                    document.getElementById('stat-quizzes').textContent = stats.quizzes;
+                    document.getElementById('stat-precisao').textContent = stats.precisao + '%';
+                    document.getElementById('stat-medalhas').textContent = stats.medalhas;
+                    document.getElementById('stat-respostas').textContent = stats.respostas;
+
+                    // 2. Atualizar Pontos e Nível no Badge do Perfil
+                    const badgePontosPerfil = document.getElementById('profile-points-badge');
+                    const badgeNivelPerfil = document.getElementById('profile-level-badge');
+                    if (badgePontosPerfil) badgePontosPerfil.textContent = `${stats.pontos || 0} Pontos`;
+                    if (badgeNivelPerfil) badgeNivelPerfil.textContent = `Nível ${stats.nivel}`;
+
+                    // 3. Atualizar a Barra de Progresso
+                    const barraTexto = document.getElementById('profile-progress-text');
+                    const barraRestante = document.getElementById('profile-progress-remaining');
+                    const barraPreenchimento = document.getElementById('profile-progress-bar-fill');
+                    
+                    if (barraTexto) barraTexto.textContent = `Progresso para Nível ${stats.nivel + 1}`;
+                    if (barraRestante) barraRestante.textContent = `${stats.pontos_restantes} pontos restantes`;
+                    if (barraPreenchimento) barraPreenchimento.style.width = `${stats.progresso_perc}%`;
+
+                } catch (error) {
+                    console.error("Erro ao carregar estatísticas do Perfil:", error);
+                }
+            }
+
+            // Executar as funções ao carregar a página
+            carregarAtividadeRecente();
+            carregarEstatisticas(); 
+            
         });
     </script>
 </body>
+
 </html>
