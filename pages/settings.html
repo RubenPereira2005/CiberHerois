@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,17 +15,31 @@
     <style>
         /* --- ESTILOS PARA O GLOW DO MFA --- */
         @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); border-color: #f59e0b; }
-            50% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); border-color: #f59e0b; background: rgba(245, 158, 11, 0.05); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); border-color: var(--border-color); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+                border-color: #f59e0b;
+            }
+
+            50% {
+                box-shadow: 0 0 0 15px rgba(245, 158, 11, 0);
+                border-color: #f59e0b;
+                background: rgba(245, 158, 11, 0.05);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+                border-color: var(--border-color);
+            }
         }
 
         .highlight-glow {
-            animation: pulseGlow 1.1s ease-out 3; /* Pisca 3 vezes suavemente */
+            animation: pulseGlow 1.1s ease-out 3;
+            /* Pisca 3 vezes suavemente */
             transition: all 0.5s ease;
         }
     </style>
 </head>
+
 <body class="site-body">
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
@@ -47,19 +62,21 @@
             <aside class="settings-sidebar">
                 <div class="sidebar-section">
                     <button class="settings-tab active" data-tab="account"><i data-lucide="user"></i> Conta</button>
-                    <button class="settings-tab" data-tab="security"><i data-lucide="shield-check"></i> Segurança</button>
+                    <button class="settings-tab" data-tab="security"><i data-lucide="shield-check"></i>
+                        Segurança</button>
                     <button class="settings-tab" data-tab="notifications"><i data-lucide="bell"></i> Alertas</button>
                     <button class="settings-tab" data-tab="appearance"><i data-lucide="palette"></i> Aparência</button>
                     <button class="settings-tab" data-tab="privacy"><i data-lucide="eye-off"></i> Privacidade</button>
                 </div>
 
                 <div class="sidebar-section danger">
-                    <button class="settings-tab" data-tab="danger" style="color: #ef4444;"><i data-lucide="alert-triangle"></i> Zona Crítica</button>
+                    <button class="settings-tab" data-tab="danger"  style="color: #ef4444;"><i
+                            data-lucide="alert-triangle"></i> Zona Crítica</button>
                 </div>
             </aside>
 
             <main class="settings-content">
-                
+
                 <section class="tab-pane active-pane" id="account">
                     <div class="settings-card-header">
                         <div class="settings-icon-wrapper blue"><i data-lucide="user"></i></div>
@@ -104,22 +121,25 @@
                             <label class="form-label">Nova Palavra-passe</label>
                             <input type="password" class="form-input" placeholder="Nova palavra-passe">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label">Autenticação Multi-fator (MFA)</label>
-                            <div id="mfa-container-box" class="checkbox-group" style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); position: relative; overflow: hidden;">
-                                <label style="font-weight: bold; font-size: 1rem; color: var(--text-color); cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                                    <input type="checkbox" id="mfa-toggle" style="width: 18px; height: 18px;"> 
+                            <div id="mfa-container-box" class="checkbox-group"  style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); position: relative; overflow: hidden;">
+                                <label  style="font-weight: bold; font-size: 1rem; color: var(--text-color); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="mfa-toggle"  style="width: 18px; height: 18px;">
                                     Ativar Login em 2 Passos (Código no E-mail)
                                 </label>
-                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px; margin-left: 28px;">
-                                    Sempre que fizeres login com palavra-passe ou Google, será enviado um código de 8 dígitos para o teu e-mail para confirmar a tua identidade.
+                                <p  style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px; margin-left: 28px;">
+                                    Sempre que fizeres login com palavra-passe ou Google, será enviado um código de 8
+                                    dígitos para o teu e-mail para confirmar a tua identidade.
                                 </p>
                             </div>
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn btn-primary" onclick="alert('Esta funcionalidade de mudar a password por aqui requer configuração extra no backend.')">Atualizar Protocolos</button>
+                            <button type="button" class="btn btn-primary"
+                                onclick="alert('Esta funcionalidade de mudar a password por aqui requer configuração extra no backend.')">Atualizar
+                                Protocolos</button>
                         </div>
                     </form>
                 </section>
@@ -157,8 +177,10 @@
                             <label class="form-label">Tema do Painel</label>
                             <div class="radio-group">
                                 <label><input type="radio" name="theme-choice" value="system"> Seguir Sistema</label>
-                                <label><input type="radio" name="theme-choice" value="light"> Modo Diurno (Claro)</label>
-                                <label><input type="radio" name="theme-choice" value="dark"> Modo Noturno (Escuro)</label>
+                                <label><input type="radio" name="theme-choice" value="light"> Modo Diurno
+                                    (Claro)</label>
+                                <label><input type="radio" name="theme-choice" value="dark"> Modo Noturno
+                                    (Escuro)</label>
                             </div>
                         </div>
                     </div>
@@ -193,8 +215,10 @@
                         </div>
                     </div>
                     <div class="danger-actions">
-                        <p style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Ao apagar a conta, todos os teus emblemas, pontos e progresso nos quizzes serão permanentemente destruídos.</p>
-                        <button type="button" id="btn-delete-account" class="btn btn-danger-outline">Apagar Identidade de Herói</button>
+                        <p  style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Ao apagar a conta, todos os
+                            teus emblemas, pontos e progresso nos quizzes serão permanentemente destruídos.</p>
+                        <button type="button" id="btn-delete-account" class="btn btn-danger-outline">Apagar Identidade
+                            de Herói</button>
                     </div>
                 </section>
             </main>
@@ -250,10 +274,10 @@
                         mfaBox.classList.add('highlight-glow');
                         // Foca a atenção no checkbox
                         mfaToggle.focus();
-                        
+
                         // Limpa a memória
                         sessionStorage.removeItem('highlightMFA');
-                        
+
                         // Remove a classe após a animação acabar (4.5s total)
                         setTimeout(() => {
                             mfaBox.classList.remove('highlight-glow');
@@ -270,7 +294,7 @@
                     const data = await response.json();
                     if (nameInput) nameInput.value = data.nome || '';
                     if (emailInput) emailInput.value = data.email || '';
-                    
+
                     // Atualiza o interruptor do MFA com o valor que veio da base de dados
                     if (mfaToggle && data.mfa_ativo !== undefined) {
                         mfaToggle.checked = data.mfa_ativo;
@@ -313,13 +337,37 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ mfa_ativo: isChecked })
                         });
-                        
+
+                        const data = await response.json();
+
                         if (response.ok) {
-                            alert(isChecked ? "MFA Ativado! A partir de agora farás login em 2 passos." : "MFA Desativado. Login normal restaurado.");
+                            // 1. Mostra a mensagem ao utilizador
+                            alert(data.message);
+                            
+                            // 2. SE ELE GANHOU A RECOMPENSA, FORÇA A ATUALIZAÇÃO VISUAL NA HORA!
+                            if (data.recompensa === true) {
+                                try {
+                                    // Pede os pontos novos diretamente à base de dados
+                                    const statsRes = await fetch('/api/stats');
+                                    if (statsRes.ok) {
+                                        const stats = await statsRes.json();
+                                        
+                                        // Atualiza os elementos da Navbar injetada diretamente
+                                        const navPoints = document.getElementById('nav-global-points');
+                                        const navLevel = document.getElementById('nav-global-level');
+                                        
+                                        if (navPoints) navPoints.textContent = `${stats.pontos} pts`;
+                                        if (navLevel) navLevel.textContent = `Nível ${stats.nivel}`;
+                                    }
+                                } catch (err) {
+                                    console.error("Erro ao atualizar visualmente o header:", err);
+                                }
+                            }
                         } else {
-                            e.target.checked = !isChecked; 
+                            e.target.checked = !isChecked;
                             alert("Erro ao atualizar a segurança na base de dados.");
                         }
+
                     } catch (error) {
                         e.target.checked = !isChecked;
                         alert("Erro de comunicação com o servidor.");
@@ -345,8 +393,8 @@
 
             function syncThemeRadios() {
                 const stored = localStorage.getItem('theme') || 'system';
-                themeRadios.forEach(r => { 
-                    r.checked = (r.value === stored); 
+                themeRadios.forEach(r => {
+                    r.checked = (r.value === stored);
                 });
             }
 
@@ -365,4 +413,5 @@
         });
     </script>
 </body>
+
 </html>

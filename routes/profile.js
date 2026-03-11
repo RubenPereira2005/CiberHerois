@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 
-// --- NOVA CONFIGURAÇÃO DO MULTER (Memória em vez de Disco) ---
-// Guarda na memória RAM temporariamente e com limite máximo de 2MB
+// --- CONFIGURAÇÃO DO MULTER (Memória em vez de Disco) ---
 const storage = multer.memoryStorage();
 const upload = multer({ 
     storage: storage,
@@ -43,19 +42,13 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
         
         try {
-            // 1. Apagar o utilizador diretamente do Supabase Auth.
-            // Como usas a Service Role Key, tens permissão para fazer isto.
-            // Graças ao "ON DELETE CASCADE", o Postgres apaga automaticamente o perfil na tabela 'utilizador'.
             const { data, error } = await supabase.auth.admin.deleteUser(req.session.userId);
-            
             if (error) throw error;
 
-            // 2. Destruir a sessão local do Node.js
             req.session.destroy((err) => {
                 if (err) return res.status(500).json({ error: "Conta apagada, mas erro ao limpar a sessão no browser." });
                 res.json({ message: "Conta eliminada permanentemente de todo o sistema." });
             });
-
         } catch (error) {
             console.error("Erro ao apagar conta (Supabase Admin):", error);
             res.status(500).json({ error: "Erro ao apagar conta permanentemente." });
@@ -73,40 +66,32 @@ module.exports = (supabase) => {
         res.json({ message: "Avatar atualizado com sucesso!" });
     });
 
-    // --- ROTA 5: Upload de Nova Foto Personalizada (SUPABASE STORAGE OTIMIZADO) ---
+    // --- ROTA 5: Upload de Nova Foto Personalizada ---
     router.post('/upload-avatar', upload.single('ficheiroAvatar'), async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
         if (!req.file) return res.status(400).json({ error: "Nenhum ficheiro recebido." });
 
         try {
-            // 1. Procurar se o utilizador já tem um upload antigo para o apagar
             const { data: user } = await supabase.from('utilizador').select('foto_upload').eq('id_utilizador', req.session.userId).single();
 
             if (user && user.foto_upload && user.foto_upload.includes('supabase.co')) {
-                // Extrai apenas o nome final do ficheiro para o apagar do Storage
                 const urlPartes = user.foto_upload.split('/');
                 const ficheiroAntigo = urlPartes[urlPartes.length - 1];
-                
-                // NOTA: Sem o 'await', o servidor manda apagar em background e não fica à espera!
                 supabase.storage.from('avatars').remove([ficheiroAntigo]).catch(err => console.error("Erro ao apagar antiga:", err));
             }
 
-            // 2. Gerar o nome para o novo ficheiro
             const extensao = req.file.originalname.split('.').pop();
             const novoNome = `upload-${req.session.userId}-${Date.now()}.${extensao}`;
 
-            // 3. Fazer o Upload do buffer para o Supabase
             const { error: uploadError } = await supabase.storage.from('avatars').upload(novoNome, req.file.buffer, {
                 contentType: req.file.mimetype,
                 upsert: true
             });
             if (uploadError) throw uploadError;
 
-            // 4. Obter o URL público da imagem no Supabase
             const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(novoNome);
             const urlImagem = publicUrlData.publicUrl;
 
-            // 5. Guardar o URL na base de dados
             const { error: dbError } = await supabase.from('utilizador')
                 .update({ foto_perfil: urlImagem, foto_upload: urlImagem })
                 .eq('id_utilizador', req.session.userId);
@@ -120,20 +105,114 @@ module.exports = (supabase) => {
         }
     });
 
-    // --- ROTA 6: Ligar/Desligar MFA ---
+    // --- ROTA 6: Ligar/Desligar MFA (COM RECOMPENSA ÚNICA) ---
     router.put('/update-mfa', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
         const { mfa_ativo } = req.body;
 
-        const { error } = await supabase
-            .from('utilizador')
-            .update({ mfa_ativo: mfa_ativo })
-            .eq('id_utilizador', req.session.userId);
+        try {
+            // (Verificação flexível: aceita boolean ou string do frontend)
+            if (mfa_ativo === true || mfa_ativo === 'true') {
+                const { data: userDados, error: userError } = await supabase
+                    .from('utilizador')
+                    .select('pontos_totais, mfa_recompensa_recebida')
+                    .eq('id_utilizador', req.session.userId)
+                    .single();
 
-        if (error) return res.status(500).json({ error: "Erro ao atualizar estado MFA." });
-        res.json({ message: "Estado MFA atualizado com sucesso!" });
+                if (userError) throw userError;
+
+                // Se ainda não recebeu a recompensa, dá os 50 pontos!
+                if (userDados && userDados.mfa_recompensa_recebida === false) {
+                    const novosPontos = (userDados.pontos_totais || 0) + 50;
+                    
+                    const { error: updateError } = await supabase
+                        .from('utilizador')
+                        .update({ 
+                            mfa_ativo: true,
+                            pontos_totais: novosPontos,
+                            mfa_recompensa_recebida: true // Bloqueia para não ganhar duas vezes
+                        })
+                        .eq('id_utilizador', req.session.userId);
+
+                    if (updateError) throw updateError;
+
+                    return res.json({ message: "MFA ativado! Ganhaste +50 Pontos de XP!", recompensa: true });
+                }
+            }
+
+            // Se for para desativar, ou se já ganhou a recompensa antes, apenas atualiza o estado
+            const { error: normalUpdateError } = await supabase
+                .from('utilizador')
+                .update({ mfa_ativo: mfa_ativo === true || mfa_ativo === 'true' })
+                .eq('id_utilizador', req.session.userId);
+
+            if (normalUpdateError) throw normalUpdateError;
+
+            res.json({ message: mfa_ativo ? "MFA reativado com sucesso." : "MFA desativado.", recompensa: false });
+
+        } catch (error) {
+            console.error("Erro ao atualizar estado MFA:", error);
+            res.status(500).json({ error: "Erro ao atualizar estado MFA." });
+        }
     });
 
+    // --- ROTA 7: Obter Atividade Recente do Utilizador ---
+    router.get('/recent-activity', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+
+        try {
+            const { data, error } = await supabase
+                .from('progresso')
+                .select(`
+                    pontos_obtidos,
+                    respostas_corretas,
+                    total_perguntas,
+                    data_realizacao,
+                    atividade (
+                        titulo,
+                        tipo
+                    )
+                `)
+                .eq('id_utilizador', req.session.userId)
+                .order('data_realizacao', { ascending: false })
+                .limit(5);
+
+            if (error) throw error;
+            res.json(data);
+        } catch (error) {
+            console.error("Erro ao carregar atividade recente:", error);
+            res.status(500).json({ error: "Erro ao carregar atividade recente." });
+        }
+    });
+
+    // --- ROTA 8: Obter TODO o Histórico do Utilizador ---
+    router.get('/history', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+
+        try {
+            const { data, error } = await supabase
+                .from('progresso')
+                .select(`
+                    pontos_obtidos,
+                    respostas_corretas,
+                    total_perguntas,
+                    data_realizacao,
+                    atividade (
+                        titulo,
+                        tipo
+                    )
+                `)
+                .eq('id_utilizador', req.session.userId)
+                .order('data_realizacao', { ascending: false });
+
+            if (error) throw error;
+            res.json(data);
+        } catch (error) {
+            console.error("Erro ao carregar histórico completo:", error);
+            res.status(500).json({ error: "Erro ao carregar histórico." });
+        }
+    });
+    
     return router;
 };
