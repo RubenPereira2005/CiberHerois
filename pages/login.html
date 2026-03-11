@@ -15,79 +15,6 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="global-init.js"></script>
-    <style>
-        .divider-container {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: #e2e8f0;
-        }
-
-        .divider-text {
-            margin: 0 10px;
-            color: #64748b;
-            font-size: 0.875rem;
-        }
-
-        /* Estilos do botão de Reenviar */
-        #resendBtn:disabled {
-            cursor: not-allowed;
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
-
-        #resendBtn:not(:disabled) {
-            cursor: pointer;
-            color: var(--primary-color);
-        }
-
-        /* Estilos das Caixinhas do Código (OTP) - CORRIGIDO PARA DARK MODE */
-        .otp-boxes-container {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-
-        .otp-box {
-            width: 40px;
-            height: 50px;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-radius: 8px;
-            /* Borda semi-transparente que se nota em qualquer fundo */
-            border: 2px solid rgba(148, 163, 184, 0.4);
-            /* Fundo ligeiramente destacado do fundo da página */
-            background: rgba(148, 163, 184, 0.1);
-            color: var(--text-color);
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .otp-box:focus {
-            /* O teu verde de destaque quando clica na caixa */
-            border-color: #10b981;
-            background: transparent;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-        }
-
-        /* Responsividade para telemóveis muito pequenos */
-        @media (max-width: 400px) {
-            .otp-box {
-                width: 32px;
-                height: 45px;
-                font-size: 1.2rem;
-                gap: 4px;
-            }
-        }
-    </style>
 </head>
 
 <body class="login-page">
@@ -111,10 +38,8 @@
             </div>
 
             <h3 class="login-subtitle" id="formSubtitle">Iniciar sessão</h3>
-            <p id="mfaInstructions"
-                style="display: none; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
-                Identidade verificada! <br>Enviámos um código de 8 dígitos para o teu e-mail por motivos de segurança
-                (MFA ativo).
+            <p id="mfaInstructions"  style="display: none; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+                Identidade verificada! <br>Enviámos um código de 8 dígitos para o teu e-mail por motivos de segurança.
             </p>
 
             <form id="loginForm" class="login-form">
@@ -125,10 +50,9 @@
                 </div>
 
                 <div class="form-group" id="passwordGroup">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div  style="display: flex; justify-content: space-between; align-items: center;">
                         <label class="form-label">Password</label>
-                        <a href="forgot-password.html" class="link-highlight"
-                            style="font-size: 0.8rem;">Esqueceu-se?</a>
+                        <a href="forgot-password.html" class="link-highlight"  style="font-size: 0.8rem;">Esqueceu-se?</a>
                     </div>
                     <div class="password-input-wrapper">
                         <input type="password" id="loginPassword" required class="form-input" placeholder="••••••••" />
@@ -138,8 +62,8 @@
                     </div>
                 </div>
 
-                <div class="form-group" id="codeGroup" style="display: none;">
-                    <label class="form-label" style="color:#10b981; text-align: left; display: block; margin-bottom: 10px;">Código de Segurança (8 dígitos)</label>
+                <div class="form-group" id="codeGroup"  style="display: none;">
+                    <label class="form-label"  style="color: #10b981; text-align: left; display: block; margin-bottom: 10px;">Código de Segurança (8 dígitos)</label>
 
                     <div class="otp-boxes-container">
                         <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
@@ -157,18 +81,18 @@
 
                 <button type="submit" id="submitBtn" class="login-btn">Entrar</button>
 
-                <div id="resendContainer" style="display: none; text-align: center; margin-top: 15px;">
-                    <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                <div id="resendContainer"  style="display: none; text-align: center; margin-top: 15px;">
+                    <p  style="font-size: 0.85rem; color: var(--text-secondary);">
                         Não recebeste o código?
-                        <button type="button" id="resendBtn" disabled
-                            style="background: none; border: none; font-weight: bold; padding: 0; font-family: inherit;">
+                        <button type="button" id="resendBtn" disabled  style="background: none; border: none; font-weight: bold; padding: 0; font-family: inherit;">
                             Reenviar em 02:00
                         </button>
                     </p>
-                    <p style="margin-top: 15px;">
-                        <a href="#" onclick="location.reload()" class="link-highlight" style="font-size: 0.85rem;"><i
-                                data-lucide="arrow-left" style="width:14px; height:14px; vertical-align:middle;"></i>
-                            Voltar e tentar outro e-mail</a>
+                    <p  style="margin-top: 15px;">
+                        <a href="#" onclick="location.reload()" class="link-highlight"  style="font-size: 0.85rem;">
+                            <i data-lucide="arrow-left"  style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                            Voltar e tentar outro e-mail
+                        </a>
                     </p>
                 </div>
 
@@ -179,11 +103,11 @@
                         <span class="divider-line"></span>
                     </div>
 
-                    <div id="googleBtnContainer" style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <div id="googleBtnContainer"  style="display: flex; justify-content: center; margin-bottom: 15px;">
                         <div id="g_id_signin"></div>
                     </div>
 
-                    <p class="login-link">
+                    <p class="login-link"  style="margin-bottom: 15px;">
                         Novo recruta? <a href="register.html" class="link-highlight">Criar conta</a>
                     </p>
 
@@ -199,7 +123,7 @@
     <script>
         lucide.createIcons();
 
-        // --- CHAVES DO SUPABASE (Aviso: Coloca aqui as tuas chaves!) ---
+        // --- CHAVES DO SUPABASE ---
         const supabaseUrl = 'https://xpmdiqqbgpzdditkbuzz.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwbWRpcXFiZ3B6ZGRpdGtidXp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDY5MzMsImV4cCI6MjA4ODIyMjkzM30.mwWcvrNrnLO_EjgbY9V1Ozdcfs9SBk0S4nWKxagiuUU';
         const db = supabase.createClient(supabaseUrl, supabaseKey);
@@ -276,7 +200,7 @@
             }
         });
 
-        // --- LÓGICA DAS CAIXINHAS DO CÓDIGO (OTP BOXES) ---
+        // --- LÓGICA DAS CAIXINHAS DO CÓDIGO (8 DIGITOS) ---
         const otpBoxes = document.querySelectorAll('.otp-box');
         const hiddenOtpInput = document.getElementById('otpCode');
 
@@ -284,11 +208,19 @@
             let code = '';
             otpBoxes.forEach(box => code += box.value);
             hiddenOtpInput.value = code;
+
+            // NOVA LÓGICA: Submissão automática mal os 8 dígitos estejam preenchidos!
+            if (code.length === 8) {
+                const submitBtn = document.getElementById('submitBtn');
+                if (!submitBtn.disabled) {
+                    processarMFA(code); // Chama diretamente a validação, ignorando o formulário HTML
+                }
+            }
         }
 
         otpBoxes.forEach((box, index) => {
             box.addEventListener('input', (e) => {
-                box.value = box.value.replace(/[^0-9]/g, ''); // Apenas números
+                box.value = box.value.replace(/[^0-9]/g, ''); // Só números
 
                 if (box.value.length === 1 && index < otpBoxes.length - 1) {
                     otpBoxes[index + 1].focus();
@@ -304,6 +236,7 @@
 
             box.addEventListener('paste', (e) => {
                 e.preventDefault();
+                // Limita a colagem para exatamente 8 dígitos
                 const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 8);
 
                 if (pastedData) {
@@ -319,41 +252,96 @@
             });
         });
 
+        // --- FUNÇÃO ISOLADA PARA PROCESSAR O MFA (Evita problemas com o Google Login) ---
+        async function processarMFA(code) {
+            const email = document.getElementById('loginEmail').value;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (code.length < 8) {
+                showToast('Por favor, insere os 8 dígitos.', 'error');
+                return;
+            }
+
+            submitBtn.textContent = "A validar...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionStorage.setItem('showLoginToast', 'true');
+                    window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                } else {
+                    showToast(data.error || 'Código inválido.', 'error');
+                    // Limpar as caixas em caso de erro
+                    otpBoxes.forEach(box => box.value = '');
+                    hiddenOtpInput.value = '';
+                    otpBoxes[0].focus();
+                    submitBtn.textContent = "Validar Código";
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                showToast('Erro de ligação ao servidor.', 'error');
+                submitBtn.textContent = "Validar Código";
+                submitBtn.disabled = false;
+            }
+        }
+
         // --- FUNÇÃO PARA MUDAR A INTERFACE PARA O PASSO DE MFA ---
         let currentStep = 1;
         function transitionToMFA(email) {
             document.getElementById('loginEmail').value = email;
 
+            // Esconder os passos iniciais
             document.getElementById('emailGroup').style.display = 'none';
             document.getElementById('passwordGroup').style.display = 'none';
             document.getElementById('extraLinks').style.display = 'none';
 
+            // CORREÇÃO CRUCIAL: Remover a validação dos campos invisíveis
+            document.getElementById('loginEmail').required = false;
+            document.getElementById('loginPassword').required = false;
+
+            // Mostrar a parte do código
             document.getElementById('formSubtitle').textContent = "Verificação de Segurança";
             document.getElementById('mfaInstructions').style.display = 'block';
             document.getElementById('codeGroup').style.display = 'block';
             document.getElementById('resendContainer').style.display = 'block';
 
-            // Ocultamente tornamos o input invisível obrigatório e focamos na primeira caixinha
-            hiddenOtpInput.required = true;
             otpBoxes[0].focus();
-
             startResendTimer(120);
             currentStep = 2;
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.textContent = "Validar Código";
             submitBtn.disabled = false;
+            // Mudar o botão para "button" para não tentar submeter o formulário ignorando o JS
+            submitBtn.type = "button"; 
         }
 
-        // --- SUBMISSÃO NORMAL ---
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // --- EVENTO DE CLIQUE DO BOTÃO PRINCIPAL ---
+        document.getElementById('submitBtn').addEventListener('click', async (e) => {
+            // Se ainda for tipo 'submit', evitamos o comportamento padrão para gerir nós o processo
+            if (document.getElementById('submitBtn').type === "submit") {
+                e.preventDefault();
+            }
+
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const code = document.getElementById('otpCode').value;
             const submitBtn = document.getElementById('submitBtn');
 
+            // PASSO 1: LOGIN COM EMAIL E PASSWORD
             if (currentStep === 1) {
+                if (!email || !password) {
+                    showToast('Por favor, preenche todos os campos.', 'error');
+                    return;
+                }
+
                 submitBtn.textContent = "A verificar...";
                 submitBtn.disabled = true;
 
@@ -385,41 +373,9 @@
                 }
             }
 
+            // PASSO 2: VALIDAR O CÓDIGO MFA (Caso o utilizador clique no botão em vez de esperar pelo auto-submit)
             else if (currentStep === 2) {
-                // Validação extra caso o utilizador não preencha os 8 quadrados
-                if (code.length < 8) {
-                    showToast('Por favor, insere os 8 dígitos.', 'error');
-                    return;
-                }
-
-                submitBtn.textContent = "A validar...";
-                submitBtn.disabled = true;
-
-                try {
-                    const response = await fetch('/api/verify-otp', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, code })
-                    });
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        sessionStorage.setItem('showLoginToast', 'true');
-                        window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
-                    } else {
-                        showToast(data.error || 'Código inválido.', 'error');
-                        // Limpa as caixas se o código estiver errado
-                        otpBoxes.forEach(box => box.value = '');
-                        hiddenOtpInput.value = '';
-                        otpBoxes[0].focus();
-                        submitBtn.textContent = "Validar Código";
-                        submitBtn.disabled = false;
-                    }
-                } catch (err) {
-                    showToast('Erro de ligação ao servidor.', 'error');
-                    submitBtn.textContent = "Validar Código";
-                    submitBtn.disabled = false;
-                }
+                processarMFA(code);
             }
         });
 
