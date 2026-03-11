@@ -9,7 +9,7 @@ const morgan = require('morgan');
 const logger = require('./utils/logger'); 
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 // --- GARANTIR QUE AS PASTAS EXISTEM ---
 const imgDir = path.join(__dirname, 'img');
@@ -47,15 +47,6 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
-
-// Proteção gestao
-app.get('/gestao.html', (req, res, next) => {
-    if (req.session && req.session.role === 'admin') {
-        next(); 
-    } else {
-        res.status(404).send(`<h1>404</h1><p>Acesso Negado</p>`);
-    }
-});
 
 // Servir Estáticos
 app.use(express.static(path.join(__dirname, 'pages')));
@@ -105,6 +96,15 @@ app.use('/api/pdf', pdfRoutes);
 
 const gestaoRoutes = require('./routes/gestao')(supabase);
 app.use('/api/gestao', gestaoRoutes);
+
+const statsRoutes = require('./routes/stats')(supabase); 
+app.use('/api/stats', statsRoutes);
+
+const leaderboardRoutes = require('./routes/leaderboard')(supabase);
+app.use('/api/leaderboard', leaderboardRoutes);
+
+const professorRoutes = require('./routes/professor')(supabase);
+app.use('/api/professor', professorRoutes);
 
 // Rota principal (Frontend)
 app.get('/', (req, res) => {

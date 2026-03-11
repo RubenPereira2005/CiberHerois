@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="edgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5A93C" />
+      <stop offset="50%" stop-color="#FFDA75" />
+      <stop offset="100%" stop-color="#D48F25" />
+    </linearGradient>
+    
+    <linearGradient id="centerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFDF73" />
+      <stop offset="100%" stop-color="#E5A93C" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="50" cy="50" r="45" fill="url(#edgeGradient)" />
+  
+  <circle cx="50" cy="50" r="38" fill="url(#centerGradient)" stroke="#C57D1E" stroke-width="2" />
+  
+  <path d="M 50 12 L 50 18 M 88 50 L 82 50 M 50 88 L 50 82 M 12 50 L 18 50" stroke="#C57D1E" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 23 23 L 28 28 M 77 23 L 72 28 M 77 77 L 72 72 M 23 77 L 28 72" stroke="#C57D1E" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M 50 28 L 66 33 V 48 C 66 59 59 68 50 72 C 41 68 34 59 34 48 V 33 Z" fill="#1E293B" stroke="#0F172A" stroke-width="2" />
+  
+  <text x="50" y="53" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="900" fill="#FFDA75" text-anchor="middle" dominant-baseline="middle" letter-spacing="1">CH</text>
+  
+  <path d="M 50 28 L 66 33 V 48 C 66 50 64 53 62 55 C 57 45 45 42 35 43 C 34 45 34 46 34 48 V 33 Z" fill="#334155" opacity="0.6" />
+</svg>
