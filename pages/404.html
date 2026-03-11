@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Negado - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
+    <link rel="stylesheet" href="404.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+</head>
+<body class="site-body">
+    
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div class="error-page-wrapper">
+        <div class="error-content">
+            <i data-lucide="file-question-mark" class="error-icon"></i>
+            <h1 class="error-code">404</h1>
+            <h2 class="error-title">Acesso Bloqueado</h2>
+            <p class="error-desc">
+                Alerta, recruta! Navegaste para uma zona de vácuo no ciberespaço. Os nossos radares não detetam nada nestas coordenadas. O ficheiro que procuras não existe ou a rota está corrompida.
+            </p>
+            
+            <a href="quizzes.html" class="btn-home">
+                <i data-lucide="arrow-left"  style="width: 20px; height: 20px;"></i>
+                Voltar à Base Segura
+            </a>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
