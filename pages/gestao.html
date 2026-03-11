@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de gestaoistração - CiberHeróis</title>
+    <title>Painel de gestao - CiberHeróis</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="gestao.css">
@@ -12,6 +13,7 @@
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
 </head>
+
 <body class="site-body">
 
     <div id="global-loader">
@@ -22,14 +24,14 @@
     <nav class="auth-navbar">
         <div class="auth-navbar-inner">
             <div class="auth-navbar-left">
-                <a href="quizzes.html" class="auth-brand">CiberHeróis | <span style="color:#ef4444">gestao</span></a>
+                <a href="quizzes.html" class="auth-brand">CiberHeróis | <span  style="color: #ef4444;">gestao</span></a>
             </div>
-            
+
             <div class="auth-navbar-right">
                 <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
                 </button>
-                <a href="quizzes.html" class="btn btn-secondary" style="margin-left: 10px;">Voltar ao Site</a>
+                <a href="quizzes.html" class="btn btn-secondary"  style="margin-left: 10px;">Voltar ao Site</a>
             </div>
         </div>
     </nav>
@@ -42,6 +44,7 @@
         <div class="gestao-tabs">
             <button class="gestao-tab active" onclick="switchTab('recursos')">Tabela de Recursos</button>
             <button class="gestao-tab" onclick="switchTab('quizzes')">Tabela de Quizzes</button>
+            <button class="gestao-tab" onclick="switchTab('turmas')">Tabela de Turmas</button>
         </div>
 
         <div id="tab-recursos" class="tab-content active">
@@ -50,7 +53,7 @@
                     <i data-lucide="plus"></i> Criar Novo Recurso Visual
                 </button>
             </div>
-            
+
             <div class="table-responsive">
                 <table class="gestao-table">
                     <thead>
@@ -69,13 +72,13 @@
         </div>
 
         <div id="tab-quizzes" class="tab-content">
-            <div class="gestao-actions-top" style="justify-content: space-between;">
+            <div class="gestao-actions-top"  style="justify-content: space-between;">
                 <button class="btn btn-primary" onclick="prepararNovoQuiz()">
                     <i data-lucide="plus"></i> Adicionar Pergunta
                 </button>
-                
+
                 <div class="filter-container">
-                    <label for="filter-categoria" style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">Filtrar Categoria:</label>
+                    <label for="filter-categoria"  style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">Filtrar Categoria:</label>
                     <select id="filter-categoria" class="filter-select" onchange="renderQuizzes()">
                         <option value="todas">Todas</option>
                     </select>
@@ -88,13 +91,13 @@
                         <tr>
                             <th>
                                 <button class="btn-sort" onclick="toggleSortID()" title="Ordenar ID">
-                                    ID <i data-lucide="arrow-up-down" style="width:14px;height:14px;"></i>
+                                    ID <i data-lucide="arrow-up-down"  style="width: 14px; height: 14px;"></i>
                                 </button>
                             </th>
                             <th>Categoria</th>
                             <th>
                                 <button class="btn-sort" onclick="toggleSortDificuldade()" title="Ordenar Dificuldade">
-                                    Dificuldade <i data-lucide="arrow-up-down" style="width:14px;height:14px;"></i>
+                                    Dificuldade <i data-lucide="arrow-up-down"  style="width: 14px; height: 14px;"></i>
                                 </button>
                             </th>
                             <th>Pergunta</th>
@@ -105,6 +108,80 @@
                 </table>
             </div>
         </div>
+
+        <div id="tab-turmas" class="tab-content">
+            <div class="gestao-actions-top">
+                <button class="btn btn-primary" onclick="prepararNovaTurmaAdmin()">
+                    <i data-lucide="plus"></i> Criar Turma (Admin)
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Professor</th>
+                            <th>Escola</th>
+                            <th>Turma</th>
+                            <th>Ano / Código</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="turmas-admin-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> 
+
+
+    <div id="modal-editar-turma" class="modal">
+        <div class="modal-content">
+            <h2>Editar Turma</h2>
+            <form id="form-editar-turma" onsubmit="salvarEdicaoTurma(event)">
+                <div class="form-group">
+                    <label>Nome da Turma</label>
+                    <input type="text" id="edit-turma-nome" required>
+                </div>
+                <div class="form-group">
+                    <label>Ano Letivo</label>
+                    <input type="text" id="edit-turma-ano" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-editar-turma')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Gravar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-criar-turma-admin" class="modal">
+        <div class="modal-content">
+            <h2>Criar Turma à Força (Admin)</h2>
+            <form id="form-criar-turma-admin" onsubmit="salvarNovaTurmaAdmin(event)">
+                <div class="form-group">
+                    <label>Atribuir a que Professor?</label>
+                    <select id="nova-turma-prof" required>
+                        <option value="">A carregar professores...</option>
+                    </select>
+                </div>
+                <div class="gestao-flex-row">
+                    <div class="form-group"  style="flex: 1;">
+                        <label>Nome da Turma</label>
+                        <input type="text" id="nova-turma-nome" placeholder="Ex: 12º B" required>
+                    </div>
+                    <div class="form-group"  style="flex: 1;">
+                        <label>Ano Letivo</label>
+                        <input type="text" id="nova-turma-ano" placeholder="Ex: 2024/2025" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-criar-turma-admin')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Criar e Gerar Código</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div id="modal-recurso" class="modal">
@@ -114,30 +191,30 @@
                 <div class="gestao-panel-section">
                     <h3 class="gestao-panel-title blue">1. Informação do Cartão (Dashboard)</h3>
                     <div class="gestao-flex-row">
-                        <div class="form-group" style="flex:1;"><label>Título</label><input type="text" id="rec-titulo" required></div>
-                        <div class="form-group" style="flex:1;"><label>Categoria</label><input type="text" id="rec-cat" required></div>
+                        <div class="form-group"  style="flex: 1;"><label>Título</label><input type="text" id="rec-titulo" required></div>
+                        <div class="form-group"  style="flex: 1;"><label>Categoria</label><input type="text" id="rec-cat" required></div>
                     </div>
                     <div class="form-group"><label>Descrição Curta</label><input type="text" id="rec-desc" required></div>
-                    <label style="color:#64748b; margin-bottom:10px; display:block; font-weight:bold;">Cor do Tema:</label>
+                    <label  style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Cor do Tema:</label>
                     <div class="color-selector" id="color-picker">
-                        <div class="color-circle active" data-color="green" style="background:#10b981" onclick="selectColor('green')"></div>
-                        <div class="color-circle" data-color="blue" style="background:#3b82f6" onclick="selectColor('blue')"></div>
-                        <div class="color-circle" data-color="red" style="background:#ef4444" onclick="selectColor('red')"></div>
-                        <div class="color-circle" data-color="purple" style="background:#a855f7" onclick="selectColor('purple')"></div>
-                        <div class="color-circle" data-color="yellow" style="background:#eab308" onclick="selectColor('yellow')"></div>
-                        <div class="color-circle" data-color="orange" style="background:#f97316" onclick="selectColor('orange')"></div>
+                        <div class="color-circle active" data-color="green" onclick="selectColor('green')" style="background: #10b981;"></div>
+                        <div class="color-circle" data-color="blue" onclick="selectColor('blue')" style="background: #3b82f6;"></div>
+                        <div class="color-circle" data-color="red" onclick="selectColor('red')" style="background: #ef4444;"></div>
+                        <div class="color-circle" data-color="purple" onclick="selectColor('purple')" style="background: #a855f7;"></div>
+                        <div class="color-circle" data-color="yellow" onclick="selectColor('yellow')" style="background: #eab308;"></div>
+                        <div class="color-circle" data-color="orange" onclick="selectColor('orange')" style="background: #f97316;"></div>
                     </div>
                     <input type="hidden" id="rec-cor" value="green">
                     <div class="gestao-flex-row">
-                        <div class="form-group" style="flex: 1;"><label>Ícone (Lucide)</label><input type="text" id="rec-icone" value="shield-alert" required></div>
-                        <div class="form-group" style="flex: 1;"><label>Link (Sem .html)</label><input type="text" id="rec-url" required></div>
+                        <div class="form-group"  style="flex: 1;"><label>Ícone (Lucide)</label><input type="text" id="rec-icone" value="shield-alert" required></div>
+                        <div class="form-group"  style="flex: 1;"><label>Link (Sem .html)</label><input type="text" id="rec-url" required></div>
                     </div>
                 </div>
 
                 <div class="gestao-panel-section">
                     <h3 class="gestao-panel-title green">2. Conteúdo da Página HTML</h3>
                     <div id="seccoes-container"></div>
-                    <div style="text-align: center;"><button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Adicionar Outro Retângulo</button></div>
+                    <div  style="text-align: center;"><button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Adicionar Outro Retângulo</button></div>
                 </div>
 
                 <div class="modal-actions">
@@ -168,7 +245,7 @@
                     <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input type="text" id="op1" placeholder="Opção 2" required></div>
                     <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input type="text" id="op2" placeholder="Opção 3" required></div>
                 </div>
-                
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quiz')">Cancelar</button>
                     <button type="submit" id="btn-submit-quiz" class="btn btn-primary">Guardar Pergunta</button>
@@ -177,17 +254,19 @@
         </div>
     </div>
 
+
     <script>
         lucide.createIcons();
 
         let editandoRecursoId = null;
         let editandoQuizId = null;
         let editandoQuizAtividadeId = null;
+        let editandoTurmaIdAdmin = null;
 
         // Variaveis de Controlo de Filtro e Ordenação dos Quizzes
-        let allQuizzes = []; 
-        let sortDiffDir = null; // Pode ser 'asc' (fácil -> difícil) ou 'desc' (difícil -> fácil)
-        let sortIdDir = null; // Pode ser 'asc' (ID crescente) ou 'desc' (ID decrescente)
+        let allQuizzes = [];
+        let sortDiffDir = null; 
+        let sortIdDir = null; 
         const diffWeights = { 'facil': 1, 'medio': 2, 'dificil': 3 };
 
         function switchTab(tabId) {
@@ -205,31 +284,29 @@
             document.getElementById('rec-cor').value = color;
         }
 
-        // ==========================================
-        // RECURSOS
-        // ==========================================
+        // --- RECURSOS ---
         async function carregarRecursos() {
             const res = await fetch('/api/gestao/resources');
             const dados = await res.json();
             const tbody = document.getElementById('resources-tbody');
             tbody.innerHTML = '';
-            
+
             dados.forEach(r => {
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>#${r.id_material}</strong></td>
                         <td>
-                            <div style="display:flex; align-items:center; gap:8px;">
+                            <div  style="display: flex; align-items: center; gap: 8px;">
                                 <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--color-${r.cor_card || 'blue'});"></span> 
-                                <i data-lucide="${r.icone_card || 'book'}" style="width:18px; height:18px; color:var(--text-secondary);"></i>
+                                <i data-lucide="${r.icone_card || 'book'}"  style="width: 18px; height: 18px; color: var(--text-secondary);"></i>
                             </div>
                         </td>
                         <td><strong>${r.titulo}</strong></td>
                         <td>${r.tipo}</td>
                         <td><code>${r.url_conteudo}</code></td>
                         <td>
-                            <button class="btn-edit" onclick="editarRecurso(${r.id_material})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width:16px;height:16px;"></i></button>
-                            <button class="btn-danger" onclick="apagarRecurso(${r.id_material})" title="Apagar"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+                            <button class="btn-edit" onclick="editarRecurso(${r.id_material})" title="Editar"  style="margin-right: 5px;"><i data-lucide="edit-3"  style="width: 16px; height: 16px;"></i></button>
+                            <button class="btn-danger" onclick="apagarRecurso(${r.id_material})" title="Apagar"><i data-lucide="trash-2"  style="width: 16px; height: 16px;"></i></button>
                         </td>
                     </tr>
                 `;
@@ -242,8 +319,8 @@
             const html = `
                 <div class="form-group seccao-item">
                     <div class="gestao-flex-row">
-                        <div style="flex:1;"><label>Ícone</label><input type="text" class="sec-icon" value="${icone}" required></div>
-                        <div style="flex:3;"><label>Título</label><input type="text" class="sec-title" value="${titulo}" required></div>
+                        <div  style="flex: 1;"><label>Ícone</label><input type="text" class="sec-icon" value="${icone}" required></div>
+                        <div  style="flex: 3;"><label>Título</label><input type="text" class="sec-title" value="${titulo}" required></div>
                     </div>
                     <label>Texto</label><textarea class="sec-text" rows="3" required>${texto}</textarea>
                 </div>`;
@@ -270,19 +347,17 @@
             document.getElementById('rec-cor').value = r.cor_card;
             document.getElementById('rec-icone').value = r.icone_card;
             document.getElementById('rec-url').value = r.url_conteudo.replace('.html', '');
-            
+
             document.querySelectorAll('.color-circle').forEach(c => {
                 c.classList.remove('active');
-                if(c.getAttribute('data-color') === r.cor_card) {
-                    c.classList.add('active');
-                }
+                if (c.getAttribute('data-color') === r.cor_card) c.classList.add('active');
             });
 
             const container = document.getElementById('seccoes-container');
             container.innerHTML = '';
             let seccoesGuardadas = [];
-            if(r.seccoes) { try { seccoesGuardadas = JSON.parse(r.seccoes); } catch (e) {} }
-            if(seccoesGuardadas.length > 0) {
+            if (r.seccoes) { try { seccoesGuardadas = JSON.parse(r.seccoes); } catch (e) { } }
+            if (seccoesGuardadas.length > 0) {
                 seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto));
             } else { adicionarSeccao(); }
 
@@ -297,7 +372,7 @@
             const icones = document.querySelectorAll('.sec-icon');
             const titulos = document.querySelectorAll('.sec-title');
             const textos = document.querySelectorAll('.sec-text');
-            for(let i = 0; i < titulos.length; i++) {
+            for (let i = 0; i < titulos.length; i++) {
                 seccoesArray.push({ icone: icones[i].value, titulo: titulos[i].value, texto: textos[i].value });
             }
 
@@ -318,31 +393,27 @@
 
             try {
                 const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if(res.ok) { closeModal('modal-recurso'); carregarRecursos(); }
-            } catch (err) { alert("Erro de ligação."); } 
+                if (res.ok) { closeModal('modal-recurso'); carregarRecursos(); }
+            } catch (err) { alert("Erro de ligação."); }
             finally { btn.textContent = editandoRecursoId ? 'Atualizar Recurso' : 'Gravar e Gerar HTML'; btn.disabled = false; }
         }
 
         async function apagarRecurso(id) {
-            if(confirm('Tem a certeza? Isto apaga a página HTML do servidor e o cartão.')) {
+            if (confirm('Tem a certeza? Isto apaga a página HTML do servidor e o cartão.')) {
                 await fetch(`/api/gestao/resources/${id}`, { method: 'DELETE' });
                 carregarRecursos();
             }
         }
 
-        // ==========================================
-        // QUIZZES (FILTRO, ORDENAÇÃO E LÓGICA)
-        // ==========================================
+        // --- QUIZZES ---
         async function carregarQuizzes() {
             const res = await fetch('/api/gestao/quizzes');
             allQuizzes = await res.json();
-            
-            // Popula as opções do Filtro Categoria com os dados recebidos
+
             const categoriasUnicas = [...new Set(allQuizzes.map(q => q.categoria))];
             const filterSelect = document.getElementById('filter-categoria');
-            
-            // Mantém a categoria que já estava escolhida, senão escolhe "todas"
             const valorAtual = filterSelect.value || 'todas';
+            
             filterSelect.innerHTML = '<option value="todas">Todas</option>';
             categoriasUnicas.forEach(cat => {
                 filterSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
@@ -353,66 +424,50 @@
         }
 
         function toggleSortDificuldade() {
-            sortIdDir = null; // Limpa a ordenação do ID
-            // Alterna a direção da ordenação: asc -> desc -> asc...
-            if (sortDiffDir === 'asc') sortDiffDir = 'desc';
-            else sortDiffDir = 'asc';
-            
+            sortIdDir = null; 
+            sortDiffDir = sortDiffDir === 'asc' ? 'desc' : 'asc';
             renderQuizzes();
         }
 
         function toggleSortID() {
-            sortDiffDir = null; // Limpa a ordenação da Dificuldade
-            // Alterna a direção da ordenação: asc -> desc -> asc...
-            if (sortIdDir === 'asc') sortIdDir = 'desc';
-            else sortIdDir = 'asc';
-            
+            sortDiffDir = null; 
+            sortIdDir = sortIdDir === 'asc' ? 'desc' : 'asc';
             renderQuizzes();
         }
 
         function renderQuizzes() {
             const tbody = document.getElementById('quizzes-tbody');
             tbody.innerHTML = '';
-            
             const categoriaSelecionada = document.getElementById('filter-categoria').value;
             
-            // 1. Aplicar o Filtro
-            let quizzesFiltrados = [...allQuizzes]; // Fazer uma cópia para não alterar o array original
+            let quizzesFiltrados = [...allQuizzes]; 
             if (categoriaSelecionada !== 'todas') {
                 quizzesFiltrados = quizzesFiltrados.filter(q => q.categoria === categoriaSelecionada);
             }
 
-            // 2. Aplicar a Ordenação (Dificuldade)
             if (sortDiffDir !== null) {
                 quizzesFiltrados.sort((a, b) => {
                     const pesoA = diffWeights[a.dificuldade] || 0;
                     const pesoB = diffWeights[b.dificuldade] || 0;
-                    
-                    if (sortDiffDir === 'asc') return pesoA - pesoB; // Fácil -> Difícil
-                    return pesoB - pesoA; // Difícil -> Fácil
+                    return sortDiffDir === 'asc' ? pesoA - pesoB : pesoB - pesoA; 
                 });
             }
 
-            // 3. Aplicar a Ordenação (ID)
             if (sortIdDir !== null) {
-                quizzesFiltrados.sort((a, b) => {
-                    if (sortIdDir === 'asc') return a.id_pergunta - b.id_pergunta; // Menor -> Maior
-                    return b.id_pergunta - a.id_pergunta; // Maior -> Menor
-                });
+                quizzesFiltrados.sort((a, b) => sortIdDir === 'asc' ? a.id_pergunta - b.id_pergunta : b.id_pergunta - a.id_pergunta);
             }
 
-            // 4. Renderizar o HTML
             quizzesFiltrados.forEach(q => {
                 let badge = q.dificuldade === 'facil' ? '🟢' : q.dificuldade === 'medio' ? '🟡' : '🔴';
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>#${q.id_pergunta}</strong></td>
-                        <td><span style="background:var(--bg-card); border:1px solid var(--border-color); padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">${q.categoria}</span></td>
-                        <td>${badge} <span style="text-transform:capitalize;">${q.dificuldade}</span></td>
-                        <td style="max-width:350px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${q.texto_pergunta}">${q.texto_pergunta}</td>
+                        <td><span  style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">${q.categoria}</span></td>
+                        <td>${badge} <span  style="text-transform: capitalize;">${q.dificuldade}</span></td>
+                        <td title="${q.texto_pergunta}" style="max-width: 350px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q.texto_pergunta}</td>
                         <td>
-                            <button class="btn-edit" onclick="editarQuiz(${q.id_pergunta})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width:16px;height:16px;"></i></button>
-                            <button class="btn-danger" onclick="apagarQuiz(${q.id_pergunta})" title="Apagar"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+                            <button class="btn-edit" onclick="editarQuiz(${q.id_pergunta})" title="Editar"  style="margin-right: 5px;"><i data-lucide="edit-3"  style="width: 16px; height: 16px;"></i></button>
+                            <button class="btn-danger" onclick="apagarQuiz(${q.id_pergunta})" title="Apagar"><i data-lucide="trash-2"  style="width: 16px; height: 16px;"></i></button>
                         </td>
                     </tr>
                 `;
@@ -454,8 +509,8 @@
 
         async function salvarPergunta(e) {
             e.preventDefault();
-            let opcoesArray = [ document.getElementById('op0').value, document.getElementById('op1').value, document.getElementById('op2').value ];
-            if(document.getElementById('op3') && document.getElementById('op3').value !== '') opcoesArray.push(document.getElementById('op3').value);
+            let opcoesArray = [document.getElementById('op0').value, document.getElementById('op1').value, document.getElementById('op2').value];
+            if (document.getElementById('op3') && document.getElementById('op3').value !== '') opcoesArray.push(document.getElementById('op3').value);
 
             const payload = {
                 texto_pergunta: document.getElementById('quiz-texto').value, categoria: document.getElementById('quiz-cat').value,
@@ -466,18 +521,129 @@
             const url = editandoQuizId ? `/api/gestao/quizzes/${editandoQuizId}` : '/api/gestao/quiz';
             const metodo = editandoQuizId ? 'PUT' : 'POST';
             const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if(res.ok) { closeModal('modal-quiz'); carregarQuizzes(); }
+            if (res.ok) { closeModal('modal-quiz'); carregarQuizzes(); }
         }
 
         async function apagarQuiz(id) {
-            if(confirm('Tem a certeza? As opções ligadas a esta pergunta também serão apagadas.')) {
+            if (confirm('Tem a certeza? As opções ligadas a esta pergunta também serão apagadas.')) {
                 await fetch(`/api/gestao/quizzes/${id}`, { method: 'DELETE' });
                 carregarQuizzes();
             }
         }
 
+
+        // --- TURMAS (ADMIN) ---
+        async function carregarTurmasAdmin() {
+            const res = await fetch('/api/gestao/turmas');
+            const turmas = await res.json();
+            const tbody = document.getElementById('turmas-admin-tbody');
+            tbody.innerHTML = '';
+
+            turmas.forEach(t => {
+                const escolaNome = t.escola ? t.escola.nome : 'N/A';
+                const professorNome = t.utilizador ? t.utilizador.nome : 'N/A';
+                const codigo = t.codigo_acesso || 'N/A';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#${t.id_turma}</strong></td>
+                        <td>${professorNome}</td>
+                        <td>${escolaNome}</td>
+                        <td><strong>${t.nome}</strong></td>
+                        <td>
+                            ${t.ano_letivo}<br>
+                            <span  style="font-size: 12px; font-family: monospace; color: var(--text-secondary);">${codigo}</span>
+                        </td>
+                        <td>
+                            <button class="btn-edit" onclick="abrirEdicaoTurma(${t.id_turma}, '${t.nome}', '${t.ano_letivo}')" title="Editar"><i data-lucide="edit-3"  style="width: 16px; height: 16px;"></i></button>
+                            <button class="btn-danger" onclick="apagarTurmaAdmin(${t.id_turma})" title="Apagar"  style="margin-left: 5px;"><i data-lucide="trash-2"  style="width: 16px; height: 16px;"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function abrirEdicaoTurma(id, nome, ano) {
+            editandoTurmaIdAdmin = id;
+            document.getElementById('edit-turma-nome').value = nome;
+            document.getElementById('edit-turma-ano').value = ano;
+            openModal('modal-editar-turma');
+        }
+
+        async function salvarEdicaoTurma(e) {
+            e.preventDefault();
+            const payload = {
+                nome: document.getElementById('edit-turma-nome').value,
+                ano_letivo: document.getElementById('edit-turma-ano').value
+            };
+
+            const res = await fetch(`/api/gestao/turmas/${editandoTurmaIdAdmin}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closeModal('modal-editar-turma');
+                carregarTurmasAdmin();
+            }
+        }
+
+        async function apagarTurmaAdmin(id) {
+            if (confirm('Tem a certeza? Se apagar a turma, os alunos associados a ela perdem a associação.')) {
+                await fetch(`/api/gestao/turmas/${id}`, { method: 'DELETE' });
+                carregarTurmasAdmin();
+            }
+        }
+
+        async function prepararNovaTurmaAdmin() {
+            document.getElementById('form-criar-turma-admin').reset();
+            const selectProf = document.getElementById('nova-turma-prof');
+            selectProf.innerHTML = '<option value="">A carregar professores...</option>';
+            openModal('modal-criar-turma-admin');
+
+            try {
+                const res = await fetch('/api/gestao/professores');
+                const profs = await res.json();
+
+                selectProf.innerHTML = '<option value="" disabled selected>-- Seleciona um Professor --</option>';
+                profs.forEach(p => {
+                    selectProf.innerHTML += `<option value="${p.id_utilizador}">${p.nome}</option>`;
+                });
+            } catch (e) {
+                selectProf.innerHTML = '<option value="">Erro ao carregar professores.</option>';
+            }
+        }
+
+        async function salvarNovaTurmaAdmin(e) {
+            e.preventDefault();
+            const payload = {
+                nome: document.getElementById('nova-turma-nome').value,
+                ano_letivo: document.getElementById('nova-turma-ano').value,
+                id_professor: document.getElementById('nova-turma-prof').value
+            };
+
+            const res = await fetch('/api/gestao/turmas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closeModal('modal-criar-turma-admin');
+                carregarTurmasAdmin();
+            } else {
+                const err = await res.json();
+                alert("Erro ao criar turma: " + err.error);
+            }
+        }
+
+        // Chamar na inicialização
+        carregarTurmasAdmin();
         carregarRecursos();
         carregarQuizzes();
     </script>
 </body>
+
 </html>

@@ -5,19 +5,48 @@ const path = require('path');
 
 module.exports = (supabase) => {
 
+    // ==========================================
+    // MIDDLEWARE DE SEGURANÇA: Apenas ADMIN
+    // ==========================================
+    const verificarAdmin = async (req, res, next) => {
+        if (!req.session.userId) {
+            return res.redirect('/404.html');
+        }
+
+        const { data: user, error } = await supabase
+            .from('utilizador')
+            .select('role')
+            .eq('id_utilizador', req.session.userId)
+            .single();
+
+        if (error || !user || user.role !== 'admin') {
+            return res.redirect('/404.html');
+        }
+        
+        next();
+    };
+
     const gerarHtmlTemplate = (titulo, cor_card, icone_card, tipo, htmlSeccoes, url_conteudo) => `<!DOCTYPE html>
     <html lang="pt">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${titulo} - CiberHeróis</title>
+        <link rel="icon" type="image/x-icon" href="img/favicon.svg">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="dark-mode.css">
+        <link rel="stylesheet" href="preloader.css">
         <script src="https://unpkg.com/lucide@latest"></script>
         <script src="theme.js"></script>
+        <script src="global-init.js"></script>
     </head>
     <body class="site-body">
-        <nav class="auth-navbar"><div class="auth-navbar-inner"><div class="auth-navbar-left"><a href="quizzes.html" class="auth-brand">CiberHeróis</a><div class="auth-navbar-menu"><a href="resources.html" class="auth-navbar-link auth-navbar-link-active">Recursos</a><a href="quizzes.html" class="auth-navbar-link">Quizzes</a></div></div><div class="auth-navbar-right"><a href="profile.html" class="auth-navbar-btn" title="Ver Perfil"><i data-lucide="user" class="auth-navbar-icon"></i></a></div></div></nav>
+        <div id="global-loader">
+            <div class="loader-logo">Ciber<span>Heróis</span></div>
+            <div class="loader-spinner"></div>
+        </div>
+
+        <div id="includedContent"></div>
 
         <div class="auth-container resource-detail-container">
             <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
@@ -42,7 +71,6 @@ module.exports = (supabase) => {
                 </button>
             </div>
         </div>
-        <script>lucide.createIcons();</script>
     </body>
     </html>`;
 
@@ -296,6 +324,93 @@ module.exports = (supabase) => {
         const { error } = await supabase.from('pergunta').delete().eq('id_pergunta', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Pergunta apagada!' });
+    });
+
+
+    // ==========================================
+    // TURMAS
+    // ==========================================
+
+    // Função para gerar um código aleatório de 6 caracteres
+    const gerarCodigoAcesso = () => {
+        const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let codigo = '';
+        for (let i = 0; i < 6; i++) {
+            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        return codigo;
+    };
+
+    // Obter todas as turmas
+    router.get('/turmas', verificarAdmin, async (req, res) => {
+        const { data, error } = await supabase
+            .from('turma')
+            .select(`
+                id_turma, 
+                nome, 
+                ano_letivo,
+                codigo_acesso,
+                escola (nome),
+                utilizador!turma_id_professor_fkey (nome)
+            `)
+            .order('id_turma', { ascending: false });
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data);
+    });
+
+    // Obter lista de professores para o Admin poder escolher
+    router.get('/professores', verificarAdmin, async (req, res) => {
+        const { data, error } = await supabase
+            .from('utilizador')
+            .select('id_utilizador, nome')
+            .eq('role', 'professor');
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data);
+    });
+
+    // Admin Criar uma Turma
+    router.post('/turmas', verificarAdmin, async (req, res) => {
+        const { nome, ano_letivo, id_professor } = req.body;
+        
+        try {
+            const { data: escolas } = await supabase.from('escola').select('id_escola').limit(1);
+            const id_escola = (escolas && escolas.length > 0) ? escolas[0].id_escola : null;
+
+            if (!id_escola) return res.status(400).json({ error: 'Nenhuma escola registada.' });
+
+            const codigo_acesso = gerarCodigoAcesso();
+
+            const { error } = await supabase.from('turma').insert([{
+                nome,
+                ano_letivo,
+                id_escola: id_escola,
+                id_professor: id_professor,
+                codigo_acesso: codigo_acesso
+            }]);
+
+            if (error) throw error;
+            res.json({ message: 'Turma criada pelo Admin!' });
+
+        } catch (err) {
+            res.status(500).json({ error: 'Erro interno ao criar turma.' });
+        }
+    });
+
+    // Editar uma Turma
+    router.put('/turmas/:id', verificarAdmin, async (req, res) => {
+        const { nome, ano_letivo } = req.body;
+        const { error } = await supabase.from('turma').update({ nome, ano_letivo }).eq('id_turma', req.params.id);
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Turma atualizada!' });
+    });
+
+    // Apagar uma Turma
+    router.delete('/turmas/:id', verificarAdmin, async (req, res) => {
+        const { error } = await supabase.from('turma').delete().eq('id_turma', req.params.id);
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Turma apagada!' });
     });
 
     return router;

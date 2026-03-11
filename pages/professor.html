@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Professor - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="gestao.css">
+    <link rel="stylesheet" href="preloader.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+    
+</head>
+<body class="site-body">
+
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <nav class="auth-navbar">
+        <div class="auth-navbar-inner">
+            <div class="auth-navbar-left">
+                <a href="quizzes.html" class="auth-brand">CiberHeróis | <span  style="color: #3b82f6;">Professor</span></a>
+            </div>
+
+            <div class="auth-navbar-right">
+                <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
+                    <i data-lucide="sun" class="auth-navbar-icon"></i>
+                </button>
+                <a href="quizzes.html" class="btn btn-secondary"  style="margin-left: 10px;">Voltar aos Quizzes</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container resources-container">
+        <div class="gestao-header">
+            <h1 class="resources-title">As Minhas Turmas</h1>
+            <p  style="color: var(--text-secondary); margin-top: 5px;">Gere as tuas turmas e acompanha o progresso dos
+                alunos.</p>
+        </div>
+
+        <div class="gestao-actions-top">
+            <button class="btn btn-primary" onclick="prepararNovaTurma()">
+                <i data-lucide="users"></i> Criar Nova Turma
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="gestao-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Escola</th>
+                        <th>Turma</th>
+                        <th>Ano Letivo</th>
+                        <th>Código de Acesso</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="turmas-tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modal-turma" class="modal">
+        <div class="modal-content">
+            <h2 id="titulo-modal-turma">Criar Nova Turma</h2>
+            <form id="form-turma" onsubmit="salvarTurma(event)">
+                <div class="form-group">
+                    <label>Nome da Turma (Ex: 10º A)</label>
+                    <input type="text" id="turma-nome" required placeholder="Escreve o nome da turma">
+                </div>
+                <div class="form-group">
+                    <label>Ano Letivo (Ex: 2023/2024)</label>
+                    <input type="text" id="turma-ano" required placeholder="Escreve o ano letivo">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-turma')">Cancelar</button>
+                    <button type="submit" id="btn-submit-turma" class="btn btn-primary">Guardar Turma</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Funções de Controlo do Modal
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // ==========================================
+        // LÓGICA DAS TURMAS
+        // ==========================================
+
+        // 1. Carregar turmas da Base de Dados
+        async function carregarTurmas() {
+            try {
+                const res = await fetch('/api/professor/turmas');
+
+                // NOVO: Verifica se o servidor nos empurrou para a página de erro (404)
+                if (res.redirected && res.url.includes('404.html')) {
+                    window.location.href = '/404.html';
+                    return;
+                }
+
+                const turmas = await res.json();
+                const tbody = document.getElementById('turmas-tbody');
+                tbody.innerHTML = '';
+
+                if (turmas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6"  style="text-align: center; padding: 20px;">Ainda não criaste nenhuma turma.</td></tr>';
+                    return;
+                }
+
+                turmas.forEach(t => {
+                    const nomeEscola = t.escola ? t.escola.nome : 'Escola não definida';
+                    const codigoAcesso = t.codigo_acesso ? t.codigo_acesso : 'N/A';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>#${t.id_turma}</strong></td>
+                            <td>${nomeEscola}</td>
+                            <td><strong>${t.nome}</strong></td>
+                            <td>${t.ano_letivo}</td>
+                            <td>
+                                <span  style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 15px; font-weight: bold; letter-spacing: 1px; color: var(--text-color);">
+                                    ${codigoAcesso}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn-edit" onclick="alert('Funcionalidade de ver alunos em desenvolvimento!')" title="Ver Alunos">
+                                    <i data-lucide="eye"  style="width: 16px; height: 16px;"></i> Ver Alunos
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                lucide.createIcons();
+            } catch (error) {
+                console.error("Erro ao carregar turmas:", error);
+            }
+        }
+
+        // 2. Preparar o Modal para nova turma
+        function prepararNovaTurma() {
+            document.getElementById('form-turma').reset();
+            openModal('modal-turma');
+        }
+
+        // 3. Salvar Turma no Servidor
+        async function salvarTurma(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btn-submit-turma');
+            btn.textContent = 'A guardar...';
+            btn.disabled = true;
+
+            const payload = {
+                nome: document.getElementById('turma-nome').value,
+                ano_letivo: document.getElementById('turma-ano').value
+            };
+
+            try {
+                const res = await fetch('/api/professor/turmas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // NOVO: Proteção contra logout repentino durante a submissão
+                if (res.redirected && res.url.includes('404.html')) {
+                    window.location.href = '/404.html';
+                    return;
+                }
+
+                // Tenta ler o JSON com segurança
+                let data;
+                try {
+                    data = await res.json();
+                } catch (parseError) {
+                    throw new Error("O servidor não devolveu os dados no formato esperado.");
+                }
+
+                if (res.ok) {
+                    closeModal('modal-turma');
+                    carregarTurmas(); // Recarrega a tabela imediatamente sem erros
+                } else {
+                    alert("Erro: " + (data.error || "Não foi possível criar a turma."));
+                }
+            } catch (err) {
+                console.error("Erro no fetch:", err);
+                alert("Erro de comunicação com o servidor.");
+            } finally {
+                btn.textContent = 'Guardar Turma';
+                btn.disabled = false;
+            }
+        }
+
+        // Iniciar o carregamento assim que a página abre
+        document.addEventListener('DOMContentLoaded', carregarTurmas);
+    </script>
+</body>
+
+</html>
