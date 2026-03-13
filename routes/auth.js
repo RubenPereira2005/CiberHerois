@@ -74,7 +74,7 @@ module.exports = (supabase) => {
 
     // --- ROTA DE LOGIN INTELIGENTE COM GOOGLE ---
     router.post('/google-login', async (req, res) => {
-        const { token } = req.body;
+        const { token, action } = req.body; // <--- RECEBEMOS O 'ACTION' AQUI
         const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
         try {
@@ -88,6 +88,15 @@ module.exports = (supabase) => {
 
             let finalUser;
             if (!existingUser) {
+                // Se a pessoa clicou no Google na página de Login, rejeitamos!
+                if (action === 'login') {
+                    return res.status(404).json({ 
+                        error: "Conta não encontrada. A redirecionar para o registo...", 
+                        redirectToRegister: true 
+                    });
+                }
+
+                // Se estiver na página de Registo (action === 'register'), então sim, criamos a conta!
                 const googlePicture = user.user_metadata?.picture || user.user_metadata?.avatar_url || null;
                 const { data: newUser, error: insertError } = await supabase.from('utilizador').insert([{
                     id_utilizador: user.id,
@@ -142,6 +151,24 @@ module.exports = (supabase) => {
 
         } catch (e) {
             res.status(500).json({ error: "Erro interno ao validar código." });
+        }
+    });
+
+    // --- ROTA DE LOGOUT ---
+    router.post('/logout', (req, res) => {
+        const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        if (req.session.userId) {
+            logger.info(`[200] Utilizador terminou sessão: ${req.session.userName} | IP: ${userIp}`);
+            req.session.destroy((err) => {
+                if (err) {
+                    logger.error(`[500] Erro ao destruir sessão: ${err.message}`);
+                    return res.status(500).json({ error: 'Erro ao terminar sessão.' });
+                }
+                res.clearCookie('connect.sid'); // Limpa o cookie de sessão do express
+                return res.status(200).json({ success: true, message: 'Sessão terminada com sucesso.' });
+            });
+        } else {
+            res.status(200).json({ success: true, message: 'Nenhuma sessão ativa.' });
         }
     });
 

@@ -38,7 +38,8 @@
             </div>
 
             <h3 class="login-subtitle" id="formSubtitle">Iniciar sessão</h3>
-            <p id="mfaInstructions"  style="display: none; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+            <p id="mfaInstructions"
+                style="display: none; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
                 Identidade verificada! <br>Enviámos um código de 8 dígitos para o teu e-mail por motivos de segurança.
             </p>
 
@@ -50,9 +51,10 @@
                 </div>
 
                 <div class="form-group" id="passwordGroup">
-                    <div  style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label class="form-label">Password</label>
-                        <a href="forgot-password.html" class="link-highlight"  style="font-size: 0.8rem;">Esqueceu-se?</a>
+                        <a href="forgot-password.html" class="link-highlight"
+                            style="font-size: 0.8rem;">Esqueceu-se?</a>
                     </div>
                     <div class="password-input-wrapper">
                         <input type="password" id="loginPassword" required class="form-input" placeholder="••••••••" />
@@ -62,8 +64,10 @@
                     </div>
                 </div>
 
-                <div class="form-group" id="codeGroup"  style="display: none;">
-                    <label class="form-label"  style="color: #10b981; text-align: left; display: block; margin-bottom: 10px;">Código de Segurança (8 dígitos)</label>
+                <div class="form-group" id="codeGroup" style="display: none;">
+                    <label class="form-label"
+                        style="color: #10b981; text-align: left; display: block; margin-bottom: 10px;">Código de
+                        Segurança (8 dígitos)</label>
 
                     <div class="otp-boxes-container">
                         <input type="text" class="otp-box" maxlength="1" pattern="[0-9]*" inputmode="numeric">
@@ -81,16 +85,17 @@
 
                 <button type="submit" id="submitBtn" class="login-btn">Entrar</button>
 
-                <div id="resendContainer"  style="display: none; text-align: center; margin-top: 15px;">
-                    <p  style="font-size: 0.85rem; color: var(--text-secondary);">
+                <div id="resendContainer" style="display: none; text-align: center; margin-top: 15px;">
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">
                         Não recebeste o código?
-                        <button type="button" id="resendBtn" disabled  style="background: none; border: none; font-weight: bold; padding: 0; font-family: inherit;">
+                        <button type="button" id="resendBtn" disabled
+                            style="background: none; border: none; font-weight: bold; padding: 0; font-family: inherit;">
                             Reenviar em 02:00
                         </button>
                     </p>
-                    <p  style="margin-top: 15px;">
-                        <a href="#" onclick="location.reload()" class="link-highlight"  style="font-size: 0.85rem;">
-                            <i data-lucide="arrow-left"  style="width: 14px; height: 14px; vertical-align: middle;"></i>
+                    <p style="margin-top: 15px;">
+                        <a href="#" onclick="location.reload()" class="link-highlight" style="font-size: 0.85rem;">
+                            <i data-lucide="arrow-left" style="width: 14px; height: 14px; vertical-align: middle;"></i>
                             Voltar e tentar outro e-mail
                         </a>
                     </p>
@@ -103,11 +108,11 @@
                         <span class="divider-line"></span>
                     </div>
 
-                    <div id="googleBtnContainer"  style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <div id="googleBtnContainer" style="display: flex; justify-content: center; margin-bottom: 15px;">
                         <div id="g_id_signin"></div>
                     </div>
 
-                    <p class="login-link"  style="margin-bottom: 15px;">
+                    <p class="login-link" style="margin-bottom: 15px;">
                         Novo recruta? <a href="register.html" class="link-highlight">Criar conta</a>
                     </p>
 
@@ -256,7 +261,7 @@
         async function processarMFA(code) {
             const email = document.getElementById('loginEmail').value;
             const submitBtn = document.getElementById('submitBtn');
-            
+
             if (code.length < 8) {
                 showToast('Por favor, insere os 8 dígitos.', 'error');
                 return;
@@ -275,7 +280,7 @@
 
                 if (response.ok) {
                     sessionStorage.setItem('showLoginToast', 'true');
-                    window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                    window.location.href = 'quizzes.html'; // Redirecionamento direto
                 } else {
                     showToast(data.error || 'Código inválido.', 'error');
                     // Limpar as caixas em caso de erro
@@ -320,7 +325,7 @@
             submitBtn.textContent = "Validar Código";
             submitBtn.disabled = false;
             // Mudar o botão para "button" para não tentar submeter o formulário ignorando o JS
-            submitBtn.type = "button"; 
+            submitBtn.type = "button";
         }
 
         // --- EVENTO DE CLIQUE DO BOTÃO PRINCIPAL ---
@@ -359,7 +364,7 @@
                             transitionToMFA(data.email);
                         } else if (data.step === 'done') {
                             sessionStorage.setItem('showLoginToast', 'true');
-                            window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                            window.location.href = 'quizzes.html'; // Redirecionamento direto
                         }
                     } else {
                         showToast(data.error || 'Erro no login.', 'error');
@@ -396,7 +401,8 @@
                 const response = await fetch('/api/google-login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: googleData.credential })
+                    // NOVO: Enviamos a action 'login'
+                    body: JSON.stringify({ token: googleData.credential, action: 'login' })
                 });
                 const data = await response.json();
 
@@ -406,9 +412,17 @@
                         transitionToMFA(data.email);
                     } else if (data.step === 'done') {
                         sessionStorage.setItem('showLoginToast', 'true');
-                        window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                        window.location.href = 'quizzes.html'; // Redirecionamento direto
                     }
-                } else { showToast(data.error || "Falha na autenticação Google", "error"); }
+                } else {
+                    // Se o servidor disser que a conta não existe, redireciona para o registo
+                    showToast(data.error || "Falha na autenticação Google", "error");
+                    if (data.redirectToRegister) {
+                        setTimeout(() => {
+                            window.location.href = 'register.html';
+                        }, 2500); // Dá tempo para a pessoa ler o balão de erro e depois muda a página
+                    }
+                }
             } catch (err) { showToast("Erro de ligação.", "error"); }
         }
     </script>

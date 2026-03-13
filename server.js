@@ -48,6 +48,52 @@ app.use(session({
     saveUninitialized: false
 }));
 
+// ==========================================
+// MIDDLEWARE DE AUTENTICAÇÃO DAS PÁGINAS
+// ==========================================
+// Lista Branca (Ficheiros que qualquer um pode abrir)
+const publicPages = [
+    '/',
+    '/index.html',
+    '/login.html',
+    '/register.html',
+    '/forgot-password.html',
+    '/update-password.html',
+    '/404.html'
+];
+
+app.use((req, res, next) => {
+    // Se não for um ficheiro HTML ou tentar aceder ao '/', ignorar (as rotas API, CSS, etc, resolvem-se sozinhas)
+    if (!req.path.endsWith('.html') && req.path !== '/') {
+        return next();
+    }
+
+    // Se estiver na lista branca, deixa passar
+    if (publicPages.includes(req.path)) {
+        return next();
+    }
+
+    // Se tentar aceder a um ficheiro que não está na lista branca sem sessão iniciada: bloquear
+    if (!req.session.userId) {
+        logger.warn(`[403] Acesso negado a ${req.path} - Sem sessão. A redirecionar para index.html`);
+        // Adicionamos a query string "?erro=sem_sessao" para o frontend saber o que aconteceu
+        return res.redirect('/?erro=sem_sessao'); 
+    }
+
+    // Verificação de Roles para páginas específicas (Role-Based Access Control)
+    if (req.path === '/gestao.html' && req.session.role !== 'admin') {
+        logger.warn(`[403] Acesso negado a gestao.html - Utilizador ${req.session.userName} (${req.session.role})`);
+        return res.redirect('/404.html');
+    }
+
+    if (req.path === '/professor.html' && req.session.role !== 'professor' && req.session.role !== 'admin') {
+        logger.warn(`[403] Acesso negado a professor.html - Utilizador ${req.session.userName} (${req.session.role})`);
+        return res.redirect('/404.html');
+    }
+
+    next();
+});
+
 // Servir Estáticos
 app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'css')));

@@ -313,14 +313,17 @@
                 const response = await fetch('/api/google-login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: googleData.credential }) 
+                    // Enviamos a action 'register'
+                    body: JSON.stringify({ token: googleData.credential, action: 'register' }) 
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    showToast('Conta Google verificada!', 'success');
+                    showToast('Conta Google associada com sucesso!', 'success');
                     sessionStorage.setItem('showLoginToast', 'true');
-                    setTimeout(() => { window.location.href = data.role === 'admin' ? 'gestao.html' : 'quiz.html'; }, 1000);
-                } else { showToast(data.error || "Erro no Google Login", "error"); }
+                    setTimeout(() => { window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html'; }, 1000);
+                } else { 
+                    showToast(data.error || "Erro no Google Login", "error"); 
+                }
             } catch (err) { showToast("Erro de ligação.", "error"); }
         }
     </script>

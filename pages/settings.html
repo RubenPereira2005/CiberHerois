@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="preloader.css">
+    <link rel="stylesheet" href="popup_modal.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
@@ -225,6 +226,20 @@
         </div>
     </div>
 
+    <div id="modal-confirmacao" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #ef4444;">
+                <i data-lucide="alert-triangle" style="width: 48px; height: 48px;"></i>
+            </div>
+            <h2>Atenção</h2>
+            <p id="texto-confirmacao" style="margin: 20px 0; color: var(--text-color);">Tem a certeza que deseja eliminar?</p>
+            <div class="modal-actions" style="justify-content: center; gap: 15px;">
+                <button type="button" class="btn btn-secondary" id="btn-cancelar-confirmacao">Cancelar</button>
+                <button type="button" class="btn" id="btn-aceitar-confirmacao" style="background-color: #ef4444; color: white; border-color: #ef4444;">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
 
@@ -378,7 +393,8 @@
             // --- APAGAR CONTA ---
             if (btnDelete) {
                 btnDelete.addEventListener('click', async () => {
-                    if (confirm("Tens a certeza absoluta? Esta ação é irreversível.")) {
+                    const confirmado = await confirmarAcao("Tens a certeza absoluta? Esta ação é irreversível e todos os teus dados serão perdidos.");
+                    if (confirmado) {
                         try {
                             const response = await fetch('/api/delete', { method: 'DELETE' });
                             if (response.ok) window.location.href = "index.html";
@@ -411,6 +427,37 @@
 
             syncThemeRadios();
         });
+
+        function confirmarAcao(mensagem) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modal-confirmacao');
+                const texto = document.getElementById('texto-confirmacao');
+                const btnAceitar = document.getElementById('btn-aceitar-confirmacao');
+                const btnCancelar = document.getElementById('btn-cancelar-confirmacao');
+
+                texto.textContent = mensagem;
+                modal.classList.add('active'); // Mostra o modal
+                lucide.createIcons(); // Recarrega o ícone de alerta
+
+                // Clonar os botões remove eventos antigos para evitar múltiplos cliques acumulados
+                const novoBtnAceitar = btnAceitar.cloneNode(true);
+                const novoBtnCancelar = btnCancelar.cloneNode(true);
+                btnAceitar.parentNode.replaceChild(novoBtnAceitar, btnAceitar);
+                btnCancelar.parentNode.replaceChild(novoBtnCancelar, btnCancelar);
+
+                // O que acontece ao clicar no Confirmar
+                novoBtnAceitar.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                    resolve(true);
+                });
+
+                // O que acontece ao clicar no Cancelar
+                novoBtnCancelar.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                    resolve(false);
+                });
+            });
+        }
     </script>
 </body>
 

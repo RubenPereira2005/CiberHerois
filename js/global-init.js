@@ -10,6 +10,18 @@ window.esconderLoader = function() {
     }
 };
 
+// 1.5. Função global para fazer Logout seguro
+window.fazerLogout = async function() {
+    try {
+        await fetch('/api/logout', { method: 'POST' });
+        // Limpa tokens locais se houver (por precaução) e redireciona
+        window.location.href = 'index.html';
+    } catch (e) {
+        console.error("Erro ao terminar sessão", e);
+        window.location.href = 'index.html'; // Redireciona na mesma por segurança
+    }
+};
+
 // 2. Função global para atualizar o Header
 window.atualizarHeaderGlobal = async function() {
     try {

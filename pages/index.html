@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,12 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="preloader.css">
+    <link rel="stylesheet" href="popup_modal.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
 </head>
+
 <body>
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
@@ -46,7 +49,8 @@
                 <p class="highlight">A melhor forma de aprender</p>
                 <h1 class="index-title">CiberHeróis</h1>
                 <h2 class="index-subtitle">Aprenda cibersegurança como um verdadeiro herói</h2>
-                <p class="lead">Aprenda cibersegurança de forma interativa e divertida. Complete quizzes, ganhe medalhas e torne-se um expert em segurança digital.</p>
+                <p class="lead">Aprenda cibersegurança de forma interativa e divertida. Complete quizzes, ganhe medalhas
+                    e torne-se um expert em segurança digital.</p>
                 <div class="cta-group">
                     <a href="register.html" class="btn btn-primary">Começar Agora</a>
                     <a href="login.html" class="btn btn-secondary">Iniciar Sessão</a>
@@ -55,9 +59,9 @@
 
             <aside class="index-right">
                 <div class="panel-bubbles" aria-hidden="true">
-                    <div class="bubble" style="left:20%; top:30%"></div>
-                    <div class="bubble" style="left:80%; top:60%"></div>
-                    <div class="bubble" style="left:50%; top:10%"></div>
+                    <div class="bubble" style="left: 20%; top: 30%;"></div>
+                    <div class="bubble" style="left: 80%; top: 60%;"></div>
+                    <div class="bubble" style="left: 50%; top: 10%;"></div>
                 </div>
 
                 <div class="panel-content">
@@ -103,6 +107,25 @@
                 <button onclick="window.location.href='register.html'" class="btn btn-white">Criar Conta Grátis</button>
             </div>
         </section>
+
+        <div class="toast-notification" id="sessaoToast">
+            <button class="toast-close" id="closeSessaoToast">✖</button>
+
+            <div class="toast-header">
+                ⚠️ Acesso Restrito
+            </div>
+
+            <div class="toast-body">
+                Precisas de ter a sessão iniciada para aceder a essa página. Por favor, faz login para continuares a tua
+                aventura!
+            </div>
+
+            <div class="toast-footer">
+                <a href="/login.html" class="btn btn-primary"
+                    style="text-decoration: none; padding: 6px 16px; font-size: 0.9rem;">Fazer Login</a>
+            </div>
+        </div>
+
     </main>
 
     <footer class="site-footer">
@@ -113,6 +136,38 @@
 
     <script>
         lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar se a URL tem o aviso de erro
+            const urlParams = new URLSearchParams(window.location.search);
+            const erro = urlParams.get('erro');
+
+            if (erro === 'sem_sessao') {
+                const toast = document.getElementById('sessaoToast');
+                const closeBtn = document.getElementById('closeSessaoToast');
+
+                // Limpa a URL imediatamente
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                // Dá um pequeno atraso de meio segundo antes de mostrar o aviso
+                setTimeout(() => {
+                    toast.classList.add('active');
+                }, 500);
+
+                // Fechar ao clicar no X
+                closeBtn.addEventListener('click', () => {
+                    toast.classList.remove('active');
+                });
+
+                // Opcional: Fechar automaticamente após 8 segundos
+                setTimeout(() => {
+                    if (toast.classList.contains('active')) {
+                        toast.classList.remove('active');
+                    }
+                }, 8500);
+            }
+        });
     </script>
 </body>
+
 </html>
