@@ -15,13 +15,25 @@ module.exports = (supabase) => {
     router.get('/me', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
+        // 1. Vai buscar os dados do utilizador e o ID da turma a que pertence
         const { data, error } = await supabase
             .from('utilizador')
-            .select('nome, email, role, mfa_ativo, foto_perfil, foto_google, foto_upload')
+            .select('nome, email, role, mfa_ativo, foto_perfil, foto_google, foto_upload, id_turma')
             .eq('id_utilizador', req.session.userId)
             .single();
 
         if (error || !data) return res.status(404).json({ error: "Utilizador não encontrado." });
+
+        // 2. Se o utilizador tiver uma turma associada, vai buscar o nome da turma e da escola
+        if (data.id_turma) {
+            const { data: turmaData } = await supabase
+                .from('turma')
+                .select('nome, escola(nome)')
+                .eq('id_turma', data.id_turma)
+                .single();
+            data.turma = turmaData;
+        }
+
         res.json(data);
     });
 
@@ -214,5 +226,34 @@ module.exports = (supabase) => {
         }
     });
     
+    // --- ROTA 9: Juntar a um Esquadrão (Turma) através de Código ---
+    router.post('/join-turma', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
+        const { codigo } = req.body;
+        
+        if (!codigo || codigo.trim() === '') return res.status(400).json({ error: "O código não pode estar vazio." });
+
+        // 1. Procurar se existe alguma turma com este código
+        const { data: turma, error: turmaErr } = await supabase
+            .from('turma')
+            .select('id_turma, nome')
+            .eq('codigo_acesso', codigo.trim().toUpperCase())
+            .single();
+
+        if (turmaErr || !turma) {
+            return res.status(404).json({ error: "Código inválido. Verifica se escreveste bem!" });
+        }
+
+        // 2. Associar o utilizador à turma encontrada
+        const { error: updateErr } = await supabase
+            .from('utilizador')
+            .update({ id_turma: turma.id_turma })
+            .eq('id_utilizador', req.session.userId);
+
+        if (updateErr) return res.status(500).json({ error: "Erro ao associar ao esquadrão." });
+
+        res.json({ message: `Acesso Concedido! Agora pertences ao esquadrão ${turma.nome}!` });
+    });
+
     return router;
 };

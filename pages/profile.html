@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,8 @@
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
 </head>
-<body class="site-body">    
+
+<body class="site-body">
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
         <div class="loader-spinner"></div>
@@ -25,11 +27,11 @@
         <div class="profile-header">
             <div class="profile-header-content">
                 <div class="profile-header-left">
-                    <div class="profile-avatar-container"  style="position: relative; display: inline-block;">
+                    <div class="profile-avatar-container" style="position: relative; display: inline-block;">
                         <div class="profile-avatar">
                         </div>
                         <button id="edit-avatar-btn" class="edit-avatar-btn" title="Mudar Avatar">
-                            <i data-lucide="pencil"  style="width: 14px; height: 14px;"></i>
+                            <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
                         </button>
                     </div>
                     <div>
@@ -46,6 +48,22 @@
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="star" class="profile-header-icon"></i>
                                     <span class="profile-header-badge-text" id="profile-points-badge">-- Pontos</span>
+                                </div>
+                            </div>
+                            <div class="profile-header-badge"
+                                style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
+                                <div class="profile-header-badge-content">
+                                    <i data-lucide="globe" class="profile-header-icon" style="color: #f59e0b;"></i>
+                                    <span class="profile-header-badge-text" id="profile-ranking-badge"
+                                        style="color: #f59e0b;">Top --</span>
+                                </div>
+                            </div>
+                            <div class="profile-header-badge"
+                                style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                                <div class="profile-header-badge-content">
+                                    <i data-lucide="flame" class="profile-header-icon" style="color: #ef4444;"></i>
+                                    <span class="profile-header-badge-text" id="profile-streak-badge"
+                                        style="color: #ef4444;">-- Dias</span>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +84,7 @@
                     <span id="profile-progress-remaining">-- pontos restantes</span>
                 </div>
                 <div class="profile-progress-bar">
-                    <div id="profile-progress-bar-fill" class="profile-progress-fill"  style="width: 0%;"></div>
+                    <div id="profile-progress-bar-fill" class="profile-progress-fill" style="width: 0%;"></div>
                 </div>
             </div>
         </div>
@@ -79,7 +97,6 @@
                         <i data-lucide="trending-up" class="profile-card-icon"></i>
                         Estatísticas
                     </h2>
-
                     <div class="profile-stats-grid">
                         <div class="profile-stat">
                             <div class="profile-stat-value profile-stat-blue" id="stat-quizzes">0</div>
@@ -101,16 +118,27 @@
                 </div>
 
                 <div class="profile-card">
-                    <div  style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 class="profile-card-title"  style="margin: 0;">
+                    <h2 class="profile-card-title" id="esquadrao-card-title">
+                        <i data-lucide="users" class="profile-card-icon"></i>
+                        O Meu Esquadrão
+                    </h2>
+                    <div id="esquadrao-content" style="text-align: center; padding: 15px 0;">
+                        <p style="color: var(--text-secondary);">A consultar os registos da academia...</p>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 class="profile-card-title" style="margin: 0;">
                             <i data-lucide="calendar" class="profile-card-icon"></i>
                             Atividade Recente
                         </h2>
-                        <a href="historico.html"  style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                            Ver Tudo <i data-lucide="chevron-right"  style="width: 16px; height: 16px;"></i>
+                        <a href="historico.html"
+                            style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                            Ver Tudo <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                         </a>
                     </div>
-
                     <div class="profile-activity">
                     </div>
                 </div>
@@ -159,11 +187,10 @@
                 </div>
             </div>
         </div>
-    </div> 
-    
+    </div>
+
     <div id="avatar-modal" class="avatar-modal hidden">
         <div class="avatar-modal-overlay" id="close-modal-overlay"></div>
-
         <div class="avatar-modal-content">
             <div class="avatar-modal-header">
                 <h2>Escolhe o teu Herói</h2>
@@ -189,9 +216,46 @@
             <div class="avatar-upload-section">
                 <input type="file" id="custom-avatar-input" accept="image/png, image/jpeg, image/jpg" hidden>
                 <label for="custom-avatar-input" class="upload-btn">
-                    <i data-lucide="upload"  style="margin-right: 8px;"></i>
+                    <i data-lucide="upload" style="margin-right: 8px;"></i>
                     Nova fotografia
                 </label>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-codigo-turma" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header">
+                <h2>Junta-te a um Esquadrão</h2>
+                <button class="close-modal-btn" onclick="closeModal('modal-codigo-turma')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Insere o código fornecido pelo teu professor.
+            </p>
+            <input type="text" id="input-codigo-turma" class="form-input" placeholder="Ex: ABC123"
+                style="text-align: center; font-size: 1.5rem; letter-spacing: 4px; text-transform: uppercase;"
+                maxlength="6">
+            <p id="erro-codigo" style="color: #ef4444; font-size: 0.9rem; margin-top: 10px; display: none;"></p>
+
+            <div class="modal-actions" style="justify-content: center; margin-top: 20px;">
+                <button type="button" class="btn btn-primary" id="btn-validar-codigo"
+                    onclick="validarCodigoTurma()">Validar Código</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-sucesso-perfil" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #10b981;">
+                <i data-lucide="shield-check" style="width: 54px; height: 54px;"></i>
+            </div>
+            <h2>Operação Bem Sucedida!</h2>
+            <p id="texto-sucesso-perfil" style="margin: 20px 0; color: var(--text-color); font-size: 1.1rem;"></p>
+            <div class="modal-actions" style="justify-content: center;">
+                <button type="button" class="btn btn-primary" onclick="window.location.reload()"
+                    style="background-color: #10b981; border-color: #10b981;">Missão Cumprida!</button>
             </div>
         </div>
     </div>
@@ -201,7 +265,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
 
-            // Carregar os dados do utilizador para mostrar o nome, email e avatar
+            // Carregar os dados do utilizador para mostrar o nome, email, avatar e ESQUADRÃO
             try {
                 const response = await fetch('/api/me');
 
@@ -219,6 +283,81 @@
 
                     if (nomeElement) nomeElement.textContent = data.nome;
                     if (emailElement) emailElement.textContent = data.email;
+
+                    // --- ATUALIZAR CARTÃO DO ESQUADRÃO E PATENTE ---
+                    const esquadraoCardTitle = document.getElementById('esquadrao-card-title');
+                    const esquadraoContent = document.getElementById('esquadrao-content');
+                    let patenteHTML = '';
+
+                    // LÓGICA PARA ADMIN (Vermelho)
+                    if (data.role === 'admin') {
+                        patenteHTML = `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Administrador</span>`;
+                        if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
+
+                        esquadraoCardTitle.innerHTML = `<i data-lucide="shield" class="profile-card-icon" style="color: #ef4444;"></i> Centro de Comando`;
+                        esquadraoContent.innerHTML = `
+                            <div style="background: rgba(239, 68, 68, 0.05); border: 1px dashed rgba(239, 68, 68, 0.4); padding: 20px 15px; border-radius: 12px;">
+                                <div style="color: #ef4444; margin-bottom: 10px;"><i data-lucide="database" style="width: 36px; height: 36px;"></i></div>
+                                <h3 style="color: #ef4444; margin-bottom: 5px; font-size: 1.2rem;">Base de Operações</h3>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Acesso total à academia e configuração do sistema.</p>
+                                <a href="gestao.html" class="btn btn-primary" style="background-color: #ef4444; border-color: #ef4444; width: 100%;">Gerir Plataforma</a>
+                            </div>
+                        `;
+                    }
+                    // LÓGICA PARA PROFESSOR (Verde)
+                    else if (data.role === 'professor') {
+                        patenteHTML = `<span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Professor</span>`;
+                        if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
+
+                        esquadraoCardTitle.innerHTML = `<i data-lucide="users" class="profile-card-icon" style="color: #10b981;"></i> Os Meus Esquadrões`;
+                        esquadraoContent.innerHTML = `
+                            <div style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.4); padding: 20px 15px; border-radius: 12px;">
+                                <div style="color: #10b981; margin-bottom: 10px;"><i data-lucide="graduation-cap" style="width: 36px; height: 36px;"></i></div>
+                                <h3 style="color: #10b981; margin-bottom: 5px; font-size: 1.2rem;">Comandante de Turmas</h3>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">És o responsável por treinar e acompanhar os novos recrutas.</p>
+                                <a href="professor.html" class="btn btn-primary" style="background-color: #10b981; border-color: #10b981; width: 100%;">Monitorizar Alunos</a>
+                            </div>
+                        `;
+                    }
+                    // LÓGICA PARA ALUNO (Azul Vibrante)
+                    else {
+                        patenteHTML = `<span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);">Aluno</span>`;
+                        if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
+
+                        esquadraoCardTitle.innerHTML = `<i data-lucide="users" class="profile-card-icon"></i> O Meu Esquadrão`;
+
+                        if (data.id_turma && data.turma) {
+                            const nomeEscola = data.turma.escola ? data.turma.escola.nome : 'Academia CiberHeróis';
+                            esquadraoContent.innerHTML = `
+                                <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px 15px; border-radius: 12px; position: relative; overflow: hidden;">
+                                    <div style="position: absolute; top: -15px; right: -15px; opacity: 0.05; color: var(--primary-color);">
+                                        <i data-lucide="shield-check" style="width: 100px; height: 100px;"></i>
+                                    </div>
+                                    <div style="display: flex; justify-content: center; margin-bottom: 10px; color: var(--primary-color); position: relative;">
+                                        <i data-lucide="shield" style="width: 36px; height: 36px;"></i>
+                                    </div>
+                                    <h3 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1.3rem; position: relative;">${data.turma.nome}</h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; position: relative;">${nomeEscola}</p>
+                                    
+                                    <div style="margin-top: 15px; display: inline-block; font-size: 0.85rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 20px; font-weight: 600; position: relative;">
+                                        <i data-lucide="check-circle" style="width: 14px; height: 14px; display: inline-block; vertical-align: text-bottom; margin-right: 4px;"></i> Alistamento Confirmado
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            esquadraoContent.innerHTML = `
+                                <div style="padding: 10px 0;">
+                                    <div style="color: var(--text-secondary); margin-bottom: 15px; opacity: 0.5;"><i data-lucide="search" style="width: 40px; height: 40px;"></i></div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">Ainda não tens afiliação a um esquadrão tático.</p>
+                                    <button class="btn btn-primary" onclick="openModal('modal-codigo-turma')" style="width: 100%;">
+                                        <i data-lucide="key" style="margin-right: 8px; width: 18px; height: 18px;"></i> Inserir Código de Recrutamento
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    lucide.createIcons(); // Recarregar os ícones gerados dinamicamente
 
                     // Mostrar a Imagem de Perfil Ativa na página
                     if (data.foto_perfil) {
@@ -292,14 +431,14 @@
             }
 
             // Lógica para abrir e fechar o modal de escolha de avatar
-            const modal = document.getElementById('avatar-modal');
+            const modalAvatar = document.getElementById('avatar-modal');
             const btnOpen = document.getElementById('edit-avatar-btn');
             const btnClose = document.getElementById('close-avatar-btn');
             const overlay = document.getElementById('close-modal-overlay');
 
-            if (btnOpen) btnOpen.addEventListener('click', () => modal.classList.remove('hidden'));
-            if (btnClose) btnClose.addEventListener('click', () => modal.classList.add('hidden'));
-            if (overlay) overlay.addEventListener('click', () => modal.classList.add('hidden'));
+            if (btnOpen) btnOpen.addEventListener('click', () => modalAvatar.classList.remove('hidden'));
+            if (btnClose) btnClose.addEventListener('click', () => modalAvatar.classList.add('hidden'));
+            if (overlay) overlay.addEventListener('click', () => modalAvatar.classList.add('hidden'));
 
             const modalContent = document.querySelector('.avatar-modal-content');
             modalContent.addEventListener('click', async (e) => {
@@ -324,7 +463,7 @@
 
                             const avatarElement = document.querySelector('.profile-avatar');
                             avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                            modal.classList.add('hidden');
+                            modalAvatar.classList.add('hidden');
                         } else {
                             alert('Erro ao atualizar avatar.');
                         }
@@ -420,7 +559,7 @@
                 }
             }
 
-            // --- CARREGAR ESTATÍSTICAS, PONTOS E NÍVEIS ---
+            // --- NOVA FUNÇÃO: CARREGAR ESTATÍSTICAS, PONTOS E NÍVEIS ---
             async function carregarEstatisticas() {
                 try {
                     const response = await fetch('/api/stats');
@@ -434,17 +573,23 @@
                     document.getElementById('stat-medalhas').textContent = stats.medalhas;
                     document.getElementById('stat-respostas').textContent = stats.respostas;
 
-                    // 2. Atualizar Pontos e Nível no Badge do Perfil
+                    // 2. Atualizar Pontos, Nível, Ranking e Streak
                     const badgePontosPerfil = document.getElementById('profile-points-badge');
                     const badgeNivelPerfil = document.getElementById('profile-level-badge');
+                    const badgeRanking = document.getElementById('profile-ranking-badge');
+                    const badgeStreak = document.getElementById('profile-streak-badge');
+
                     if (badgePontosPerfil) badgePontosPerfil.textContent = `${stats.pontos || 0} Pontos`;
                     if (badgeNivelPerfil) badgeNivelPerfil.textContent = `Nível ${stats.nivel}`;
+                    
+                    if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
+                    if (badgeStreak) badgeStreak.textContent = `${stats.ofensiva || 0} Dias`;
 
                     // 3. Atualizar a Barra de Progresso
                     const barraTexto = document.getElementById('profile-progress-text');
                     const barraRestante = document.getElementById('profile-progress-remaining');
                     const barraPreenchimento = document.getElementById('profile-progress-bar-fill');
-                    
+
                     if (barraTexto) barraTexto.textContent = `Progresso para Nível ${stats.nivel + 1}`;
                     if (barraRestante) barraRestante.textContent = `${stats.pontos_restantes} pontos restantes`;
                     if (barraPreenchimento) barraPreenchimento.style.width = `${stats.progresso_perc}%`;
@@ -456,9 +601,64 @@
 
             // Executar as funções ao carregar a página
             carregarAtividadeRecente();
-            carregarEstatisticas(); 
-            
+            carregarEstatisticas();
+
         });
+
+        // ==========================================
+        // FUNÇÕES GLOBAIS (MODAIS E TURMAS)
+        // ==========================================
+
+        window.openModal = function (id) { document.getElementById(id).classList.add('active'); }
+        window.closeModal = function (id) { document.getElementById(id).classList.remove('active'); }
+
+        window.validarCodigoTurma = async function () {
+            const codigo = document.getElementById('input-codigo-turma').value;
+            const btn = document.getElementById('btn-validar-codigo');
+            const erroBox = document.getElementById('erro-codigo');
+
+            erroBox.style.display = 'none';
+            if (codigo.length < 5) {
+                erroBox.textContent = "O código costuma ter 6 caracteres.";
+                erroBox.style.display = 'block';
+                return;
+            }
+
+            btn.textContent = "A desencriptar...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/join-turma', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codigo })
+                });
+                const dados = await res.json();
+
+                if (res.ok) {
+                    closeModal('modal-codigo-turma');
+                    document.getElementById('texto-sucesso-perfil').textContent = dados.message;
+                    openModal('modal-sucesso-perfil');
+                    lucide.createIcons();
+                } else {
+                    erroBox.textContent = dados.error;
+                    erroBox.style.display = 'block';
+                }
+            } catch (e) {
+                erroBox.textContent = "Erro de comunicação com o servidor central.";
+                erroBox.style.display = 'block';
+            } finally {
+                btn.textContent = "Validar Código";
+                btn.disabled = false;
+            }
+        }
+
+        // Atualizar Ofensiva e Ranking
+        const badgeRanking = document.getElementById('profile-ranking-badge');
+        const badgeStreak = document.getElementById('profile-streak-badge');
+
+        if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
+        if (badgeStreak) badgeStreak.textContent = `${stats.ofensiva || 0} Dias`;
     </script>
 </body>
 
