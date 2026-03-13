@@ -413,5 +413,61 @@ module.exports = (supabase) => {
         res.json({ message: 'Turma apagada!' });
     });
 
+    // Ver alunos da turma (ADMIN)
+    router.get('/turmas/:id/alunos', verificarAdmin, async (req, res) => {
+        const { data, error } = await supabase
+            .from('utilizador')
+            .select('id_utilizador, nome, email, pontos_totais')
+            .eq('id_turma', req.params.id)
+            .order('nome', { ascending: true });
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data || []);
+    });
+
+    // Remover aluno da turma (ADMIN)
+    router.put('/turmas/:id_turma/alunos/:id_aluno/remover', verificarAdmin, async (req, res) => {
+        try {
+            const { error } = await supabase
+                .from('utilizador')
+                .update({ id_turma: null })
+                .eq('id_utilizador', req.params.id_aluno);
+                
+            if (error) throw error;
+            res.json({ message: 'Aluno removido com sucesso!' });
+        } catch (error) {
+            console.error("Erro ao remover aluno (Admin):", error);
+            res.status(500).json({ error: "Erro interno na base de dados." });
+        }
+    });
+
+    // --- ROTAS AUXILIARES PARA EDIÇÃO DE TURMAS ---
+    router.get('/escolas', verificarAdmin, async (req, res) => {
+        const { data, error } = await supabase.from('escola').select('*').order('nome');
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data || []);
+    });
+
+    router.get('/professores', verificarAdmin, async (req, res) => {
+        const { data, error } = await supabase.from('utilizador').select('id_utilizador, nome, email').eq('role', 'professor').order('nome');
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data || []);
+    });
+
+    // --- ATUALIZAR TURMA (ADMIN - CONTROLO TOTAL) ---
+    router.put('/turmas/:id', verificarAdmin, async (req, res) => {
+        const { nome, ano_letivo, id_escola, id_professor } = req.body;
+        try {
+            const { error } = await supabase
+                .from('turma')
+                .update({ nome, ano_letivo, id_escola, id_professor })
+                .eq('id_turma', req.params.id);
+            
+            if (error) throw error;
+            res.json({ message: 'Turma atualizada com sucesso!' });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+    
     return router;
 };

@@ -10,11 +10,12 @@
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="gestao.css">
     <link rel="stylesheet" href="preloader.css">
+    <link rel="stylesheet" href="popup_modal.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
-    
 </head>
+
 <body class="site-body">
 
     <div id="global-loader">
@@ -25,189 +26,942 @@
     <nav class="auth-navbar">
         <div class="auth-navbar-inner">
             <div class="auth-navbar-left">
-                <a href="quizzes.html" class="auth-brand">CiberHeróis | <span  style="color: #3b82f6;">Professor</span></a>
+                <a href="quizzes.html" class="auth-brand">CiberHeróis | <span
+                        style="color: #10b981;">Professor</span></a>
             </div>
 
             <div class="auth-navbar-right">
                 <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
                 </button>
-                <a href="quizzes.html" class="btn btn-secondary"  style="margin-left: 10px;">Voltar aos Quizzes</a>
+                <a href="quizzes.html" class="btn btn-secondary" style="margin-left: 10px;">Voltar aos Quizzes</a>
             </div>
         </div>
     </nav>
 
     <div class="auth-container resources-container">
         <div class="gestao-header">
-            <h1 class="resources-title">As Minhas Turmas</h1>
-            <p  style="color: var(--text-secondary); margin-top: 5px;">Gere as tuas turmas e acompanha o progresso dos
-                alunos.</p>
+            <h1 class="resources-title">Painel de Controlo do Professor</h1>
+            <p style="color: var(--text-secondary); margin-top: 5px;">Gere os teus esquadrões, recursos e treinos
+                táticos.</p>
         </div>
 
-        <div class="gestao-actions-top">
-            <button class="btn btn-primary" onclick="prepararNovaTurma()">
-                <i data-lucide="users"></i> Criar Nova Turma
-            </button>
+        <div class="gestao-tabs">
+            <button class="gestao-tab active" onclick="switchTab('turmas')">Os Meus Esquadrões</button>
+            <button class="gestao-tab" onclick="switchTab('recursos')">Os Meus Recursos</button>
+            <button class="gestao-tab" onclick="switchTab('quizzes')">Os Meus Quizzes</button>
         </div>
 
-        <div class="table-responsive">
-            <table class="gestao-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Escola</th>
-                        <th>Turma</th>
-                        <th>Ano Letivo</th>
-                        <th>Código de Acesso</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="turmas-tbody">
-                </tbody>
-            </table>
+        <div id="tab-turmas" class="tab-content active">
+            <div class="gestao-actions-top">
+                <button class="btn btn-primary" onclick="prepararNovaTurma()" style="background-color: #10b981;">
+                    <i data-lucide="users"></i> Criar Novo Esquadrão
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Escola</th>
+                            <th>Turma</th>
+                            <th>Ano Letivo</th>
+                            <th>Código de Acesso</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="turmas-tbody"></tbody>
+                </table>
+            </div>
         </div>
+
+        <div id="tab-recursos" class="tab-content">
+            <div class="gestao-actions-top">
+                <button class="btn btn-primary" onclick="prepararNovoRecurso()" style="background-color: #10b981;">
+                    <i data-lucide="plus"></i> Criar Novo Recurso Visual
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Visual</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>URL / Ficheiro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resources-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-quizzes" class="tab-content">
+            <div class="gestao-actions-top" style="justify-content: space-between;">
+                <button class="btn btn-primary" onclick="prepararNovoQuiz()" style="background-color: #10b981;">
+                    <i data-lucide="plus"></i> Adicionar Pergunta
+                </button>
+                <div class="filter-container">
+                    <label for="filter-categoria"
+                        style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">Filtrar
+                        Categoria:</label>
+                    <select id="filter-categoria" class="filter-select" onchange="renderQuizzes()">
+                        <option value="todas">Todas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <button class="btn-sort" onclick="toggleSortID()" title="Ordenar ID">ID <i
+                                        data-lucide="arrow-up-down" style="width: 14px; height: 14px;"></i></button>
+                            </th>
+                            <th>Categoria</th>
+                            <th>
+                                <button class="btn-sort" onclick="toggleSortDificuldade()"
+                                    title="Ordenar Dificuldade">Dificuldade <i data-lucide="arrow-up-down"
+                                        style="width: 14px; height: 14px;"></i></button>
+                            </th>
+                            <th>Pergunta</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quizzes-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <div id="modal-turma" class="modal">
-        <div class="modal-content">
-            <h2 id="titulo-modal-turma">Criar Nova Turma</h2>
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="titulo-modal-turma">Criar Nova Turma</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-turma')"><i
+                        data-lucide="x"></i></button>
+            </div>
             <form id="form-turma" onsubmit="salvarTurma(event)">
                 <div class="form-group">
                     <label>Nome da Turma (Ex: 10º A)</label>
-                    <input type="text" id="turma-nome" required placeholder="Escreve o nome da turma">
+                    <input type="text" id="turma-nome" class="form-input" required
+                        placeholder="Escreve o nome da turma">
                 </div>
                 <div class="form-group">
                     <label>Ano Letivo (Ex: 2023/2024)</label>
-                    <input type="text" id="turma-ano" required placeholder="Escreve o ano letivo">
+                    <input type="text" id="turma-ano" class="form-input" required placeholder="Escreve o ano letivo">
                 </div>
-
-                <div class="modal-actions">
+                <div class="modal-actions" style="margin-top: 20px;">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-turma')">Cancelar</button>
-                    <button type="submit" id="btn-submit-turma" class="btn btn-primary">Guardar Turma</button>
+                    <button type="submit" id="btn-submit-turma" class="btn btn-primary"
+                        style="background-color: #10b981;">Guardar Turma</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
+    <div id="modal-editar-turma" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Editar o Meu Esquadrão</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-editar-turma')"><i
+                        data-lucide="x"></i></button>
+            </div>
+            <form id="form-editar-turma" onsubmit="salvarEdicaoTurma(event)">
+                <input type="hidden" id="edit-turma-id">
+                <div class="form-group">
+                    <label>Nome da Turma</label>
+                    <input type="text" id="edit-turma-nome" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Ano Letivo</label>
+                    <input type="text" id="edit-turma-ano" class="form-input" required>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-editar-turma')">Cancelar</button>
+                    <button type="submit" id="btn-submit-edit-turma" class="btn btn-primary"
+                        style="background-color: #10b981;">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-ver-alunos" class="modal" style="z-index: 8888 !important;">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h2>Alunos do Esquadrão</h2>
+                <button class="close-modal-btn" onclick="closeModal('modal-ver-alunos')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>Nome do Herói</th>
+                            <th>Email</th>
+                            <th>Pontos</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alunos-tbody"></tbody>
+                </table>
+                <p id="msg-sem-alunos"
+                    style="text-align: center; color: var(--text-secondary); display: none; margin-top: 20px; font-style: italic;">
+                    Não existem alunos neste esquadrão.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-recurso" class="modal">
+        <div class="modal-content modal-large">
+            <h2 id="titulo-modal-recurso">Criar Novo Recurso</h2>
+            <form id="form-recurso" onsubmit="salvarRecurso(event)">
+                <div class="gestao-panel-section">
+                    <h3 class="gestao-panel-title blue">1. Informação do Cartão</h3>
+                    <div class="gestao-flex-row">
+                        <div class="form-group" style="flex: 1;"><label>Título</label><input type="text" id="rec-titulo"
+                                required></div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Tipo (Categoria)</label>
+                            <select id="rec-cat" class="form-input" required>
+                                <option value="documento">Documento</option>
+                                <option value="guia">Guia Prático</option>
+                                <option value="video">Vídeo</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Descrição Curta</label><input type="text" id="rec-desc" required>
+                    </div>
+                    <label style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Cor do
+                        Tema:</label>
+                    <div class="color-selector" id="color-picker">
+                        <div class="color-circle active" data-color="green" onclick="selectColor('green')"
+                            style="background: #10b981;"></div>
+                        <div class="color-circle" data-color="blue" onclick="selectColor('blue')"
+                            style="background: #3b82f6;"></div>
+                        <div class="color-circle" data-color="red" onclick="selectColor('red')"
+                            style="background: #ef4444;"></div>
+                        <div class="color-circle" data-color="purple" onclick="selectColor('purple')"
+                            style="background: #a855f7;"></div>
+                        <div class="color-circle" data-color="yellow" onclick="selectColor('yellow')"
+                            style="background: #eab308;"></div>
+                        <div class="color-circle" data-color="orange" onclick="selectColor('orange')"
+                            style="background: #f97316;"></div>
+                    </div>
+                    <input type="hidden" id="rec-cor" value="green">
+                    <div class="gestao-flex-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label
+                                style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Escolha
+                                um Ícone:</label>
+                            <div class="icon-selector" id="icon-picker">
+                                <div class="icon-box active" data-icon="shield" onclick="selectIcon('shield')"
+                                    title="Escudo / Segurança"><i data-lucide="shield"></i></div>
+                                <div class="icon-box" data-icon="book-open" onclick="selectIcon('book-open')"
+                                    title="Livro / Estudo"><i data-lucide="book-open"></i></div>
+                                <div class="icon-box" data-icon="lock" onclick="selectIcon('lock')"
+                                    title="Cadeado / Encriptação"><i data-lucide="lock"></i></div>
+                                <div class="icon-box" data-icon="key" onclick="selectIcon('key')"
+                                    title="Chave / Password"><i data-lucide="key"></i></div>
+                                <div class="icon-box" data-icon="alert-triangle" onclick="selectIcon('alert-triangle')"
+                                    title="Aviso / Perigo"><i data-lucide="alert-triangle"></i></div>
+                                <div class="icon-box" data-icon="file-text" onclick="selectIcon('file-text')"
+                                    title="Documento / Ficheiro"><i data-lucide="file-text"></i></div>
+                                <div class="icon-box" data-icon="monitor" onclick="selectIcon('monitor')"
+                                    title="Computador / Sistema"><i data-lucide="monitor"></i></div>
+                                <div class="icon-box" data-icon="video" onclick="selectIcon('video')" title="Vídeo"><i
+                                        data-lucide="video"></i></div>
+                            </div>
+                            <input type="hidden" id="rec-icone" value="shield">
+                        </div>
+                    </div>
+                </div>
+                <div class="gestao-panel-section">
+                    <h3 class="gestao-panel-title green">2. Conteúdo da Página HTML</h3>
+                    <div id="seccoes-container"></div>
+                    <div style="text-align: center;"><button type="button" class="btn btn-secondary"
+                            onclick="adicionarSeccao()">+ Adicionar Outro Retângulo</button></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-recurso')">Cancelar</button>
+                    <button type="submit" id="btn-submit-recurso" class="btn btn-primary"
+                        style="background-color: #10b981;">Gravar e Gerar HTML</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-quiz" class="modal">
+        <div class="modal-content">
+            <h2 id="titulo-modal-quiz">Adicionar Pergunta à BD</h2>
+            <form id="form-quiz" onsubmit="salvarPergunta(event)">
+                <div class="form-group"><label>Categoria</label><input type="text" id="quiz-cat" required></div>
+                <div class="form-group">
+                    <label>Dificuldade</label>
+                    <select id="quiz-diff">
+                        <option value="facil">Fácil</option>
+                        <option value="medio">Médio</option>
+                        <option value="dificil">Difícil</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>A Pergunta</label><textarea id="quiz-texto" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Opções de Resposta (Marque a certa)</label>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio0" value="0" required> <input
+                            type="text" id="op0" placeholder="Opção 1" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input
+                            type="text" id="op1" placeholder="Opção 2" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input
+                            type="text" id="op2" placeholder="Opção 3" required></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quiz')">Cancelar</button>
+                    <button type="submit" id="btn-submit-quiz" class="btn btn-primary"
+                        style="background-color: #10b981;">Guardar Pergunta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-confirmacao" class="modal" style="z-index: 99999 !important;">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #ef4444;"><i
+                    data-lucide="alert-triangle" style="width: 48px; height: 48px;"></i></div>
+            <h2>Atenção</h2>
+            <p id="texto-confirmacao" style="margin: 20px 0; color: var(--text-color);">Tem a certeza?</p>
+            <div class="modal-actions" style="justify-content: center; gap: 15px;">
+                <button type="button" class="btn btn-secondary" id="btn-cancelar-confirmacao">Cancelar</button>
+                <button type="button" class="btn" id="btn-aceitar-confirmacao"
+                    style="background-color: #ef4444; color: white; border-color: #ef4444;">Confirmar Ação</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-sucesso" class="modal" style="z-index: 99998 !important;">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #10b981;"><i
+                    data-lucide="check-circle" style="width: 54px; height: 54px;"></i></div>
+            <h2>Sucesso!</h2>
+            <p id="texto-sucesso" style="margin: 20px 0; color: var(--text-color); font-size: 1.1rem;"></p>
+            <div class="modal-actions" style="justify-content: center;">
+                <button type="button" class="btn btn-primary" onclick="closeModal('modal-sucesso')"
+                    style="background-color: #10b981; border-color: #10b981;">Ok</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    lucide.createIcons();
+
+    // --- Variáveis e Tabs ---
+    let editandoRecursoId = null;
+    let editandoQuizId = null;
+    let editandoQuizAtividadeId = null;
+
+    let allQuizzes = [];
+    let sortDiffDir = null;
+    let sortIdDir = null;
+    const diffWeights = { 'facil': 1, 'medio': 2, 'dificil': 3 };
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.gestao-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function openModal(id) { 
+        document.getElementById(id).classList.add('active'); 
+    }
+
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('active'); 
+    }
+
+    function selectColor(color) {
+        document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
+        document.querySelector(`.color-circle[data-color="${color}"]`).classList.add('active');
+        document.getElementById('rec-cor').value = color;
+    }
+
+    function selectIcon(iconName) {
+        document.querySelectorAll('.icon-box').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.icon-box[data-icon="${iconName}"]`).classList.add('active');
+        document.getElementById('rec-icone').value = iconName;
+    }
+
+    // --- Utils: Confirmações e Alertas ---
+    function confirmarAcao(mensagem) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('modal-confirmacao');
+            const texto = document.getElementById('texto-confirmacao');
+            const btnAceitar = document.getElementById('btn-aceitar-confirmacao');
+            const btnCancelar = document.getElementById('btn-cancelar-confirmacao');
+            
+            texto.textContent = mensagem;
+            openModal('modal-confirmacao');
+            lucide.createIcons();
+            
+            const novoBtnAceitar = btnAceitar.cloneNode(true);
+            const novoBtnCancelar = btnCancelar.cloneNode(true);
+            
+            btnAceitar.parentNode.replaceChild(novoBtnAceitar, btnAceitar);
+            btnCancelar.parentNode.replaceChild(novoBtnCancelar, btnCancelar);
+            
+            novoBtnAceitar.addEventListener('click', () => { 
+                closeModal('modal-confirmacao'); 
+                resolve(true); 
+            });
+            
+            novoBtnCancelar.addEventListener('click', () => { 
+                closeModal('modal-confirmacao'); 
+                resolve(false); 
+            });
+        });
+    }
+
+    function mostrarSucesso(mensagem) {
+        document.getElementById('texto-sucesso').textContent = mensagem;
+        openModal('modal-sucesso');
         lucide.createIcons();
+    }
 
-        // Funções de Controlo do Modal
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    // ==========================================
+    // LÓGICA TURMAS (PROFESSOR)
+    // ==========================================
+    async function carregarTurmas() {
+        try {
+            const res = await fetch('/api/professor/turmas');
+            
+            if (res.redirected && res.url.includes('404.html')) { 
+                window.location.href = '/404.html'; 
+                return; 
+            }
+            
+            const turmas = await res.json();
+            const tbody = document.getElementById('turmas-tbody');
+            tbody.innerHTML = '';
+            
+            if (turmas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Ainda não criaste nenhuma turma.</td></tr>';
+                return;
+            }
+            
+            turmas.forEach(t => {
+                const nomeEscola = t.escola ? t.escola.nome : 'Escola não definida';
+                const codigoAcesso = t.codigo_acesso ? t.codigo_acesso : 'N/A';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#${t.id_turma}</strong></td>
+                        <td>${nomeEscola}</td>
+                        <td><strong>${t.nome}</strong></td>
+                        <td>${t.ano_letivo}</td>
+                        <td><span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 15px; font-weight: bold; letter-spacing: 1px; color: var(--text-color);">${codigoAcesso}</span></td>
+                        <td>
+                            <button type="button" class="btn-edit" onclick="abrirEdicaoTurma(${t.id_turma}, '${t.nome}', '${t.ano_letivo}')" title="Editar Turma" style="margin-right: 8px;"><i data-lucide="edit" style="width: 16px; height: 16px;"></i> Editar</button>
+                            <button type="button" class="btn-edit" onclick="verAlunosTurma(${t.id_turma})" title="Ver Alunos"><i data-lucide="users" style="width: 16px; height: 16px;"></i> Ver Alunos</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            lucide.createIcons();
+        } catch (error) { 
+            console.error("Erro ao carregar turmas:", error); 
+        }
+    }
 
-        // ==========================================
-        // LÓGICA DAS TURMAS
-        // ==========================================
+    function prepararNovaTurma() { 
+        document.getElementById('form-turma').reset(); 
+        openModal('modal-turma'); 
+    }
 
-        // 1. Carregar turmas da Base de Dados
-        async function carregarTurmas() {
-            try {
-                const res = await fetch('/api/professor/turmas');
+    async function salvarTurma(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-submit-turma'); 
+        btn.textContent = 'A guardar...'; 
+        btn.disabled = true;
+        
+        const payload = { 
+            nome: document.getElementById('turma-nome').value, 
+            ano_letivo: document.getElementById('turma-ano').value 
+        };
+        
+        try {
+            const res = await fetch('/api/professor/turmas', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            let data = await res.json();
+            
+            if (res.ok) { 
+                closeModal('modal-turma'); 
+                carregarTurmas(); 
+                mostrarSucesso('A tua nova turma foi criada com sucesso! Partilha o código com os alunos.'); 
+            } else { 
+                alert("Erro: " + (data.error || "Não foi possível criar a turma.")); 
+            }
+        } catch (err) { 
+            alert("Erro de comunicação com o servidor."); 
+        } finally { 
+            btn.textContent = 'Guardar Turma'; 
+            btn.disabled = false; 
+        }
+    }
 
-                // NOVO: Verifica se o servidor nos empurrou para a página de erro (404)
-                if (res.redirected && res.url.includes('404.html')) {
-                    window.location.href = '/404.html';
-                    return;
-                }
+    function abrirEdicaoTurma(id, nome, ano) {
+        document.getElementById('edit-turma-id').value = id;
+        document.getElementById('edit-turma-nome').value = nome;
+        document.getElementById('edit-turma-ano').value = ano;
+        openModal('modal-editar-turma');
+    }
 
-                const turmas = await res.json();
-                const tbody = document.getElementById('turmas-tbody');
-                tbody.innerHTML = '';
+    async function salvarEdicaoTurma(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-turma-id').value;
+        const btn = document.getElementById('btn-submit-edit-turma'); 
+        btn.textContent = 'A guardar...'; 
+        btn.disabled = true;
+        
+        const payload = { 
+            nome: document.getElementById('edit-turma-nome').value, 
+            ano_letivo: document.getElementById('edit-turma-ano').value 
+        };
+        
+        try {
+            const res = await fetch(`/api/professor/turmas/${id}`, { 
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            
+            if (res.ok) { 
+                closeModal('modal-editar-turma'); 
+                carregarTurmas(); 
+                mostrarSucesso('As informações do esquadrão foram atualizadas!'); 
+            } else { 
+                alert('Erro ao atualizar a turma.'); 
+            }
+        } catch (err) { 
+            alert('Erro de ligação.'); 
+        } finally { 
+            btn.textContent = 'Guardar'; 
+            btn.disabled = false; 
+        }
+    }
 
-                if (turmas.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6"  style="text-align: center; padding: 20px;">Ainda não criaste nenhuma turma.</td></tr>';
-                    return;
-                }
-
-                turmas.forEach(t => {
-                    const nomeEscola = t.escola ? t.escola.nome : 'Escola não definida';
-                    const codigoAcesso = t.codigo_acesso ? t.codigo_acesso : 'N/A';
-
+    async function verAlunosTurma(idTurma) {
+        const tbody = document.getElementById('alunos-tbody');
+        const msgVazio = document.getElementById('msg-sem-alunos');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">A recolher dados...</td></tr>';
+        msgVazio.style.display = 'none';
+        openModal('modal-ver-alunos');
+        
+        try {
+            const res = await fetch(`/api/professor/turmas/${idTurma}/alunos`);
+            const alunos = await res.json();
+            tbody.innerHTML = '';
+            
+            if (alunos.length === 0) { 
+                msgVazio.style.display = 'block'; 
+            } else {
+                alunos.forEach(a => {
                     tbody.innerHTML += `
                         <tr>
-                            <td><strong>#${t.id_turma}</strong></td>
-                            <td>${nomeEscola}</td>
-                            <td><strong>${t.nome}</strong></td>
-                            <td>${t.ano_letivo}</td>
-                            <td>
-                                <span  style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 15px; font-weight: bold; letter-spacing: 1px; color: var(--text-color);">
-                                    ${codigoAcesso}
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn-edit" onclick="alert('Funcionalidade de ver alunos em desenvolvimento!')" title="Ver Alunos">
-                                    <i data-lucide="eye"  style="width: 16px; height: 16px;"></i> Ver Alunos
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                            <td><strong>${a.nome}</strong></td>
+                            <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${a.email}</span></td>
+                            <td><span style="font-weight: bold; color: var(--primary-color);">${a.pontos_totais || 0} pts</span></td>
+                            <td><button type="button" class="btn-danger" onclick="removerAlunoDaTurma(${idTurma}, '${a.id_utilizador}')" title="Remover Aluno" style="padding: 6px; border-radius: 6px;"><i data-lucide="user-minus" style="width: 18px; height: 18px;"></i></button></td>
+                        </tr>`;
                 });
-                lucide.createIcons();
-            } catch (error) {
-                console.error("Erro ao carregar turmas:", error);
             }
+            lucide.createIcons();
+        } catch (e) { 
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #ef4444;">Erro ao carregar ficheiros.</td></tr>'; 
         }
+    }
 
-        // 2. Preparar o Modal para nova turma
-        function prepararNovaTurma() {
-            document.getElementById('form-turma').reset();
-            openModal('modal-turma');
-        }
-
-        // 3. Salvar Turma no Servidor
-        async function salvarTurma(e) {
-            e.preventDefault();
-
-            const btn = document.getElementById('btn-submit-turma');
-            btn.textContent = 'A guardar...';
-            btn.disabled = true;
-
-            const payload = {
-                nome: document.getElementById('turma-nome').value,
-                ano_letivo: document.getElementById('turma-ano').value
-            };
-
-            try {
-                const res = await fetch('/api/professor/turmas', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                // NOVO: Proteção contra logout repentino durante a submissão
-                if (res.redirected && res.url.includes('404.html')) {
-                    window.location.href = '/404.html';
-                    return;
-                }
-
-                // Tenta ler o JSON com segurança
-                let data;
-                try {
-                    data = await res.json();
-                } catch (parseError) {
-                    throw new Error("O servidor não devolveu os dados no formato esperado.");
-                }
-
-                if (res.ok) {
-                    closeModal('modal-turma');
-                    carregarTurmas(); // Recarrega a tabela imediatamente sem erros
-                } else {
-                    alert("Erro: " + (data.error || "Não foi possível criar a turma."));
-                }
-            } catch (err) {
-                console.error("Erro no fetch:", err);
-                alert("Erro de comunicação com o servidor.");
-            } finally {
-                btn.textContent = 'Guardar Turma';
-                btn.disabled = false;
+    async function removerAlunoDaTurma(idTurma, idAluno) {
+        const confirmado = await confirmarAcao("Tem a certeza absoluta? O aluno será expulso deste esquadrão.");
+        if (!confirmado) return;
+        
+        try {
+            const res = await fetch(`/api/professor/turmas/${idTurma}/alunos/${idAluno}/remover`, { 
+                method: 'PUT', 
+                headers: { 'Content-Type': 'application/json' } 
+            });
+            
+            if (res.ok) { 
+                mostrarSucesso("Aluno removido com sucesso."); 
+                verAlunosTurma(idTurma); 
+            } else { 
+                const data = await res.json(); 
+                alert("Erro: " + (data.error || "Desconhecido")); 
             }
+        } catch (e) { 
+            alert("Erro de comunicação com o servidor."); 
+        }
+    }
+
+    // ==========================================
+    // LÓGICA RECURSOS (PROFESSOR)
+    // ==========================================
+    async function carregarRecursos() {
+        const res = await fetch('/api/professor/resources');
+        const dados = await res.json();
+        const tbody = document.getElementById('resources-tbody');
+        tbody.innerHTML = '';
+        
+        dados.forEach(r => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>#${r.id_material}</strong></td>
+                    <td><div style="display: flex; align-items: center; gap: 8px;"><span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--color-${r.cor_card || 'blue'});"></span> <i data-lucide="${r.icone_card || 'book'}" style="width: 18px; height: 18px; color: var(--text-secondary);"></i></div></td>
+                    <td><strong>${r.titulo}</strong></td>
+                    <td>${r.tipo}</td>
+                    <td><code>${r.url_conteudo}</code></td>
+                    <td>
+                        <button type="button" class="btn-edit" onclick="editarRecurso(${r.id_material})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width: 16px; height: 16px;"></i></button>
+                        <button type="button" class="btn-danger" onclick="apagarRecurso(${r.id_material})" title="Apagar"><i data-lucide="trash-2" style="width: 16px; height: 16px;"></i></button>
+                    </td>
+                </tr>`;
+        });
+        lucide.createIcons();
+    }
+
+    function adicionarSeccao(icone = 'info', titulo = '', texto = '') {
+        const container = document.getElementById('seccoes-container');
+
+        // As opções curadas para as secções
+        const opcoes = [
+            { val: 'info', nome: 'Informação (ℹ️)' },
+            { val: 'alert-triangle', nome: 'Atenção / Perigo (⚠️)' },
+            { val: 'check-circle', nome: 'Sucesso / Boa Prática (✅)' },
+            { val: 'shield', nome: 'Segurança / Escudo (🛡️)' },
+            { val: 'lock', nome: 'Privacidade / Cadeado (🔒)' },
+            { val: 'terminal', nome: 'Código / Consola (💻)' },
+            { val: 'help-circle', nome: 'Dúvida / Pergunta (❓)' }
+        ];
+
+        // Gera as opções do <select> e seleciona a que veio da BD (se estivermos a editar)
+        let opcoesHTML = opcoes.map(op =>
+            `<option value="${op.val}" ${icone === op.val ? 'selected' : ''}>${op.nome}</option>`
+        ).join('');
+
+        const html = `
+            <div class="form-group seccao-item">
+                <div class="gestao-flex-row">
+                    <div style="flex: 1;">
+                        <label>Ícone da Secção</label>
+                        <select class="sec-icon form-input" required>
+                            ${opcoesHTML}
+                        </select>
+                    </div>
+                    <div style="flex: 2;">
+                        <label>Título da Secção</label>
+                        <input type="text" class="sec-title form-input" value="${titulo}" placeholder="Ex: O que é Phishing?" required>
+                    </div>
+                </div>
+                <label>Texto da Secção</label>
+                <textarea class="sec-text form-input" rows="4" placeholder="Escreve o conteúdo aqui..." required>${texto}</textarea>
+            </div>`;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function prepararNovoRecurso() {
+        editandoRecursoId = null; 
+        document.getElementById('form-recurso').reset();
+        document.getElementById('seccoes-container').innerHTML = ''; 
+        adicionarSeccao();
+        document.getElementById('titulo-modal-recurso').textContent = 'Criar Novo Recurso'; 
+        document.getElementById('btn-submit-recurso').textContent = 'Gravar e Gerar HTML';
+        openModal('modal-recurso');
+    }
+
+    async function editarRecurso(id) {
+        editandoRecursoId = id;
+        const res = await fetch(`/api/gestao/resources/${id}`); // O get individual usa a rota de gestao pois é público no backend
+        const r = await res.json();
+        
+        document.getElementById('rec-titulo').value = r.titulo;
+        document.getElementById('rec-cat').value = r.tipo || '';
+        document.getElementById('rec-desc').value = r.descricao;
+        document.getElementById('rec-cor').value = r.cor_card;
+        document.getElementById('rec-icone').value = r.icone_card;
+        
+        document.querySelectorAll('.color-circle').forEach(c => { 
+            c.classList.remove('active'); 
+            if (c.getAttribute('data-color') === r.cor_card) c.classList.add('active'); 
+        });
+
+        // Selecionar o ícone visualmente ao editar
+        const iconeSalvo = r.icone_card || 'shield';
+        const iconBox = document.querySelector(`.icon-box[data-icon="${iconeSalvo}"]`);
+        
+        if (iconBox) {
+            selectIcon(iconeSalvo);
+        } else {
+            // Se por acaso o ícone antigo não estiver na grelha, assumimos o shield
+            selectIcon('shield');
+        }
+        
+        const container = document.getElementById('seccoes-container'); 
+        container.innerHTML = '';
+        let seccoesGuardadas = []; 
+        
+        if (r.seccoes) { 
+            try { 
+                seccoesGuardadas = JSON.parse(r.seccoes); 
+            } catch (e) { } 
+        }
+        
+        if (seccoesGuardadas.length > 0) { 
+            seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto)); 
+        } else { 
+            adicionarSeccao(); 
+        }
+        
+        document.getElementById('titulo-modal-recurso').textContent = 'Editar Recurso #' + id; 
+        document.getElementById('btn-submit-recurso').textContent = 'Atualizar Recurso'; 
+        openModal('modal-recurso');
+    }
+
+    async function salvarRecurso(e) {
+        e.preventDefault();
+        let seccoesArray = [];
+        const icones = document.querySelectorAll('.sec-icon');
+        const titulos = document.querySelectorAll('.sec-title');
+        const textos = document.querySelectorAll('.sec-text');
+        
+        for (let i = 0; i < titulos.length; i++) {
+            seccoesArray.push({ icone: icones[i].value, titulo: titulos[i].value, texto: textos[i].value });
         }
 
-        // Iniciar o carregamento assim que a página abre
-        document.addEventListener('DOMContentLoaded', carregarTurmas);
-    </script>
+        const tituloInserido = document.getElementById('rec-titulo').value;
+
+        // Cria um link automático limpo e adiciona o prefixo "resource-"
+        // Ex: "O que é Phishing?" -> "resource-o-que-e-phishing"
+        const slug = tituloInserido
+            .toLowerCase()
+            .normalize("NFD") // Separa os acentos das letras
+            .replace(/[\u0300-\u036f]/g, "") // Remove os acentos
+            .replace(/[^a-z0-9 ]/g, "") // Remove caracteres especiais como ? ! @
+            .trim()
+            .replace(/\s+/g, '-'); // Troca espaços por traços
+
+        const urlGeradaAutomatica = `resource-${slug}`; // Adiciona o prefixo aqui!
+
+        const payload = {
+            titulo: tituloInserido,
+            tipo: document.getElementById('rec-cat').value,
+            descricao: document.getElementById('rec-desc').value,
+            cor_card: document.getElementById('rec-cor').value,
+            icone_card: document.getElementById('rec-icone').value,
+            url_conteudo: urlGeradaAutomatica, // Usa a variável atualizada
+            seccoes: seccoesArray
+        };
+
+        const btn = document.getElementById('btn-submit-recurso');
+        btn.textContent = 'A gravar...';
+        btn.disabled = true;
+
+        const url = editandoRecursoId ? `/api/professor/resources/${editandoRecursoId}` : '/api/professor/resources';
+        const metodo = editandoRecursoId ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, { 
+                method: metodo, 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            });
+            
+            if (res.ok) {
+                closeModal('modal-recurso');
+                carregarRecursos();
+                mostrarSucesso(editandoRecursoId ? 'Recurso atualizado!' : 'Novo recurso criado!');
+            } else {
+                alert("Erro ao guardar recurso.");
+            }
+        } catch (err) { 
+            alert("Erro de ligação."); 
+        } finally { 
+            btn.textContent = editandoRecursoId ? 'Atualizar Recurso' : 'Gravar e Gerar HTML'; 
+            btn.disabled = false; 
+        }
+    }
+
+    async function apagarRecurso(id) {
+        const confirmado = await confirmarAcao('Tem a certeza? O recurso será eliminado da tua lista e apagado do sistema.');
+        if (confirmado) { 
+            await fetch(`/api/professor/resources/${id}`, { method: 'DELETE' }); 
+            carregarRecursos(); 
+        }
+    }
+
+    // ==========================================
+    // LÓGICA QUIZZES (PROFESSOR)
+    // ==========================================
+    async function carregarQuizzes() {
+        const res = await fetch('/api/professor/quizzes');
+        allQuizzes = await res.json();
+        const categoriasUnicas = [...new Set(allQuizzes.map(q => q.categoria))];
+        const filterSelect = document.getElementById('filter-categoria'); 
+        const valorAtual = filterSelect.value || 'todas';
+        
+        filterSelect.innerHTML = '<option value="todas">Todas</option>'; 
+        categoriasUnicas.forEach(cat => filterSelect.innerHTML += `<option value="${cat}">${cat}</option>`); 
+        filterSelect.value = valorAtual;
+        renderQuizzes();
+    }
+
+    function toggleSortDificuldade() { 
+        sortIdDir = null; 
+        sortDiffDir = sortDiffDir === 'asc' ? 'desc' : 'asc'; 
+        renderQuizzes(); 
+    }
+    
+    function toggleSortID() { 
+        sortDiffDir = null; 
+        sortIdDir = sortIdDir === 'asc' ? 'desc' : 'asc'; 
+        renderQuizzes(); 
+    }
+
+    function renderQuizzes() {
+        const tbody = document.getElementById('quizzes-tbody'); 
+        tbody.innerHTML = '';
+        const categoriaSelecionada = document.getElementById('filter-categoria').value;
+        let quizzesFiltrados = [...allQuizzes];
+        
+        if (categoriaSelecionada !== 'todas') { 
+            quizzesFiltrados = quizzesFiltrados.filter(q => q.categoria === categoriaSelecionada); 
+        }
+        
+        if (sortDiffDir !== null) { 
+            quizzesFiltrados.sort((a, b) => { 
+                const pesoA = diffWeights[a.dificuldade] || 0; 
+                const pesoB = diffWeights[b.dificuldade] || 0; 
+                return sortDiffDir === 'asc' ? pesoA - pesoB : pesoB - pesoA; 
+            }); 
+        }
+        
+        if (sortIdDir !== null) { 
+            quizzesFiltrados.sort((a, b) => sortIdDir === 'asc' ? a.id_pergunta - b.id_pergunta : b.id_pergunta - a.id_pergunta); 
+        }
+        
+        quizzesFiltrados.forEach(q => {
+            let badge = q.dificuldade === 'facil' ? '🟢' : q.dificuldade === 'medio' ? '🟡' : '🔴';
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>#${q.id_pergunta}</strong></td>
+                    <td><span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">${q.categoria}</span></td>
+                    <td>${badge} <span style="text-transform: capitalize;">${q.dificuldade}</span></td>
+                    <td title="${q.texto_pergunta}" style="max-width: 350px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q.texto_pergunta}</td>
+                    <td>
+                        <button type="button" class="btn-edit" onclick="editarQuiz(${q.id_pergunta})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width: 16px; height: 16px;"></i></button>
+                        <button type="button" class="btn-danger" onclick="apagarQuiz(${q.id_pergunta})" title="Apagar"><i data-lucide="trash-2" style="width: 16px; height: 16px;"></i></button>
+                    </td>
+                </tr>`;
+        });
+        lucide.createIcons();
+    }
+
+    function prepararNovoQuiz() {
+        editandoQuizId = null; 
+        editandoQuizAtividadeId = null; 
+        document.getElementById('form-quiz').reset();
+        document.getElementById('titulo-modal-quiz').textContent = 'Adicionar Pergunta à BD'; 
+        document.getElementById('btn-submit-quiz').textContent = 'Guardar Pergunta'; 
+        openModal('modal-quiz');
+    }
+
+    async function editarQuiz(id) {
+        editandoQuizId = id;
+        const res = await fetch(`/api/gestao/quizzes/${id}`);
+        const data = await res.json();
+        const q = data.pergunta; 
+        editandoQuizAtividadeId = q.id_atividade;
+
+        document.getElementById('quiz-cat').value = q.categoria;
+        document.getElementById('quiz-diff').value = q.dificuldade;
+        document.getElementById('quiz-texto').value = q.texto_pergunta;
+        document.querySelectorAll('input[name="correta"]').forEach(r => r.checked = false);
+
+        data.opcoes.forEach((op, index) => {
+            const inputTexto = document.getElementById('op' + index);
+            if (inputTexto) {
+                inputTexto.value = op.texto_opcao; 
+                if (op.e_correta === true) document.getElementById('radio' + index).checked = true;
+            }
+        });
+
+        document.getElementById('titulo-modal-quiz').textContent = 'Editar Pergunta #' + id; 
+        document.getElementById('btn-submit-quiz').textContent = 'Atualizar Pergunta'; 
+        openModal('modal-quiz');
+    }
+
+    async function salvarPergunta(e) {
+        e.preventDefault();
+        let opcoesArray = [
+            document.getElementById('op0').value, 
+            document.getElementById('op1').value, 
+            document.getElementById('op2').value
+        ];
+
+        if (document.getElementById('op3') && document.getElementById('op3').value !== '') {
+            opcoesArray.push(document.getElementById('op3').value);
+        }
+
+        const payload = { 
+            texto_pergunta: document.getElementById('quiz-texto').value, 
+            categoria: document.getElementById('quiz-cat').value, 
+            dificuldade: document.getElementById('quiz-diff').value, 
+            opcoes: opcoesArray, 
+            corretaIndex: document.querySelector('input[name="correta"]:checked').value, 
+            id_atividade: editandoQuizAtividadeId 
+        };
+        
+        // IMPORTANTE: Nota que para o POST e PUT do quiz estou a usar a rota do admin, a tua rota original está perfeitamente bem.
+        const url = editandoQuizId ? `/api/gestao/quizzes/${editandoQuizId}` : '/api/gestao/quiz';
+        const metodo = editandoQuizId ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, { 
+            method: metodo, 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(payload) 
+        });
+        
+        if (res.ok) { 
+            closeModal('modal-quiz'); 
+            carregarQuizzes(); 
+            mostrarSucesso(editandoQuizId ? 'Pergunta atualizada com sucesso!' : 'Nova pergunta adicionada!'); 
+        }
+    }
+
+    async function apagarQuiz(id) {
+        const confirmado = await confirmarAcao('Tem a certeza? As opções ligadas a esta pergunta também serão apagadas.');
+        if (confirmado) { 
+            await fetch(`/api/gestao/quizzes/${id}`, { method: 'DELETE' }); 
+            carregarQuizzes(); 
+        }
+    }
+
+    // --- INICIALIZAÇÃO DA PÁGINA ---
+    document.addEventListener('DOMContentLoaded', () => {
+        carregarTurmas();
+        carregarRecursos();
+        carregarQuizzes();
+    });
+
+</script>
 </body>
-
 </html>

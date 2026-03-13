@@ -1,8 +1,9 @@
-/* Estilos para o Modal de Seleção de Avatar do perfil*/
+/* =========================================================
+   ESTILOS GLOBAIS PARA TODOS OS MODAIS (Pop-ups)
+   ========================================================= */
 
-
-/* Pop-up (Modal) - Wrapper Principal */
-.avatar-modal {
+/* 1. Wrapper Principal do Modal */
+.modal, .avatar-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,22 +12,28 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 9999; /* Fica por cima de todos os elementos (ex: navbar) */
     
-    /* Controla apenas se o modal está ativo ou não */
-    visibility: visible;
-    transition: visibility 0.3s; 
-}
-
-/* Estado FECHADO do Wrapper */
-.avatar-modal.hidden {    
-    visibility: hidden;     
+    /* Oculto por defeito para não bloquear a página */
+    visibility: hidden;
     pointer-events: none;
-    display: flex !important; 
+    transition: visibility 0.3s;
 }
 
-/* Fundo com Blur! */
-.avatar-modal-overlay {
+/* O Modal fica visível quando ativado via JavaScript */
+.modal.active {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.avatar-modal:not(.hidden) {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 2. O Fundo Escuro com Blur (Criado automaticamente) */
+.modal::before, .avatar-modal-overlay {
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -36,18 +43,24 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     
-    opacity: 1;
-    transform: translateZ(0); /* Força a criação de uma nova camada para melhor performance */
+    opacity: 0;
+    transform: translateZ(0);
     transition: opacity 0.3s ease;
+    z-index: 1000;
 }
 
-/* Fundo FECHADO */
+/* Mostrar Fundo Blur quando ativo */
+.modal.active::before,
+.avatar-modal:not(.hidden) .avatar-modal-overlay {
+    opacity: 1;
+}
+
 .avatar-modal.hidden .avatar-modal-overlay {
     opacity: 0;
 }
 
-/* Caixa Branca */
-.avatar-modal-content {
+/* 3. A Caixa Branca do Conteúdo */
+.modal-content, .avatar-modal-content {
     position: relative;
     background: white;
     padding: 2rem;
@@ -55,26 +68,40 @@
     width: 90%;
     max-width: 600px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    z-index: 1001; 
-
-    opacity: 1;
-    transform: scale(1);
+    z-index: 1001;
+    
+    /* Animação de entrada (surge e aumenta suavemente) */
+    opacity: 0;
+    transform: scale(0.95);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    
+    /* Previne que o modal fique maior que o ecrã e cria scroll se necessário */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-/* Estado FECHADO da Caixa Branca */
+/* Mostrar Caixa quando ativo */
+.modal.active .modal-content,
+.avatar-modal:not(.hidden) .avatar-modal-content {
+    opacity: 1;
+    transform: scale(1);
+}
+
 .avatar-modal.hidden .avatar-modal-content {
     opacity: 0;
     transform: scale(0.95);
 }
 
-/* Modo Escuro */
+/* Modo Escuro Global para Modais */
+body.dark-mode .modal-content,
 body.dark-mode .avatar-modal-content {
     background: #1e293b;
     color: white;
+    border: 1px solid #334155;
 }
 
-.avatar-modal-header {
+/* 4. Cabeçalhos e Botões de Fechar */
+.modal-header, .avatar-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -86,9 +113,26 @@ body.dark-mode .avatar-modal-content {
     border: none;
     cursor: pointer;
     color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 8px;
+    transition: background 0.2s;
 }
 
-/* Grelha de Imagens */
+.close-modal-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .close-modal-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================================
+   ESTILOS ESPECÍFICOS: SELEÇÃO DE AVATAR (Perfil)
+   ========================================================= */
+
 .avatar-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -110,13 +154,12 @@ body.dark-mode .avatar-modal-content {
     border-color: #3b82f6;
 }
 
-
-/* ====== Avatar Upload Section ====== */
 .upload-divider {
     text-align: center;
     margin: 1.5rem 0;
     position: relative;
 }
+
 .upload-divider::before {
     content: "";
     position: absolute;
@@ -124,6 +167,7 @@ body.dark-mode .avatar-modal-content {
     border-top: 1px solid #e2e8f0;
     z-index: 1;
 }
+
 .upload-divider span {
     background: white;
     padding: 0 10px;
@@ -131,6 +175,7 @@ body.dark-mode .avatar-modal-content {
     position: relative;
     z-index: 2;
 }
+
 body.dark-mode .upload-divider span { background: #1e293b; }
 body.dark-mode .upload-divider::before { border-top-color: #334155; }
 
@@ -138,6 +183,7 @@ body.dark-mode .upload-divider::before { border-top-color: #334155; }
     display: flex;
     justify-content: center;
 }
+
 .upload-btn {
     display: flex;
     align-items: center;
@@ -150,11 +196,10 @@ body.dark-mode .upload-divider::before { border-top-color: #334155; }
     transition: all 0.2s;
     border: 1px dashed #cbd5e1;
 }
+
 .upload-btn:hover { background: #e0f2fe; border-color: #3b82f6; }
 body.dark-mode .upload-btn { background: #334155; border-color: #475569; }
 
-
-/* Secção de Fotos Pessoais (Google e Uploads) */
 .personal-avatars-section {
     display: flex;
     justify-content: center;
@@ -169,14 +214,12 @@ body.dark-mode .upload-btn { background: #334155; border-color: #475569; }
     gap: 0.5rem;
 }
 
-/* Tamanho fixo para as bolinhas pessoais (um pouco mais pequenas que a grelha) */
 .personal-avatar-wrapper .avatar-option {
     width: 70px;
     height: 70px;
     margin: 0; 
 }
 
-/* Estilo do texto "Google" ou "Último Upload" */
 .personal-avatar-label {
     font-size: 0.85rem;
     color: #64748b;
@@ -187,14 +230,96 @@ body.dark-mode .personal-avatar-label {
     color: #94a3b8;
 }
 
-
-/* Efeito para o Avatar Atualmente Selecionado */
 .avatar-option.active-avatar {
-    border: 3px solid #3b82f6; /* Azul CiberHeróis */
+    border: 3px solid #3b82f6;
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
 
 .avatar-option.active-avatar:hover {
     transform: scale(1.05); 
+}
+
+
+/* =========================================================
+   ESTILOS PARA AVISOS SEM LOGIN (INDEX)
+   ========================================================= */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: white;
+    color: #0f172a;
+    /* Demos um pouco mais de espaço no topo (25px) para o botão X não ficar em cima do texto */
+    padding: 25px 20px 15px 20px; 
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10000;
+    width: 90%;
+    max-width: 350px;
+    
+    /* GARANTIA DE QUE FICA ESCONDIDO ATÉ SER CHAMADO */
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease, visibility 0s 0.4s;
+}
+
+/* Quando a notificação está ativa */
+.toast-notification.active {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease, visibility 0s 0s;
+}
+
+/* Modo escuro para o Toast */
+body.dark-mode .toast-notification {
+    background-color: #1e293b;
+    color: white;
+    border: 1px solid #334155;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* O NOVO BOTÃO X - Canto superior direito e Vermelho */
+.toast-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #ef4444; /* Cor vermelha viva */
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+    padding: 5px;
+}
+
+.toast-close:hover {
+    opacity: 1;
+    transform: scale(1.2); /* Aumenta ligeiramente ao passar o rato */
+}
+
+.toast-header {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #ef4444; /* Título também a vermelho para condizer com o aviso */
+}
+
+.toast-body {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.toast-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 5px;
 }
