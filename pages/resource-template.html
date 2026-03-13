@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Carregar Recurso... - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+</head>
+
+<body class="site-body">
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+
+    <div class="auth-container resource-detail-container" id="conteudo-recurso" style="display: none;">
+        <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos
+            Recursos</a>
+
+        <div class="resource-header">
+            <div class="resource-header-icon" id="rh-icon-container">
+                <i id="rh-icon" class="icon-32"></i>
+            </div>
+            <div>
+                <p class="resource-category" id="rh-tipo"></p>
+                <h1 class="resource-title" id="rh-titulo"></h1>
+                <p style="color: var(--text-secondary); margin-top: 8px;" id="rh-desc"></p>
+            </div>
+
+            <div class="resource-meta">
+                <span id="rh-tempo">📚 -- min de leitura</span>
+                <span>•</span>
+                <span id="rh-autor">✍️ Autor</span>
+                <span>•</span>
+                <span id="rh-data">📅 Data</span>
+            </div>
+        </div>
+
+        <div class="resource-content" id="rh-seccoes">
+        </div>
+
+        <div class="resource-buttons">
+            <button class="resource-btn resource-btn-secondary" id="btn-download-pdf">
+                <i data-lucide="download" class="icon-20"></i> Descarregar PDF
+            </button>
+        </div>
+
+        <div class="resource-cta-box">
+            <h3>Teste os seus conhecimentos!</h3>
+            <p>Faça o quiz desta categoria e ganhe pontos táticos</p>
+            <a href="quizzes.html" class="resource-cta-link">Ir para os Quizzes</a>
+        </div>
+    </div>
+
+    <div class="auth-container" id="erro-recurso" style="display: none; text-align: center; padding: 50px;">
+        <i data-lucide="alert-circle" style="width: 64px; height: 64px; color: #ef4444; margin-bottom: 20px;"></i>
+        <h2>Recurso não encontrado</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">O ficheiro que procuras não existe ou foi
+            removido.</p>
+        <a href="recursos.html" class="btn btn-primary">Voltar à Academia</a>
+    </div>
+
+    <div id="download-toast" class="toast-container">
+        <div class="toast-content">
+            <i data-lucide="loader" class="toast-icon spin-animation"></i>
+            <span class="toast-message">A preparar o PDF, por favor aguarde...</span>
+        </div>
+        <div class="toast-progress"></div>
+    </div>
+
+    <style>
+        .spin-animation { animation: loader-rotate 2s linear infinite; }
+        @keyframes loader-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .toast-container.active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
+    </style>
+
+    <script>
+        lucide.createIcons();
+
+        async function carregarRecursoDetalhe() {
+            // 1. Apanhar o ID que está no URL (ex: ?id=5)
+            const urlParams = new URLSearchParams(window.location.search);
+            const recursoId = urlParams.get('id');
+
+            if (!recursoId) {
+                document.getElementById('erro-recurso').style.display = 'block';
+                return;
+            }
+
+            try {
+                // 2. Ir buscar os dados à BD
+                // NOTA: Certifica-te que tens uma rota pública/alunos no backend que permita ler um recurso pelo ID!
+                // Ex: /api/public/resources/:id
+                const response = await fetch(`/api/gestao/resources/${recursoId}`);
+                if (!response.ok) throw new Error('Recurso não encontrado');
+
+                const r = await response.json();
+
+                // 3. Preencher o Cabeçalho
+                document.title = `${r.titulo} - CiberHeróis`;
+                document.getElementById('rh-titulo').textContent = r.titulo;
+                document.getElementById('rh-desc').textContent = r.descricao;
+                document.getElementById('rh-tipo').textContent = r.tipo ? r.tipo.charAt(0).toUpperCase() + r.tipo.slice(1) : 'Documento';
+
+                const cor = r.cor_card || 'blue';
+                const containerIcon = document.getElementById('rh-icon-container');
+                containerIcon.className = `resource-header-icon resource-header-icon-${cor}`;
+
+                document.getElementById('rh-icon').setAttribute('data-lucide', r.icone_card || 'shield');
+
+                // 4. Preencher Autor e Data
+                // Podes passar o nome do autor na query da BD, ou usar um default
+                document.getElementById('rh-autor').textContent = `✍️ Equipa CiberHeróis`;
+                document.getElementById('rh-data').textContent = `📅 ${new Date(r.data_criacao || Date.now()).toLocaleDateString('pt-PT')}`;
+
+                // 5. Montar as Secções e calcular o tempo
+                let seccoes = [];
+                try { seccoes = typeof r.seccoes === 'string' ? JSON.parse(r.seccoes) : r.seccoes; } catch (e) { }
+
+                let htmlSeccoes = '';
+                let textoCompleto = (r.titulo || '') + " " + (r.descricao || '') + " ";
+
+                if (seccoes && seccoes.length > 0) {
+                    seccoes.forEach(sec => {
+                        const icone = sec.icone || 'info';
+                        const texto = sec.texto ? String(sec.texto) : '';
+                        textoCompleto += sec.titulo + " " + texto + " ";
+
+                        htmlSeccoes += `
+                        <div class="resource-section">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <i data-lucide="${icone}" class="icon-24" style="color: var(--primary-color); margin-top: 4px;"></i>
+                                <div>
+                                    <h2>${sec.titulo}</h2>
+                                    <p>${texto.replace(/\\n/g, '<br>')}</p>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                }
+
+                document.getElementById('rh-seccoes').innerHTML = htmlSeccoes;
+
+                // 6. Calcular Tempo
+                const wpm = 225;
+                const totalPalavras = textoCompleto.trim().split(/\\s+/).filter(w => w.length > 0).length;
+                let min = Math.ceil(totalPalavras / wpm);
+                if (min < 1) min = 1;
+                document.getElementById('rh-tempo').textContent = `📚 ${min} min de leitura`;
+
+                // Mostrar Conteúdo e atualizar Ícones
+                document.getElementById('conteudo-recurso').style.display = 'block';
+                lucide.createIcons();
+
+                // 7. Configurar o botão de Download PDF
+                const urlName = r.url_conteudo ? r.url_conteudo.replace('.html', '') : r.id_material;
+                const btnDownload = document.getElementById('btn-download-pdf');
+                
+                btnDownload.onclick = function() {
+                    const toast = document.getElementById('download-toast');
+                    if (toast) {
+                        toast.classList.add('active');
+                        lucide.createIcons(); // Garante que o ícone roda
+                        setTimeout(() => { toast.classList.remove('active'); }, 3500);
+                    }
+                    window.location.href = `/api/pdf/download/${urlName}`;
+                };
+                
+            } catch (error) {
+                document.getElementById('erro-recurso').style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarRecursoDetalhe);
+    </script>
+</body>
+
+</html>

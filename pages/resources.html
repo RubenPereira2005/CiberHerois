@@ -273,11 +273,8 @@
                 const grid = document.getElementById('grid-recursos');
 
                 recursosNovos.forEach(rec => {
-                    // Garante que o link tem .html para funcionar corretamente
-                    let linkVer = rec.url_conteudo;
-                    if (!linkVer.startsWith('http') && !linkVer.endsWith('.html') && !linkVer.endsWith('.pdf')) {
-                        linkVer += '.html';
-                    }
+                    // Todos os recursos novos vão abrir usando o nosso ficheiro "molde"
+                    let linkVer = `resource-template.html?id=${rec.id_material}`;
 
                     // Previne erros caso a cor ou ícone não venham preenchidos
                     let cor = rec.cor_card || 'blue';
