@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Pesquisa - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+    <style>
+
+    </style>
+</head>
+<body class="site-body">
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+
+    <div class="auth-container">
+        <div class="search-page-header">
+            <h1 style="margin: 0;">Resultados da Pesquisa</h1>
+            <p style="color: var(--text-secondary); margin-top: 8px; font-size: 1.1rem;" id="search-subtitle">
+                A procurar...
+            </p>
+        </div>
+
+        <div id="loading-state" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+            <i data-lucide="loader" class="icon-spin" style="width: 40px; height: 40px; margin-bottom: 10px;"></i>
+            <p>A consultar a base de dados...</p>
+        </div>
+
+        <div class="users-grid" id="users-grid-container" style="display: none;">
+            </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Vai buscar a palavra pesquisada ao URL
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get('q');
+            
+            const subtitle = document.getElementById('search-subtitle');
+            const gridContainer = document.getElementById('users-grid-container');
+            const loadingState = document.getElementById('loading-state');
+
+            if (!query) {
+                subtitle.innerHTML = 'Não escreveste nada para pesquisar.';
+                loadingState.style.display = 'none';
+                return;
+            }
+
+            subtitle.innerHTML = `Resultados para "<strong>${query}</strong>"`;
+
+            try {
+                // Pede até 50 resultados ao backend
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=50`);
+                const results = await response.json();
+
+                loadingState.style.display = 'none';
+                gridContainer.style.display = 'grid';
+
+                if (results.length === 0) {
+                    gridContainer.style.display = 'block';
+                    gridContainer.innerHTML = `
+                        <div style="text-align: center; padding: 50px 0; color: var(--text-secondary);">
+                            <i data-lucide="search-x" style="width: 64px; height: 64px; opacity: 0.5; margin-bottom: 15px;"></i>
+                            <h2 style="margin-bottom: 10px;">Nenhum ciber-herói encontrado.</h2>
+                            <p>Tenta pesquisar por outro nome.</p>
+                        </div>
+                    `;
+                } else {
+                    let html = '';
+                    results.forEach(user => {
+                        // Caminho da Imagem
+                        let avatarSrc = '/img/default_avatar.png';
+                        if (user.foto_perfil) {
+                            if (user.foto_perfil.startsWith('http')) avatarSrc = user.foto_perfil;
+                            else if (user.foto_perfil.startsWith('upload-')) avatarSrc = `/img/uploads/${user.foto_perfil}`;
+                            else avatarSrc = `/img/${user.foto_perfil}`;
+                        }
+
+                        // Patente / Role
+                        let roleNome = 'Aluno';
+                        let roleClass = 'role-aluno';
+                        if (user.role === 'professor') { roleNome = 'Professor'; roleClass = 'role-professor'; }
+                        if (user.role === 'admin') { roleNome = 'Administrador'; roleClass = 'role-admin'; }
+
+                        html += `
+                            <a href="profile.html?id=${user.id_utilizador}" class="user-card">
+                                <img src="${avatarSrc}" alt="${user.nome}" class="user-card-avatar" referrerpolicy="no-referrer">
+                                <h3 class="user-card-name">${user.nome}</h3>
+                                <span class="user-card-role ${roleClass}">${roleNome}</span>
+                            </a>
+                        `;
+                    });
+                    gridContainer.innerHTML = html;
+                }
+                
+                lucide.createIcons(); // Ativa os ícones gerados
+                
+            } catch (error) {
+                loadingState.innerHTML = `<p style="color: #ef4444;">Ocorreu um erro ao carregar os resultados.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

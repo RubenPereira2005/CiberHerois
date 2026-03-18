@@ -1702,6 +1702,7 @@ body.site-body {
   background: #2563eb;
   color: #fff;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .resource-card-btn-primary:hover {
@@ -1864,10 +1865,6 @@ body.site-body {
 }
 
 /* ====== Profile Page Styles ====== */
-/* Profile Specific - Deprecated: use auth-navbar-* instead */
-
-/* Profile Main - use auth-container instead */
-
 /* ====== Profile Header ====== */
 .profile-header {
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
@@ -2687,75 +2684,6 @@ body.site-body {
   /* Verde para sucesso [cite: 32] */
 }
 
-.divider-container {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 20px 0;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: #e2e8f0;
-}
-
-.divider-text {
-  margin: 0 10px;
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-/* Estilos do botão de Reenviar */
-#resendBtn:disabled {
-  cursor: not-allowed;
-  color: var(--text-secondary);
-  opacity: 0.7;
-}
-
-#resendBtn:not(:disabled) {
-  cursor: pointer;
-  color: var(--primary-color);
-}
-
-/* Estilos das Caixinhas do Código (OTP) */
-.otp-boxes-container {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.otp-box {
-  width: 38px;
-  height: 50px;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  border-radius: 8px;
-  border: 2px solid rgba(148, 163, 184, 0.4);
-  background: rgba(148, 163, 184, 0.1);
-  color: var(--text-color);
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.otp-box:focus {
-  border-color: #10b981;
-  background: transparent;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-}
-
-/* Responsividade para caberem as 8 caixas em ecrãs pequenos */
-@media (max-width: 400px) {
-  .otp-box {
-    width: 32px;
-    height: 45px;
-    font-size: 1.2rem;
-    gap: 4px;
-  }
-}
-
 
 /* ====== Forgot Password & Toast Notification ====== */
 
@@ -3403,6 +3331,7 @@ body.site-body {
   }
 }
 
+
 /* Leaderboard */
 .ranking-list {
   display: flex;
@@ -3534,4 +3463,271 @@ body.site-body {
     box-shadow 0.3s ease,
     border-color 0.3s ease,
     background 0.3s ease;
+}
+
+/* =========================================
+   BARRA DE PESQUISA (EXPANSÍVEL)
+   ========================================= */
+.auth-navbar-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+
+/* Fundo fica ligeiramente visível quando o rato está em cima ou a escrever */
+.auth-navbar-search-container:hover,
+.auth-navbar-search-container:focus-within {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.auth-search-input {
+  width: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  padding: 0;
+  font-size: 14px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  outline: none;
+}
+
+.auth-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* A Mágica do Hover: Expande o input */
+.auth-navbar-search-container:hover .auth-search-input,
+.auth-navbar-search-container:focus-within .auth-search-input {
+  width: 220px;
+  opacity: 1;
+  padding: 8px 16px 8px 4px;
+}
+
+/* =========================================
+   DROPDOWN DE RESULTADOS DE PESQUISA
+   ========================================= */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.search-results-dropdown.hidden {
+  display: none;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #111827;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background: #f8fafc;
+}
+
+.search-result-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e2e8f0;
+  border: 1px solid #e2e8f0;
+}
+
+.search-result-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-result-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.search-result-role {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: capitalize;
+}
+
+.search-no-results {
+  padding: 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Mensagens de estado da pesquisa */
+.search-message {
+  padding: 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.search-message.error-msg {
+  color: #ef4444;
+}
+
+/* Rodapé do Dropdown (Ver todos) */
+.search-dropdown-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b82f6;
+  /* Azul primário */
+  background: #f8fafc;
+  /* Fundo muito clarinho para destacar o rodapé */
+  text-decoration: none;
+  border-top: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.search-dropdown-footer:hover {
+  background: #eff6ff;
+  /* Azul clarinho no hover */
+  color: #2563eb;
+}
+
+/* =========================================
+   MELHORIAS DE PESQUISA (UX)
+   ========================================= */
+
+/* Botão de limpar (X) */
+.search-clear-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.search-clear-btn:hover {
+    color: #ef4444; /* Fica vermelho ao passar o rato */
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.search-clear-btn.hidden {
+    display: none;
+}
+
+/* Destaque (Highlight) das letras pesquisadas */
+.search-highlight {
+    font-weight: 800;
+    color: #3b82f6; /* Azul CiberHeróis */
+    text-decoration: underline;
+    text-decoration-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Seleção ativa através das setas do teclado */
+.search-result-item.active-search-item {
+    background: #f1f5f9;
+    border-left: 3px solid #3b82f6;
+}
+
+
+/* --- Search page --- */
+.search-page-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Grelha de cartões de utilizadores */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.user-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.user-card-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 16px;
+  background: #e2e8f0;
+  border: 3px solid var(--primary-color);
+}
+
+.user-card-name {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.user-card-role {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.role-aluno {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.role-professor {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.role-admin {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
 }

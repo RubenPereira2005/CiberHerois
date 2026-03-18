@@ -26,12 +26,24 @@
                 <i data-lucide="chart-no-axes-column" class="auth-navbar-icon"></i>
             </a>
 
-            <button class="auth-navbar-btn">
-                <i data-lucide="search" class="auth-navbar-icon"></i>
-            </button>
+            <div class="auth-navbar-search-container">
+                <button class="auth-navbar-btn search-trigger">
+                    <i data-lucide="search" class="auth-navbar-icon"></i>
+                </button>
+                <input type="text" id="global-search-input" class="auth-search-input" placeholder="Pesquisar heróis..."
+                    autocomplete="off">
 
-            <div class="auth-navbar-badge" title="O teu saldo de Ciber-Moedas"  style="margin-right: 5px;">
-                <img src="../img/coin.svg" alt="Moeda CiberHeróis" class="auth-navbar-badge-icon"  style="width: 21px !important; height: 21px !important; margin-right: 4px; object-fit: contain;">
+                <button type="button" id="search-clear-btn" class="search-clear-btn hidden" title="Limpar pesquisa">
+                    <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                </button>
+
+                <div id="search-results-dropdown" class="search-results-dropdown hidden">
+                </div>
+            </div>
+
+            <div class="auth-navbar-badge" title="O teu saldo de Ciber-Moedas" style="margin-right: 5px;">
+                <img src="../img/coin.svg" alt="Moeda CiberHeróis" class="auth-navbar-badge-icon"
+                    style="width: 21px !important; height: 21px !important; margin-right: 4px; object-fit: contain;">
                 <div class="auth-navbar-badge-content">
                     <span class="auth-navbar-badge-label">Saldo</span>
                     <span class="auth-navbar-badge-value" id="nav-coin-balance">150 CC</span>

@@ -1,19 +1,19 @@
 /* ====== Dark Mode Overrides ====== */
 
 body.dark-mode {
-  background-color: #0f172a;
-  color: #f8fafc;
+    background-color: #0f172a;
+    color: #f8fafc;
 }
 
 /* Navbar e Containers */
 body.dark-mode .auth-navbar {
-  background: #1e293b !important; /* Azul muito escuro */
-  border-bottom: 1px solid #334155;
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155;
 }
 
 body.dark-mode .auth-navbar-badge {
-  background: #0f172a !important;
-  border-color: #334155 !important;
+    background: #0f172a !important;
+    border-color: #334155 !important;
 }
 
 /* Cards e Seções */
@@ -23,9 +23,9 @@ body.dark-mode .resource-section,
 body.dark-mode .login-box,
 body.dark-mode .profile-card,
 body.dark-mode .feature-card {
-  background-color: #1e293b !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
-  border: 1px solid #334155 !important;
+    background-color: #1e293b !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid #334155 !important;
 }
 
 /* Textos */
@@ -35,7 +35,7 @@ body.dark-mode .resource-title,
 body.dark-mode .login-title,
 body.dark-mode .profile-card-title,
 body.dark-mode .suggestion-section-title {
-  color: #ffffff !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode .page-lead,
@@ -47,40 +47,41 @@ body.dark-mode .form-label,
 body.dark-mode .profile-header-email,
 body.dark-mode .profile-stat-label,
 body.dark-mode .suggestion-section-description {
-  color: #94a3b8 !important; /* Slate-400 */
+    color: #94a3b8 !important;
+    /* Slate-400 */
 }
 
 /* Inputs */
 body.dark-mode .form-input {
-  background-color: #334155 !important;
-  border-color: #475569 !important;
-  color: #ffffff !important;
+    background-color: #334155 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
 }
 
 /* Elementos de Destaque (Banners e Sugestões) */
 body.dark-mode .game-banner {
-  background: linear-gradient(to right, #1e293b, #334155) !important;
-  border-color: #475569 !important;
+    background: linear-gradient(to right, #1e293b, #334155) !important;
+    border-color: #475569 !important;
 }
 
 body.dark-mode .game-banner-title,
 body.dark-mode .game-banner-description {
-  color: #f8fafc !important;
+    color: #f8fafc !important;
 }
 
 body.dark-mode .suggestion-section {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
 }
 
 /* Toasts */
 body.dark-mode .toast-container {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
 }
 
 body.dark-mode .toast-message {
-  color: #ffffff !important;
+    color: #ffffff !important;
 }
 
 
@@ -89,67 +90,71 @@ body.dark-mode .toast-message {
 
 /* Cabeçalho da Página de Recursos */
 body.dark-mode .resources-title {
-    color: #ffffff !important; /* [cite: 110, 112] */
+    color: #ffffff !important;
+    /* [cite: 110, 112] */
 }
 
 body.dark-mode .resources-subtitle {
-    color: #94a3b8 !important; /* [cite: 111] */
+    color: #94a3b8 !important;
+    /* [cite: 111] */
 }
 
 body.dark-mode .resources-section-title {
-    color: #f1f5f9 !important; /* [cite: 112] */
+    color: #f1f5f9 !important;
+    /* [cite: 112] */
 }
 
 /* Cartões de Recurso */
 body.dark-mode .resource-card {
-    background-color: #1e293b !important; /* [cite: 116, 158] */
-    border: 1px solid #334155 !important; /* [cite: 158] */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important; /* [cite: 116] */
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
 }
 
 body.dark-mode .resource-card-title {
-    color: #ffffff !important; /* [cite: 124] */
+    color: #ffffff !important;
 }
 
 body.dark-mode .resource-card-description,
 body.dark-mode .resource-card-label {
-    color: #94a3b8 !important; /* [cite: 124, 125] */
+    color: #94a3b8 !important;
 }
 
 /* Ajuste dos Botões Secundários nos Cards (Download/Opções) */
 body.dark-mode .resource-card-btn-secondary {
-    background-color: #334155 !important; /* [cite: 129] */
-    color: #f1f5f9 !important; /* [cite: 129] */
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
 }
 
 body.dark-mode .resource-card-btn-secondary:hover {
-    background-color: #475569 !important; /* [cite: 129] */
+    background-color: #475569 !important;
 }
 
 /* Ícones dentro dos cards (Garante que o SVG herda a cor correta) */
 body.dark-mode .resource-card-icon i,
 body.dark-mode .resource-card-icon svg {
-    color: #ffffff !important; /* [cite: 121] */
+    color: #ffffff !important;
 }
 
 /* Secção de Sugestão (ao fundo da página) */
 body.dark-mode .suggestion-section {
-    background-color: #1e293b !important; /* [cite: 140] */
-    border: 1px solid #334155 !important; /* [cite: 140] */
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
 }
 
 body.dark-mode .suggestion-section-title {
-    color: #ffffff !important; /* [cite: 140] */
+    color: #ffffff !important;
 }
 
 body.dark-mode .suggestion-section-description {
-    color: #94a3b8 !important; /* [cite: 141] */
+    color: #94a3b8 !important;
 }
 
 
 /* Resource Passwords Page Specifics */
 body.dark-mode .resource-section-icon {
-    color: #60a5fa !important; /* Lighter blue for dark mode */
+    color: #60a5fa !important;
+    /* Lighter blue for dark mode */
 }
 
 body.dark-mode .resource-video-caption {
@@ -226,7 +231,7 @@ body.dark-mode .practice-btn {
 
 body.dark-mode .practice-btn:hover {
     background: #1d4ed8 !important;
-  color: white !important;
+    color: white !important;
 }
 
 body.dark-mode .game-btn-phish {
@@ -279,7 +284,8 @@ body.dark-mode .profile-stat-label {
 
 /* Melhoria de Contraste para os Valores das Estatísticas */
 body.dark-mode .profile-stat-orange {
-    color: #fb923c !important; /* Laranja mais vivo para fundo escuro */
+    color: #fb923c !important;
+    /* Laranja mais vivo para fundo escuro */
 }
 
 body.dark-mode .profile-stat-blue {
@@ -316,19 +322,24 @@ body.dark-mode .profile-activity-points {
 }
 
 body.dark-mode .profile-medal-unlocked {
-    background-color: rgba(251, 191, 36, 0.1) !important; /* Brilho de fundo */
-    border: 2px solid #fbbf24 !important; /* Bordo visível */
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.2) !important; /* Glow para destaque */
+    background-color: rgba(251, 191, 36, 0.1) !important;
+    /* Brilho de fundo */
+    border: 2px solid #fbbf24 !important;
+    /* Bordo visível */
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.2) !important;
+    /* Glow para destaque */
 }
 
 body.dark-mode .profile-medal-unlocked .profile-medal-title {
-    color: #fbbf24 !important; /* Título em destaque */
+    color: #fbbf24 !important;
+    /* Título em destaque */
 }
 
 body.dark-mode .profile-medal-locked {
     background-color: #0f172a !important;
     border-color: #334155 !important;
-    opacity: 0.4 !important; /* Mais apagado para indicar bloqueio */
+    opacity: 0.4 !important;
+    /* Mais apagado para indicar bloqueio */
 }
 
 body.dark-mode .profile-medal-desc {
@@ -354,13 +365,14 @@ body.dark-mode .profile-medal-title {
 /* Se o site tiver a classe .dark-mode ou .site-body.dark */
 body.dark-mode .settings-btn {
     /* Fundo translúcido sobre o azul */
-    background-color: rgba(255, 255, 255, 0.1); 
+    background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 body.dark-mode .settings-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Mais visível ao passar o rato */
+    background-color: rgba(255, 255, 255, 0.2);
+    /* Mais visível ao passar o rato */
     border-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -372,7 +384,8 @@ body.dark-mode .index-title {
 }
 
 body.dark-mode .index-subtitle {
-    color: #cbd5e1 !important; /* Slate-300 para suavizar o subtítulo */
+    color: #cbd5e1 !important;
+    /* Slate-300 para suavizar o subtítulo */
 }
 
 body.dark-mode .lead {
@@ -394,7 +407,8 @@ body.dark-mode .panel-desc {
 }
 
 body.dark-mode .bubble {
-    background: #2563eb !important; /* Mantém as bolhas azuis mas com brilho no escuro [cite: 49] */
+    background: #2563eb !important;
+    /* Mantém as bolhas azuis mas com brilho no escuro [cite: 49] */
     opacity: 0.2;
 }
 
@@ -443,12 +457,14 @@ body.dark-mode .cta-panel {
 
 /* Fundo da Página (Body) */
 body.dark-mode body.login-page {
-    background-color: #0f172a !important; /* gray-900 */
+    background-color: #0f172a !important;
+    /* gray-900 */
 }
 
 /* Caixa de Registo/Login */
 body.dark-mode .login-box {
-    background-color: #1e293b !important; /* gray-800 */
+    background-color: #1e293b !important;
+    /* gray-800 */
     border: 1px solid #334155 !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
 }
@@ -457,12 +473,14 @@ body.dark-mode .login-box {
 body.dark-mode .login-title,
 body.dark-mode .login-subtitle,
 body.dark-mode .form-label {
-    color: #f8fafc !important; /* gray-50 */
+    color: #f8fafc !important;
+    /* gray-50 */
 }
 
 /* Campos de Input */
 body.dark-mode .form-input {
-    background-color: #334155 !important; /* gray-700 */
+    background-color: #334155 !important;
+    /* gray-700 */
     border-color: #475569 !important;
     color: #ffffff !important;
 }
@@ -474,20 +492,20 @@ body.dark-mode .form-input:focus {
 
 /* Requisitos da Password (Caixa Flutuante) */
 body.dark-mode #passwordRequirements {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Pinta o losango (setinha) com a mesma cor da caixa no Dark Mode */
 body.dark-mode #passwordRequirements::before {
-    background: #1e293b !important; 
+    background: #1e293b !important;
     border-left: 1px solid #334155 !important;
     border-bottom: 1px solid #334155 !important;
 }
 
 body.dark-mode .requirements-title {
-  color: #f8fafc !important;
+    color: #f8fafc !important;
 }
 
 body.dark-mode .requirement-item {
@@ -496,7 +514,8 @@ body.dark-mode .requirement-item {
 
 /* Requisito Válido (Verde) */
 body.dark-mode .requirement-item.valid {
-    color: #4ade80 !important; /* Verde vibrante */
+    color: #4ade80 !important;
+    /* Verde vibrante */
 }
 
 body.dark-mode .requirement-item.valid span {
@@ -626,7 +645,8 @@ body.dark-mode .resource-category {
 /* Secções de Conteúdo */
 body.dark-mode .resource-section {
     background-color: #1e293b !important;
-    border-left: 4px solid #10b981 !important; /* Mantém a cor verde */
+    border-left: 4px solid #10b981 !important;
+    /* Mantém a cor verde */
     border-top: 1px solid #334155 !important;
     border-right: 1px solid #334155 !important;
     border-bottom: 1px solid #334155 !important;
@@ -639,39 +659,47 @@ body.dark-mode .resource-section h3 {
 }
 
 body.dark-mode .resource-section p {
-    color: #cbd5e1 !important; /* Texto de leitura confortável */
+    color: #cbd5e1 !important;
+    /* Texto de leitura confortável */
 }
 
 /* Sobrescreve o verde padrão no modo dark quando a classe específica está presente */
 body.dark-mode .resource-section.border-red {
-    border-left-color: #f87171 !important; /* Vermelho mais claro para melhor contraste no escuro */
+    border-left-color: #f87171 !important;
+    /* Vermelho mais claro para melhor contraste no escuro */
 }
 
 body.dark-mode .resource-section.border-blue {
-    border-left-color: #60a5fa !important; /* Azul mais claro para o modo dark */
+    border-left-color: #60a5fa !important;
+    /* Azul mais claro para o modo dark */
 }
 
 body.dark-mode .resource-section.border-yellow {
-    border-left-color: #eab308 !important; /* Amarelo mais claro para o modo dark */
+    border-left-color: #eab308 !important;
+    /* Amarelo mais claro para o modo dark */
 }
 
 body.dark-mode .resource-section.border-purple {
-    border-left-color: #a855f7 !important; /* Roxo mais claro para o modo dark */
+    border-left-color: #a855f7 !important;
+    /* Roxo mais claro para o modo dark */
 }
 
 body.dark-mode .resource-section.border-orange {
-    border-left-color: #f97316 !important; /* Laranja mais claro para o modo dark */
+    border-left-color: #f97316 !important;
+    /* Laranja mais claro para o modo dark */
 }
 
 
 /* Caixa de Melhores Práticas (Verde) */
 body.dark-mode .resource-best-practices {
-    background-color: rgba(16, 185, 129, 0.1) !important; /* Verde muito escuro/transparente */
+    background-color: rgba(16, 185, 129, 0.1) !important;
+    /* Verde muito escuro/transparente */
     border: 1px solid rgba(16, 185, 129, 0.3) !important;
 }
 
 body.dark-mode .resource-best-practices h3 {
-    color: #34d399 !important; /* Verde claro vibrante */
+    color: #34d399 !important;
+    /* Verde claro vibrante */
 }
 
 body.dark-mode .resource-best-practices li {
@@ -684,12 +712,14 @@ body.dark-mode .resource-best-practices i {
 
 /* Caixa de Avisos (Amarela/Laranja) */
 body.dark-mode .resource-warnings {
-    background-color: rgba(245, 158, 11, 0.1) !important; /* Laranja muito escuro/transparente */
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    /* Laranja muito escuro/transparente */
     border: 1px solid rgba(245, 158, 11, 0.3) !important;
 }
 
 body.dark-mode .resource-warnings h3 {
-    color: #fbbf24 !important; /* Amarelo vibrante */
+    color: #fbbf24 !important;
+    /* Amarelo vibrante */
 }
 
 body.dark-mode .resource-warnings li {
@@ -727,23 +757,28 @@ body.dark-mode .resource-cta-box p {
 
 /* Overrides for new classes */
 body.dark-mode .icon-red {
-    color: #f87171 !important; /* lighter red for dark mode */
+    color: #f87171 !important;
+    /* lighter red for dark mode */
 }
 
 body.dark-mode .icon-blue {
-    color: #60a5fa !important; /* lighter blue for dark mode */
+    color: #60a5fa !important;
+    /* lighter blue for dark mode */
 }
 
 body.dark-mode .icon-purple {
-    color: #a855f7 !important; /* lighter purple for dark mode */
+    color: #a855f7 !important;
+    /* lighter purple for dark mode */
 }
 
 body.dark-mode .icon-yellow {
-    color: #fbbf24 !important; /* lighter yellow for dark mode */
+    color: #fbbf24 !important;
+    /* lighter yellow for dark mode */
 }
 
 body.dark-mode .icon-orange {
-    color: #f97316 !important; /* lighter orange for dark mode */
+    color: #f97316 !important;
+    /* lighter orange for dark mode */
 }
 
 body.dark-mode .quiz-option-seq {
@@ -773,4 +808,68 @@ body.dark-mode .quiz-completed p {
 /* Banner de MFA */
 .dark-mode .mfa-banner {
     background: linear-gradient(to right, rgba(245, 158, 11, 0.15), rgba(30, 41, 59, 0.8));
+}
+
+/* =========================================
+   PESQUISA - DARK MODE
+   ========================================= */
+body.dark-mode .search-results-dropdown {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .search-result-item {
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .search-result-item:hover {
+    background: #334155;
+}
+
+body.dark-mode .search-result-name {
+    color: #f8fafc;
+}
+
+body.dark-mode .search-result-role,
+body.dark-mode .search-message {
+    color: #94a3b8;
+}
+
+body.dark-mode .search-result-avatar {
+    background: #334155;
+    border-color: #475569;
+}
+
+body.dark-mode .search-dropdown-footer {
+    background: #0f172a;
+    /* Azul muito escuro para rodapé */
+    border-top-color: #334155;
+    color: #60a5fa;
+}
+
+body.dark-mode .search-dropdown-footer:hover {
+    background: #1e293b;
+    color: #93c5fd;
+}
+
+body.dark-mode .search-highlight {
+    color: #60a5fa;
+    /* Azul mais claro para destacar no fundo escuro */
+}
+
+body.dark-mode .search-result-item.active-search-item {
+    background: #334155;
+    border-left-color: #60a5fa;
+}
+
+
+/* Search page */
+body.dark-mode .user-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .user-card-name {
+    color: #f1f5f9;
 }
