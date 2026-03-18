@@ -13,6 +13,8 @@ module.exports = (supabase) => {
                 .from('utilizador')
                 .select('id_utilizador, nome, pontos_totais, foto_perfil')
                 .eq('role', 'aluno')
+                // Só puxa quem ativou a opção de aparecer no ranking
+                .eq('priv_ranking', true) 
                 .order('pontos_totais', { ascending: false }) // Do maior para o menor
                 .limit(10); // Mostra o Top 10
 
@@ -46,6 +48,7 @@ module.exports = (supabase) => {
                 }
 
                 return {
+                    id_utilizador: user.id_utilizador,
                     posicao: index + 1, // 1º, 2º, 3º, etc.
                     nome: user.nome,
                     pontos: totalPontos,

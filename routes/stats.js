@@ -32,48 +32,42 @@ module.exports = (supabase) => {
             const progressoPerc = Math.round((pontosFeitosNesteNivel / pontosParaSubir) * 100);
 
             // 2. Calcular a precisão e ir buscar datas para a OFENSIVA (Streak)
+            // CORTAMOS O !inner PARA EVITAR ERROS CRÍTICOS SE A RELAÇÃO FALHAR
             const { data: progresso, error: erroProgresso } = await supabase
                 .from('progresso')
-                .select(`respostas_corretas, total_perguntas, data_realizacao, atividade!inner(tipo)`)
-                .eq('id_utilizador', req.session.userId)
-                .eq('atividade.tipo', 'quiz');
-
-            if (erroProgresso) throw erroProgresso;
+                .select('respostas_corretas, total_perguntas, data_realizacao, atividade(tipo)')
+                .eq('id_utilizador', req.session.userId);
 
             let totalQuizzes = 0;
             let totalCorretas = 0;
             let totalRespostas = 0;
             let ofensiva = 0;
 
-            if (progresso && progresso.length > 0) {
-                totalQuizzes = progresso.length;
-                progresso.forEach(p => {
+            if (!erroProgresso && progresso && progresso.length > 0) {
+                // Filtramos os Quizzes de forma segura no JavaScript
+                const quizzes = progresso.filter(p => p.atividade && p.atividade.tipo === 'quiz');
+                totalQuizzes = quizzes.length;
+
+                quizzes.forEach(p => {
                     if (p.respostas_corretas !== null) totalCorretas += p.respostas_corretas;
                     if (p.total_perguntas !== null) totalRespostas += p.total_perguntas;
                 });
 
-                // --- CÁLCULO DA OFENSIVA  ---
-                // Converter todas as datas para "Meia-Noite" para ignorar horas e fusos horários
+                // --- CÁLCULO DA OFENSIVA (Qualquer atividade conta para a chama!) ---
                 const diasJogados = [...new Set(progresso.map(p => {
                     const d = new Date(p.data_realizacao);
-                    d.setHours(0, 0, 0, 0); // Força a ficar na meia noite do dia em que jogou
-                    return d.getTime();     // Transforma num número para comparar mais facilmente
+                    d.setHours(0, 0, 0, 0); 
+                    return d.getTime();     
                 }))];
 
-                const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0);
-                
-                const ontem = new Date(hoje);
-                ontem.setDate(ontem.getDate() - 1);
-
+                const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                const ontem = new Date(hoje); ontem.setDate(ontem.getDate() - 1);
                 let tempoCheck = hoje.getTime();
 
-                // 1. Verifica se jogou hoje
                 if (diasJogados.includes(tempoCheck)) {
-                    ofensiva = 1;
-                    tempoCheck = ontem.getTime(); // O próximo dia a verificar vai ser ontem
+                    ofensiva = 1; 
+                    tempoCheck = ontem.getTime(); 
                 } 
-                // 2. Se não jogou hoje, verifica se jogou ontem (para a chama não morrer no início do dia)
                 else if (diasJogados.includes(ontem.getTime())) {
                     ofensiva = 1;
                     const anteontem = new Date(ontem);
@@ -81,7 +75,6 @@ module.exports = (supabase) => {
                     tempoCheck = anteontem.getTime(); 
                 }
 
-                // 3. Ir recuando dia a dia até a sequência quebrar
                 if (ofensiva > 0) {
                     while (true) {
                         if (diasJogados.includes(tempoCheck)) {
@@ -90,7 +83,7 @@ module.exports = (supabase) => {
                             diaAnterior.setDate(diaAnterior.getDate() - 1);
                             tempoCheck = diaAnterior.getTime();
                         } else {
-                            break; // A sequência quebrou, paramos de contar
+                            break; 
                         }
                     }
                 }
@@ -101,29 +94,32 @@ module.exports = (supabase) => {
                 precisao = Math.round((totalCorretas / totalRespostas) * 100);
             }
 
-            // 3. Contar as Medalhas
-            const { count: totalMedalhas, error: erroMedalhas } = await supabase
+            // 3. Contar as Medalhas (MÉTODO FAIL-SAFE)
+            // Se a tabela das medalhas falhar, ele apenas diz que tens 0, em vez de crashar!
+            let totalMedalhas = 0;
+            const { count, error: erroMedalhas } = await supabase
                 .from('utilizador_medalha')
                 .select('*', { count: 'exact', head: true })
                 .eq('id_utilizador', req.session.userId);
 
-            if (erroMedalhas) throw erroMedalhas;
+            if (!erroMedalhas) {
+                totalMedalhas = count || 0;
+            }
 
-            // 4. Calcular a Posição Global (RANKING) CORRIGIDO
+            // 4. Calcular a Posição Global (RANKING)
             let posicaoRanking = '--';
             if (userData && userData.role === 'aluno') {
-                // Vai buscar todos os alunos ordenados por pontos (tal como no leaderboard)
                 const { data: rankingData, error: rankErr } = await supabase
                     .from('utilizador')
                     .select('id_utilizador, pontos_totais')
                     .eq('role', 'aluno')
+                    .eq('priv_ranking', true) // <-- ADICIONADO: Só conta contigo se estiveres público!
                     .order('pontos_totais', { ascending: false });
                     
                 if (!rankErr && rankingData) {
-                    // Procura em que posição (index) o nosso utilizador ficou na lista
                     const myIndex = rankingData.findIndex(u => u.id_utilizador === req.session.userId);
                     if (myIndex !== -1) {
-                        posicaoRanking = myIndex + 1; // O Array começa em 0, por isso somamos 1 (ex: Index 0 = Top #1)
+                        posicaoRanking = myIndex + 1; 
                     }
                 }
             }
@@ -133,7 +129,7 @@ module.exports = (supabase) => {
                 quizzes: totalQuizzes,
                 precisao: precisao,
                 respostas: totalRespostas,
-                medalhas: totalMedalhas || 0,
+                medalhas: totalMedalhas,
                 pontos: totalPontos,
                 nivel: nivel,
                 pontos_restantes: pontosRestantes,
@@ -143,7 +139,7 @@ module.exports = (supabase) => {
             });
 
         } catch (error) {
-            console.error("Erro ao carregar estatísticas:", error);
+            console.error("Erro crítico em stats.js:", error);
             res.status(500).json({ error: "Erro interno ao carregar estatísticas." });
         }
     });

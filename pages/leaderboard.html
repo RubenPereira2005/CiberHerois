@@ -66,7 +66,7 @@
                     const classIsMe = user.eOUtilizador ? 'is-me' : '';
 
                     const itemHTML = `
-                        <div class="ranking-item ${classTop} ${classIsMe}">
+                        <a href="profile.html?id=${user.id_utilizador}" class="ranking-item ${classTop} ${classIsMe}" style="display: flex; text-decoration: none; color: inherit; width: 100%;">
                             <div class="ranking-left">
                                 <div class="ranking-pos">${posVisual}</div>
                                 <img src="${user.avatar}" alt="Avatar" class="ranking-avatar" referrerpolicy="no-referrer">
@@ -78,7 +78,7 @@
                             <div class="ranking-right">
                                 <span class="ranking-points">${user.pontos} pts</span>
                             </div>
-                        </div>
+                        </a>
                     `;
                     container.insertAdjacentHTML('beforeend', itemHTML);
                 });
