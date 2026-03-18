@@ -242,7 +242,7 @@ body.dark-mode .personal-avatar-label {
 
 
 /* =========================================================
-   ESTILOS PARA AVISOS SEM LOGIN (INDEX)
+   ESTILOS PARA AVISOS FLUTUANTES (TOASTS)
    ========================================================= */
 .toast-notification {
     position: fixed;

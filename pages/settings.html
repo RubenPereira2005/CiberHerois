@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="sidebar-section danger">
-                    <button class="settings-tab" data-tab="danger"  style="color: #ef4444;"><i
+                    <button class="settings-tab" data-tab="danger" style="color: #ef4444;"><i
                             data-lucide="alert-triangle"></i> Zona Crítica</button>
                 </div>
             </aside>
@@ -125,12 +125,15 @@
 
                         <div class="form-group">
                             <label class="form-label">Autenticação Multi-fator (MFA)</label>
-                            <div id="mfa-container-box" class="checkbox-group"  style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); position: relative; overflow: hidden;">
-                                <label  style="font-weight: bold; font-size: 1rem; color: var(--text-color); cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                                    <input type="checkbox" id="mfa-toggle"  style="width: 18px; height: 18px;">
+                            <div id="mfa-container-box" class="checkbox-group"
+                                style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); position: relative; overflow: hidden;">
+                                <label
+                                    style="font-weight: bold; font-size: 1rem; color: var(--text-color); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="mfa-toggle" style="width: 18px; height: 18px;">
                                     Ativar Login em 2 Passos (Código no E-mail)
                                 </label>
-                                <p  style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px; margin-left: 28px;">
+                                <p
+                                    style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px; margin-left: 28px;">
                                     Sempre que fizeres login com palavra-passe ou Google, será enviado um código de 8
                                     dígitos para o teu e-mail para confirmar a tua identidade.
                                 </p>
@@ -192,19 +195,50 @@
                         <div class="settings-icon-wrapper purple"><i data-lucide="eye-off"></i></div>
                         <div>
                             <h2 class="settings-card-title">Protocolos de Privacidade</h2>
-                            <p class="settings-card-desc">Controla quem pode ver o teu progresso.</p>
+                            <p class="settings-card-desc">Controla quem pode ver o teu progresso na academia.</p>
                         </div>
                     </div>
-                    <div class="settings-form">
+                    <form id="privacy-form" class="settings-form">
                         <div class="form-group">
-                            <label class="form-label">Visibilidade de Perfil</label>
-                            <div class="checkbox-group">
-                                <label><input type="checkbox" checked> Mostrar as minhas medalhas publicamente</label>
-                                <label><input type="checkbox"> Aparecer no Ranking Global de Heróis</label>
-                                <label><input type="checkbox"> Permitir que outros heróis me enviem mensagens</label>
+                            <label class="form-label">Visibilidade do Perfil Público</label>
+                            <div class="checkbox-group"
+                                style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <label style="font-weight: 600; color: var(--text-color);">
+                                    <input type="checkbox" id="priv-perfil-publico">
+                                    O meu perfil é público
+                                </label>
+                                <p
+                                    style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px; margin-left: 28px;">
+                                    Se desativado, não aparecerás nas pesquisas e o teu perfil só será visível para ti. Ativa para partilhares o teu progresso e conquistas com os colegas!
+                                </p>
                             </div>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Elementos Visíveis no Perfil</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="priv-turma"> Mostrar o meu Esquadrão (Turma e Escola)</label>
+                                <label><input type="checkbox" id="priv-pontos"> Mostrar o meu Nível e XP</label>
+                                <label><input type="checkbox" id="priv-medalhas"> Mostrar as minhas Medalhas</label>
+                                <label><input type="checkbox" id="priv-historico"> Mostrar a minha Atividade Recente</label>
+                                <label><input type="checkbox" id="priv-ofensiva"> Mostrar a minha Ofensiva (Dias em chamas)</label>
+                                <label><input type="checkbox" id="priv-estatisticas"> Mostrar as minhas Estatísticas Gerais</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Competição Global</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="priv-ranking"> Aparecer no Ranking Global de Heróis
+                                    (Leaderboard)</label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary"
+                                style="background-color: #8b5cf6; border-color: #8b5cf6;">Guardar Privacidade</button>
+                        </div>
+                    </form>
                 </section>
 
                 <section class="tab-pane hidden" id="danger">
@@ -216,7 +250,7 @@
                         </div>
                     </div>
                     <div class="danger-actions">
-                        <p  style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Ao apagar a conta, todos os
+                        <p style="font-size: 14px; color: #6b7280; margin-bottom: 16px;">Ao apagar a conta, todos os
                             teus emblemas, pontos e progresso nos quizzes serão permanentemente destruídos.</p>
                         <button type="button" id="btn-delete-account" class="btn btn-danger-outline">Apagar Identidade
                             de Herói</button>
@@ -232,14 +266,48 @@
                 <i data-lucide="alert-triangle" style="width: 48px; height: 48px;"></i>
             </div>
             <h2>Atenção</h2>
-            <p id="texto-confirmacao" style="margin: 20px 0; color: var(--text-color);">Tem a certeza que deseja eliminar?</p>
+            <p id="texto-confirmacao" style="margin: 20px 0; color: var(--text-color);">Tem a certeza que deseja
+                eliminar?</p>
             <div class="modal-actions" style="justify-content: center; gap: 15px;">
                 <button type="button" class="btn btn-secondary" id="btn-cancelar-confirmacao">Cancelar</button>
-                <button type="button" class="btn" id="btn-aceitar-confirmacao" style="background-color: #ef4444; color: white; border-color: #ef4444;">Eliminar</button>
+                <button type="button" class="btn" id="btn-aceitar-confirmacao"
+                    style="background-color: #ef4444; color: white; border-color: #ef4444;">Eliminar</button>
             </div>
         </div>
     </div>
 
+    <div id="modal-aviso-privacidade" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #f59e0b;">
+                <i data-lucide="shield-alert" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h2 style="margin-bottom: 10px; text-align: center;">Perfil Privado</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 30px; text-align: center; line-height: 1.6;">
+                Para poderes mostrar esta informação aos teus colegas, precisas primeiro de tornar o teu <strong>Perfil Público</strong>.<br><br>Queres ativar o perfil público agora?
+            </p>
+            <div class="modal-actions" style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <button type="button" class="btn btn-secondary" id="btn-cancelar-privacidade" style="min-width: 140px;">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-ativar-perfil-publico" style="background-color: #f59e0b; border-color: #f59e0b; color: white; min-width: 140px;">Sim, Tornar Público</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-tudo-desativado" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #3b82f6;">
+                <i data-lucide="ghost" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h2 style="margin-bottom: 10px; text-align: center;">Perfil Fantasma?</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 30px; text-align: center; line-height: 1.6;">
+                Desativaste todas as informações visíveis. O teu perfil está praticamente privado, mas ainda vai aparecer na barra de pesquisa da academia.<br><br>Queres ativar os Escudos (Privado) ou mantê-lo visível na pesquisa?
+            </p>
+            <div class="modal-actions" style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <button type="button" class="btn btn-secondary" id="btn-manter-pesquisa" style="min-width: 140px;">Apenas Pesquisa</button>
+                <button type="button" class="btn btn-primary" id="btn-tornar-total-privado" style="background-color: #3b82f6; border-color: #3b82f6; color: white; min-width: 140px;">Ocultar Totalmente</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         lucide.createIcons();
 
@@ -302,20 +370,68 @@
             }
 
 
-            // --- CARREGAR DADOS DO UTILIZADOR (NOME, EMAIL e MFA) ---
+            // --- CARREGAR DADOS DO UTILIZADOR (NOME, EMAIL, MFA e PRIVACIDADE) ---
             try {
                 const response = await fetch('/api/me');
                 if (response.ok) {
                     const data = await response.json();
+
+                    // Conta
                     if (nameInput) nameInput.value = data.nome || '';
                     if (emailInput) emailInput.value = data.email || '';
 
-                    // Atualiza o interruptor do MFA com o valor que veio da base de dados
-                    if (mfaToggle && data.mfa_ativo !== undefined) {
-                        mfaToggle.checked = data.mfa_ativo;
-                    }
+                    // Segurança
+                    if (mfaToggle && data.mfa_ativo !== undefined) mfaToggle.checked = data.mfa_ativo;
+
+                    // Privacidade (Atribuir valores aos checkboxes)
+                    const checks = ['priv_perfil_publico', 'priv_turma', 'priv_pontos', 'priv_medalhas', 'priv_historico', 'priv_ranking', 'priv_ofensiva'];
+                    checks.forEach(campo => {
+                        const el = document.getElementById(campo.replace(/_/g, '-')); // Converte priv_turma para priv-turma
+                        if (el && data[campo] !== undefined) el.checked = data[campo];
+                    });
                 }
             } catch (e) { console.error("Erro de conexão", e); }
+
+
+            // --- GUARDAR DEFINIÇÕES DE PRIVACIDADE ---
+            const privacyForm = document.getElementById('privacy-form');
+            if (privacyForm) {
+                privacyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = privacyForm.querySelector('button[type="submit"]');
+                    const originalText = btn.innerText;
+                    btn.innerText = "A encriptar protocolos...";
+                    btn.disabled = true;
+
+                    const payload = {
+                        priv_perfil_publico: document.getElementById('priv-perfil-publico').checked,
+                        priv_turma: document.getElementById('priv-turma').checked,
+                        priv_pontos: document.getElementById('priv-pontos').checked,
+                        priv_medalhas: document.getElementById('priv-medalhas').checked,
+                        priv_historico: document.getElementById('priv-historico').checked,
+                        priv_ranking: document.getElementById('priv-ranking').checked,
+                        priv_ofensiva: document.getElementById('priv-ofensiva').checked,
+                        priv_estatisticas: document.getElementById('priv-estatisticas').checked
+                    };
+
+                    try {
+                        const response = await fetch('/api/update-privacy', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) alert("Protocolos de privacidade atualizados!");
+                        else alert("Erro ao atualizar a privacidade.");
+                    } catch (error) {
+                        alert("Erro de servidor.");
+                    } finally {
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }
+                });
+            }
+
 
             // --- ATUALIZAR NOME DA CONTA ---
             if (accountForm) {
@@ -358,7 +474,7 @@
                         if (response.ok) {
                             // 1. Mostra a mensagem ao utilizador
                             alert(data.message);
-                            
+
                             // 2. SE ELE GANHOU A RECOMPENSA, FORÇA A ATUALIZAÇÃO VISUAL NA HORA!
                             if (data.recompensa === true) {
                                 try {
@@ -366,11 +482,11 @@
                                     const statsRes = await fetch('/api/stats');
                                     if (statsRes.ok) {
                                         const stats = await statsRes.json();
-                                        
+
                                         // Atualiza os elementos da Navbar injetada diretamente
                                         const navPoints = document.getElementById('nav-global-points');
                                         const navLevel = document.getElementById('nav-global-level');
-                                        
+
                                         if (navPoints) navPoints.textContent = `${stats.pontos} pts`;
                                         if (navLevel) navLevel.textContent = `Nível ${stats.nivel}`;
                                     }
@@ -425,6 +541,96 @@
                 syncThemeRadios();
             });
 
+            // ==========================================
+            // LÓGICA INTELIGENTE DE PRIVACIDADE DO PERFIL
+            // ==========================================
+            const checkPerfilPublico = document.getElementById('priv-perfil-publico');
+            const checksOpcionais = ['priv-turma', 'priv-pontos', 'priv-medalhas', 'priv-historico', 'priv-ofensiva', 'priv-ranking', 'priv-estatisticas'];
+            
+            const modalAvisoPrivado = document.getElementById('modal-aviso-privacidade');
+            const modalTudoDesativado = document.getElementById('modal-tudo-desativado');
+            let checkboxQueQueriaAtivar = null;
+
+            // 1. Se desligar o perfil público no switch principal, desliga tudo o resto
+            if (checkPerfilPublico) {
+                checkPerfilPublico.addEventListener('change', (e) => {
+                    if (!e.target.checked) {
+                        checksOpcionais.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.checked = false;
+                        });
+                    }
+                });
+            }
+
+            // 2. Controlar os cliques nas caixas individuais
+            checksOpcionais.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', (e) => {
+                        // CENÁRIO A: O perfil está Privado e tenta ligar uma opção
+                        if (checkPerfilPublico && !checkPerfilPublico.checked && e.target.checked) {
+                            e.preventDefault(); // Impede a caixa de ficar marcada
+                            checkboxQueQueriaAtivar = el; // Memoriza a caixa
+                            modalAvisoPrivado.classList.add('active'); // Abre o Modal Laranja
+                            lucide.createIcons();
+                        }
+                        
+                        // CENÁRIO B: O perfil está Público e ele desligou uma caixa
+                        if (checkPerfilPublico && checkPerfilPublico.checked && !e.target.checked) {
+                            // Verifica se ainda sobrou alguma caixa ligada
+                            const algumaLigada = checksOpcionais.some(optId => {
+                                const optEl = document.getElementById(optId);
+                                return optEl && optEl.checked;
+                            });
+
+                            // Se não sobrou nenhuma ligada, dispara o aviso do Fantasma!
+                            if (!algumaLigada) {
+                                modalTudoDesativado.classList.add('active'); // Abre o Modal Azul
+                                lucide.createIcons();
+                            }
+                        }
+                    });
+                }
+            });
+
+            // --- AÇÕES DO MODAL LARANJA (Tornar Público) ---
+            const btnAtivarTudo = document.getElementById('btn-ativar-perfil-publico');
+            if (btnAtivarTudo) {
+                btnAtivarTudo.addEventListener('click', () => {
+                    if (checkPerfilPublico) checkPerfilPublico.checked = true; 
+                    if (checkboxQueQueriaAtivar) checkboxQueQueriaAtivar.checked = true; 
+                    checkboxQueQueriaAtivar = null; 
+                    modalAvisoPrivado.classList.remove('active'); 
+                });
+            }
+
+            const btnCancelarPriv = document.getElementById('btn-cancelar-privacidade');
+            if (btnCancelarPriv) {
+                btnCancelarPriv.addEventListener('click', () => {
+                    checkboxQueQueriaAtivar = null; 
+                    modalAvisoPrivado.classList.remove('active'); 
+                });
+            }
+
+            // --- AÇÕES DO MODAL AZUL (Perfil Fantasma) ---
+            const btnTornarPrivado = document.getElementById('btn-tornar-total-privado');
+            if (btnTornarPrivado) {
+                btnTornarPrivado.addEventListener('click', () => {
+                    // Desliga o perfil público principal
+                    if (checkPerfilPublico) checkPerfilPublico.checked = false; 
+                    modalTudoDesativado.classList.remove('active');
+                });
+            }
+
+            const btnManterPesquisa = document.getElementById('btn-manter-pesquisa');
+            if (btnManterPesquisa) {
+                btnManterPesquisa.addEventListener('click', () => {
+                    // Não faz nada à caixa pública, apenas fecha o aviso
+                    modalTudoDesativado.classList.remove('active'); 
+                });
+            }
+            
             syncThemeRadios();
         });
 
