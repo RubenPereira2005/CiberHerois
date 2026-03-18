@@ -134,7 +134,7 @@
                             <i data-lucide="calendar" class="profile-card-icon"></i>
                             Atividade Recente
                         </h2>
-                        <a href="historico.html"
+                        <a href="historico.html?id=${id}"
                             style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                             Ver Tudo <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                         </a>
@@ -264,13 +264,23 @@
         lucide.createIcons();
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Verificar se é Perfil Próprio ou Perfil Público (através do URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            const publicUserId = urlParams.get('id');
+            const isPublicProfile = !!publicUserId; // Retorna true se houver um ID
 
-            // Carregar os dados do utilizador para mostrar o nome, email, avatar e ESQUADRÃO
+            const endpointUrl = isPublicProfile ? '/api/user/' + publicUserId : '/api/me';
+
             try {
-                const response = await fetch('/api/me');
+                const response = await fetch(endpointUrl);
 
                 if (response.status === 401) {
                     window.location.href = 'index.html';
+                    return;
+                }
+                
+                if (response.status === 404) {
+                    window.location.href = '404.html'; 
                     return;
                 }
 
@@ -282,155 +292,234 @@
                     const avatarElement = document.querySelector('.profile-avatar');
 
                     if (nomeElement) nomeElement.textContent = data.nome;
-                    if (emailElement) emailElement.textContent = data.email;
 
-                    // --- ATUALIZAR CARTÃO DO ESQUADRÃO E PATENTE ---
-                    const esquadraoCardTitle = document.getElementById('esquadrao-card-title');
-                    const esquadraoContent = document.getElementById('esquadrao-content');
-                    let patenteHTML = '';
+                    // LÓGICA DE PRIVACIDADE: O que esconder no Perfil Público
+                    if (isPublicProfile) {
+                        if (emailElement) emailElement.style.display = 'none';
+                        document.getElementById('edit-avatar-btn').style.display = 'none';
+                        document.querySelector('.profile-header-right').style.display = 'none';
+                        document.querySelector('.profile-progress').style.display = 'none';
 
-                    // LÓGICA PARA ADMIN (Vermelho)
-                    if (data.role === 'admin') {
-                        patenteHTML = `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Administrador</span>`;
-                        if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
+                        // ESTATÍSTICAS (Quizzes, Precisão, Respostas, Medalhas)
+                            if (!data.showEstatisticas) { 
+                                const statsGrid = document.querySelector('.profile-stats-grid');
+                                if (statsGrid) {
+                                    statsGrid.closest('.profile-card').style.display = 'none';
+                                }
+                            } else if (data.estatisticas) {
+                                document.getElementById('stat-quizzes').textContent = data.estatisticas.quizzes;
+                                document.getElementById('stat-precisao').textContent = data.estatisticas.precisao + '%';
+                                document.getElementById('stat-respostas').textContent = data.estatisticas.respostas;
+                                document.getElementById('stat-medalhas').textContent = data.showMedalhas ? (data.total_medalhas || 0) : 'Oculto';
+                            }
 
-                        esquadraoCardTitle.innerHTML = `<i data-lucide="shield" class="profile-card-icon" style="color: #ef4444;"></i> Centro de Comando`;
-                        esquadraoContent.innerHTML = `
-                            <div style="background: rgba(239, 68, 68, 0.05); border: 1px dashed rgba(239, 68, 68, 0.4); padding: 20px 15px; border-radius: 12px;">
-                                <div style="color: #ef4444; margin-bottom: 10px;"><i data-lucide="database" style="width: 36px; height: 36px;"></i></div>
-                                <h3 style="color: #ef4444; margin-bottom: 5px; font-size: 1.2rem;">Base de Operações</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Acesso total à academia e configuração do sistema.</p>
-                                <a href="gestao.html" class="btn btn-primary" style="background-color: #ef4444; border-color: #ef4444; width: 100%;">Gerir Plataforma</a>
-                            </div>
-                        `;
-                    }
-                    // LÓGICA PARA PROFESSOR (Verde)
-                    else if (data.role === 'professor') {
-                        patenteHTML = `<span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Professor</span>`;
-                        if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
-
-                        esquadraoCardTitle.innerHTML = `<i data-lucide="users" class="profile-card-icon" style="color: #10b981;"></i> Os Meus Esquadrões`;
-                        esquadraoContent.innerHTML = `
-                            <div style="background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.4); padding: 20px 15px; border-radius: 12px;">
-                                <div style="color: #10b981; margin-bottom: 10px;"><i data-lucide="graduation-cap" style="width: 36px; height: 36px;"></i></div>
-                                <h3 style="color: #10b981; margin-bottom: 5px; font-size: 1.2rem;">Comandante de Turmas</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">És o responsável por treinar e acompanhar os novos recrutas.</p>
-                                <a href="professor.html" class="btn btn-primary" style="background-color: #10b981; border-color: #10b981; width: 100%;">Monitorizar Alunos</a>
-                            </div>
-                        `;
-                    }
-                    // LÓGICA PARA ALUNO (Azul Vibrante)
-                    else {
-                        patenteHTML = `<span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);">Aluno</span>`;
-                        if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
-
-                        esquadraoCardTitle.innerHTML = `<i data-lucide="users" class="profile-card-icon"></i> O Meu Esquadrão`;
-
-                        if (data.id_turma && data.turma) {
-                            const nomeEscola = data.turma.escola ? data.turma.escola.nome : 'Academia CiberHeróis';
-                            esquadraoContent.innerHTML = `
-                                <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px 15px; border-radius: 12px; position: relative; overflow: hidden;">
-                                    <div style="position: absolute; top: -15px; right: -15px; opacity: 0.05; color: var(--primary-color);">
-                                        <i data-lucide="shield-check" style="width: 100px; height: 100px;"></i>
-                                    </div>
-                                    <div style="display: flex; justify-content: center; margin-bottom: 10px; color: var(--primary-color); position: relative;">
-                                        <i data-lucide="shield" style="width: 36px; height: 36px;"></i>
-                                    </div>
-                                    <h3 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1.3rem; position: relative;">${data.turma.nome}</h3>
-                                    <p style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; position: relative;">${nomeEscola}</p>
-                                    
-                                    <div style="margin-top: 15px; display: inline-block; font-size: 0.85rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 20px; font-weight: 600; position: relative;">
-                                        <i data-lucide="check-circle" style="width: 14px; height: 14px; display: inline-block; vertical-align: text-bottom; margin-right: 4px;"></i> Alistamento Confirmado
-                                    </div>
-                                </div>
-                            `;
+                        // PONTOS E NÍVEIS
+                        if (data.priv_pontos === false) {
+                            document.getElementById('profile-level-badge').parentElement.parentElement.style.display = 'none';
+                            document.getElementById('profile-points-badge').parentElement.parentElement.style.display = 'none';
                         } else {
-                            esquadraoContent.innerHTML = `
-                                <div style="padding: 10px 0;">
-                                    <div style="color: var(--text-secondary); margin-bottom: 15px; opacity: 0.5;"><i data-lucide="search" style="width: 40px; height: 40px;"></i></div>
-                                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">Ainda não tens afiliação a um esquadrão tático.</p>
-                                    <button class="btn btn-primary" onclick="openModal('modal-codigo-turma')" style="width: 100%;">
-                                        <i data-lucide="key" style="margin-right: 8px; width: 18px; height: 18px;"></i> Inserir Código de Recrutamento
-                                    </button>
-                                </div>
-                            `;
+                            document.getElementById('profile-level-badge').textContent = `Nível ${data.nivel || 1}`;
+                            document.getElementById('profile-points-badge').textContent = `${data.pontos_totais || 0} pts`;
+                        }
+
+                        // RANKING
+                        if (data.showRanking === false) {
+                            document.getElementById('profile-ranking-badge').parentElement.parentElement.style.display = 'none';
+                        } else {
+                            document.getElementById('profile-ranking-badge').parentElement.parentElement.style.display = 'flex';
+                            document.getElementById('profile-ranking-badge').textContent = data.posicao_ranking ? `Top #${data.posicao_ranking}` : 'Top --';
+                        }
+
+                        // OFENSIVA (STREAK)
+                        if (data.showOfensiva === false) {
+                            document.getElementById('profile-streak-badge').parentElement.parentElement.style.display = 'none';
+                        } else {
+                            document.getElementById('profile-streak-badge').parentElement.parentElement.style.display = 'flex';
+                            document.getElementById('profile-streak-badge').textContent = `${data.ofensiva || 0} Dias`;
+                        }
+
+                        // MEDALHAS
+                        if (data.showMedalhas === false) {
+                            document.querySelector('.profile-medals').style.display = 'none';
+                        }
+
+                        // TURMA (ESQUADRÃO)
+                        if (data.priv_turma === false) {
+                            document.getElementById('esquadrao-content').parentElement.style.display = 'none';
+                        }
+
+                        // ATIVIDADE / HISTÓRICO
+                        if (data.showHistorico === false) {
+                            document.querySelector('.profile-activity').parentElement.style.display = 'none';
+                        } else {
+                            const contentor = document.querySelector('.profile-activity');
+
+                            // Atualiza o link do botão "Ver Tudo" para garantir que leva ao histórico correto (com ID para perfis públicos)
+                            const btnVerHistorico = contentor.previousElementSibling.querySelector('a');
+                            if (btnVerHistorico) {
+                                btnVerHistorico.href = 'historico.html?id=' + publicUserId;
+                            }
+
+                            if (data.atividades_recentes && data.atividades_recentes.length > 0) {
+                                contentor.innerHTML = data.atividades_recentes.map(act => {
+                                    const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
+                                    const dataRealizacao = new Date(act.data_realizacao).toLocaleDateString('pt-PT');
+                                    let textoDescricao = act.total_perguntas ? `${act.respostas_corretas}/${act.total_perguntas} corretas` : 'Concluído';
+
+                                    return `
+                                        <div class="profile-activity-item">
+                                            <div>
+                                                <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
+                                                <div class="profile-activity-desc">${textoDescricao}</div>
+                                            </div>
+                                            <div class="profile-activity-right">
+                                                <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
+                                                <div class="profile-activity-time">${dataRealizacao}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                            } else {
+                                contentor.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Ainda não existem atividades registadas.</p>';
+                            }
+                        }
+
+                    } else {
+                        // Se for o próprio utilizador, mostra o email
+                        if (emailElement) emailElement.textContent = data.email;
+
+                        // Garante que o link do histórico leva ao histórico pessoal (sem ID)
+                        const btnVerHistorico = document.querySelector('.profile-activity').previousElementSibling.querySelector('a');
+                        if (btnVerHistorico) {
+                            btnVerHistorico.href = 'historico.html';
                         }
                     }
 
-                    lucide.createIcons(); // Recarregar os ícones gerados dinamicamente
 
-                    // Mostrar a Imagem de Perfil Ativa na página
+                    // --- ATUALIZAR PATENTE (ROLE) ---
+                    let patenteHTML = '';
+                    if (data.role === 'admin') {
+                        patenteHTML = `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Administrador</span>`;
+                    } else if (data.role === 'professor') {
+                        patenteHTML = `<span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Professor</span>`;
+                    } else {
+                        patenteHTML = `<span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);">Aluno</span>`;
+                    }
+                    if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
+
+
+                    // --- ATUALIZAR CARTÃO DO ESQUADRÃO ---
+                    const esquadraoCardTitle = document.getElementById('esquadrao-card-title');
+                    const esquadraoContent = document.getElementById('esquadrao-content');
+
+                    if (data.role === 'admin') {
+                        esquadraoCardTitle.innerHTML = `<i data-lucide="shield" class="profile-card-icon" style="color: #ef4444;"></i> Centro de Comando`;
+                        if (isPublicProfile) {
+                            esquadraoContent.innerHTML = `<p style="color: var(--text-secondary); padding: 15px;">Membro da Administração</p>`;
+                        } else {
+                            esquadraoContent.innerHTML = `
+                                <div style="background: rgba(239, 68, 68, 0.05); border: 1px dashed rgba(239, 68, 68, 0.4); padding: 20px 15px; border-radius: 12px;">
+                                    <div style="color: #ef4444; margin-bottom: 10px;"><i data-lucide="database" style="width: 36px; height: 36px;"></i></div>
+                                    <h3 style="color: #ef4444; margin-bottom: 5px; font-size: 1.2rem;">Base de Operações</h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Acesso total à academia.</p>
+                                    <a href="gestao.html" class="btn btn-primary" style="background-color: #ef4444; border-color: #ef4444; width: 100%;">Gerir Plataforma</a>
+                                </div>
+                            `;
+                        }
+                    } else if (data.role === 'professor') {
+                        esquadraoCardTitle.innerHTML = `<i data-lucide="users" class="profile-card-icon" style="color: #10b981;"></i> ${isPublicProfile ? 'Esquadrões Atribuídos' : 'Os Meus Esquadrões'}`;
+
+                        let turmasHTML = '';
+                        if (data.turmas_geridas && data.turmas_geridas.length > 0) {
+                            turmasHTML = `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">`;
+
+                            data.turmas_geridas.forEach(t => {
+                                const nomeEscola = t.escola ? t.escola.nome : '';
+                                turmasHTML += `
+                                    <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                                        <i data-lucide="graduation-cap" style="color: #10b981; width: 24px; height: 24px; margin-bottom: 6px;"></i>
+                                        <h4 style="color: #10b981; margin: 0 0 4px 0; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.nome}</h4>
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${nomeEscola}</span>
+                                    </div>
+                                `;
+                            });
+                            turmasHTML += `</div>`;
+                        } else {
+                            turmasHTML = `<p style="color: var(--text-secondary); padding: 15px; text-align: center;">Ainda não existem esquadrões atribuídos.</p>`;
+                        }
+
+                        if (isPublicProfile) {
+                            esquadraoContent.innerHTML = turmasHTML;
+                        } else {
+                            esquadraoContent.innerHTML = `
+                                ${turmasHTML}
+                                <a href="professor.html" class="btn btn-primary" style="background-color: #10b981; border-color: #10b981; width: 100%;">Monitorizar Alunos</a>
+                            `;
+                        }
+                    } else {
+                        esquadraoCardTitle.innerHTML = `<i data-lucide="users" class="profile-card-icon"></i> ${isPublicProfile ? 'Esquadrão Tático' : 'O Meu Esquadrão'}`;
+
+                        if (data.id_turma && data.turma) {
+                            const nomeEscola = data.turma.escola ? data.turma.escola.nome : 'Academia CiberHeróis';
+
+                            let conteudoAluno = `
+                                <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 20px 15px; border-radius: 12px; position: relative; overflow: hidden;">
+                                    <div style="display: flex; justify-content: center; margin-bottom: 10px; color: var(--primary-color);">
+                                        <i data-lucide="shield" style="width: 36px; height: 36px;"></i>
+                                    </div>
+                                    <h3 style="color: var(--primary-color); margin-bottom: 5px; font-size: 1.3rem;">${data.turma.nome}</h3>
+                                    <p style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">${nomeEscola}</p>
+                                </div>
+                            `;
+                            esquadraoContent.innerHTML = conteudoAluno;
+
+                        } else {
+                            if (isPublicProfile) {
+                                esquadraoContent.innerHTML = `<p style="color: var(--text-secondary); padding: 15px;">Sem afiliação a um esquadrão.</p>`;
+                            } else {
+                                esquadraoContent.innerHTML = `
+                                    <div style="padding: 10px 0;">
+                                        <div style="color: var(--text-secondary); margin-bottom: 15px; opacity: 0.5;"><i data-lucide="search" style="width: 40px; height: 40px;"></i></div>
+                                        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">Ainda não tens afiliação a um esquadrão tático.</p>
+                                        <button class="btn btn-primary" onclick="openModal('modal-codigo-turma')" style="width: 100%;">
+                                            <i data-lucide="key" style="margin-right: 8px; width: 18px; height: 18px;"></i> Inserir Código
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+
+
+                    // --- ATUALIZAR IMAGEM DE PERFIL ---
                     if (data.foto_perfil) {
                         let caminhoImagem = data.foto_perfil;
                         if (!caminhoImagem.startsWith('http')) {
-                            caminhoImagem = caminhoImagem.startsWith('upload-')
-                                ? `/img/uploads/${data.foto_perfil}`
-                                : `/img/${data.foto_perfil}`;
+                            caminhoImagem = caminhoImagem.startsWith('upload-') ? `/img/uploads/${data.foto_perfil}` : `/img/${data.foto_perfil}`;
                         }
                         avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                     } else {
                         avatarElement.innerHTML = `<img src="/img/default_avatar.png" alt="Avatar"  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                     }
 
-                    // Adicionar as bolinhas de avatar personalizadas
-                    const personalSection = document.getElementById('personal-avatars-section');
+                    lucide.createIcons();
 
-                    if (data.foto_upload) {
-                        const wrapperUpload = document.createElement('div');
-                        wrapperUpload.className = 'personal-avatar-wrapper';
-
-                        const imgUpload = document.createElement('img');
-
-                        let linkUpload = data.foto_upload;
-                        if (!linkUpload.startsWith('http')) {
-                            linkUpload = `/img/uploads/${data.foto_upload}`;
-                        }
-
-                        imgUpload.src = linkUpload;
-                        imgUpload.className = 'avatar-option';
-                        imgUpload.setAttribute('data-avatar', data.foto_upload);
-                        imgUpload.setAttribute('referrerpolicy', 'no-referrer');
-
-                        const labelUpload = document.createElement('span');
-                        labelUpload.className = 'personal-avatar-label';
-                        labelUpload.textContent = 'Último Upload';
-
-                        wrapperUpload.appendChild(imgUpload);
-                        wrapperUpload.appendChild(labelUpload);
-                        personalSection.appendChild(wrapperUpload);
+                    // --- SE FOR O PRÓPRIO UTILIZADOR, CARREGA AS FUNCIONALIDADES PRIVADAS ---
+                    if (!isPublicProfile) {
+                        inicializarSistemaAvatares(data);
+                        carregarAtividadeRecente();
+                        carregarEstatisticas();
                     }
-
-                    if (data.foto_google) {
-                        const wrapperGoogle = document.createElement('div');
-                        wrapperGoogle.className = 'personal-avatar-wrapper';
-
-                        const imgGoogle = document.createElement('img');
-                        imgGoogle.src = data.foto_google;
-                        imgGoogle.className = 'avatar-option';
-                        imgGoogle.setAttribute('data-avatar', data.foto_google);
-                        imgGoogle.setAttribute('referrerpolicy', 'no-referrer');
-                        imgGoogle.alt = "Foto do Google";
-
-                        const labelGoogle = document.createElement('span');
-                        labelGoogle.className = 'personal-avatar-label';
-                        labelGoogle.textContent = 'Conta Google';
-
-                        wrapperGoogle.appendChild(imgGoogle);
-                        wrapperGoogle.appendChild(labelGoogle);
-                        personalSection.appendChild(wrapperGoogle);
-                    }
-
-                    document.querySelectorAll('.avatar-option').forEach(img => {
-                        if (img.getAttribute('data-avatar') === data.foto_perfil) {
-                            img.classList.add('active-avatar');
-                        }
-                    });
                 }
             } catch (error) {
                 console.error("Erro ao carregar perfil:", error);
             }
+        });
 
-            // Lógica para abrir e fechar o modal de escolha de avatar
+        // ==========================================
+        // FUNCIONALIDADES DO AVATAR E MODAIS
+        // ==========================================
+        function inicializarSistemaAvatares(data) {
             const modalAvatar = document.getElementById('avatar-modal');
             const btnOpen = document.getElementById('edit-avatar-btn');
             const btnClose = document.getElementById('close-avatar-btn');
@@ -440,11 +529,33 @@
             if (btnClose) btnClose.addEventListener('click', () => modalAvatar.classList.add('hidden'));
             if (overlay) overlay.addEventListener('click', () => modalAvatar.classList.add('hidden'));
 
-            const modalContent = document.querySelector('.avatar-modal-content');
-            modalContent.addEventListener('click', async (e) => {
+            const personalSection = document.getElementById('personal-avatars-section');
+            if (data.foto_upload || data.foto_google) {
+                if (data.foto_upload) {
+                    let linkUpload = data.foto_upload;
+                    if (!linkUpload.startsWith('http')) linkUpload = `/img/uploads/${data.foto_upload}`;
+                    personalSection.innerHTML += `
+                        <div class="personal-avatar-wrapper">
+                            <img src="${linkUpload}" class="avatar-option" data-avatar="${data.foto_upload}" referrerpolicy="no-referrer">
+                            <span class="personal-avatar-label">Upload</span>
+                        </div>`;
+                }
+                if (data.foto_google) {
+                    personalSection.innerHTML += `
+                        <div class="personal-avatar-wrapper">
+                            <img src="${data.foto_google}" class="avatar-option" data-avatar="${data.foto_google}" referrerpolicy="no-referrer">
+                            <span class="personal-avatar-label">Google</span>
+                        </div>`;
+                }
+            }
+
+            document.querySelectorAll('.avatar-option').forEach(img => {
+                if (img.getAttribute('data-avatar') === data.foto_perfil) img.classList.add('active-avatar');
+            });
+
+            document.querySelector('.avatar-modal-content').addEventListener('click', async (e) => {
                 if (e.target.classList.contains('avatar-option')) {
                     const novoAvatar = e.target.getAttribute('data-avatar');
-
                     try {
                         const response = await fetch('/api/update-avatar', {
                             method: 'PUT',
@@ -453,19 +564,7 @@
                         });
 
                         if (response.ok) {
-                            document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('active-avatar'));
-                            e.target.classList.add('active-avatar');
-
-                            let caminho = novoAvatar;
-                            if (!caminho.startsWith('http')) {
-                                caminho = caminho.startsWith('upload-') ? `/img/uploads/${novoAvatar}` : `/img/${novoAvatar}`;
-                            }
-
-                            const avatarElement = document.querySelector('.profile-avatar');
-                            avatarElement.innerHTML = `<img src="${caminho}" alt="Avatar" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                            modalAvatar.classList.add('hidden');
-                        } else {
-                            alert('Erro ao atualizar avatar.');
+                            window.location.reload();
                         }
                     } catch (error) {
                         console.error("Erro:", error);
@@ -483,132 +582,85 @@
                     formData.append('ficheiroAvatar', file);
 
                     try {
-                        const response = await fetch('/api/upload-avatar', {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert('Erro ao fazer upload da imagem.');
-                        }
+                        const response = await fetch('/api/upload-avatar', { method: 'POST', body: formData });
+                        if (response.ok) window.location.reload();
+                        else alert('Erro ao fazer upload da imagem.');
                     } catch (error) {
                         console.error("Erro no upload:", error);
                     }
                 });
             }
+        }
 
-            // --- FUNÇÃO: CARREGAR ATIVIDADES RECENTES ---
-            async function carregarAtividadeRecente() {
-                try {
-                    const response = await fetch('/api/recent-activity');
-                    if (!response.ok) throw new Error('Falha ao obter atividades');
+        // ==========================================
+        // ATIVIDADE RECENTE & ESTATÍSTICAS
+        // ==========================================
+        async function carregarAtividadeRecente() {
+            try {
+                const response = await fetch('/api/recent-activity');
+                if (!response.ok) throw new Error('Falha ao obter atividades');
+                const atividades = await response.json();
+                const contentor = document.querySelector('.profile-activity');
 
-                    const atividades = await response.json();
-                    const contentorAtividade = document.querySelector('.profile-activity');
+                if (atividades.length === 0) {
+                    contentor.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Ainda não tens atividades registadas.</p>';
+                    return;
+                }
 
-                    contentorAtividade.innerHTML = '';
+                contentor.innerHTML = atividades.map(act => {
+                    const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
+                    const dataRealizacao = new Date(act.data_realizacao).toLocaleDateString('pt-PT');
+                    let textoDescricao = act.total_perguntas ? `${act.respostas_corretas}/${act.total_perguntas} corretas` : 'Concluído';
 
-                    if (atividades.length === 0) {
-                        contentorAtividade.innerHTML = '<p  style="color: var(--text-secondary); padding: 10px;">Ainda não tens atividades registadas. Começa a jogar!</p>';
-                        return;
-                    }
-
-                    atividades.forEach(act => {
-                        const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
-
-                        const dataRealizacao = new Date(act.data_realizacao);
-                        const hoje = new Date();
-                        const ontem = new Date(hoje);
-                        ontem.setDate(ontem.getDate() - 1);
-
-                        let textoData = dataRealizacao.toLocaleDateString('pt-PT');
-
-                        if (dataRealizacao.toDateString() === hoje.toDateString()) {
-                            textoData = 'Hoje';
-                        } else if (dataRealizacao.toDateString() === ontem.toDateString()) {
-                            textoData = 'Ontem';
-                        }
-
-                        let textoDescricao = 'Concluído';
-                        if (act.respostas_corretas !== null && act.total_perguntas !== null && act.total_perguntas > 0) {
-                            textoDescricao = `${act.respostas_corretas}/${act.total_perguntas} corretas`;
-                        }
-
-                        const itemHTML = `
-                            <div class="profile-activity-item">
-                                <div>
-                                    <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
-                                    <div class="profile-activity-desc">${textoDescricao}</div>
-                                </div>
-                                <div class="profile-activity-right">
-                                    <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
-                                    <div class="profile-activity-time">${textoData}</div>
-                                </div>
+                    return `
+                        <div class="profile-activity-item">
+                            <div>
+                                <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
+                                <div class="profile-activity-desc">${textoDescricao}</div>
                             </div>
-                        `;
-
-                        contentorAtividade.insertAdjacentHTML('beforeend', itemHTML);
-                    });
-
-                } catch (error) {
-                    console.error("Erro ao carregar o histórico:", error);
-                    const contentorAtividade = document.querySelector('.profile-activity');
-                    contentorAtividade.innerHTML = '<p  style="color: var(--error);">Não foi possível carregar as atividades recentes.</p>';
-                }
+                            <div class="profile-activity-right">
+                                <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
+                                <div class="profile-activity-time">${dataRealizacao}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error("Erro ao carregar histórico:", error);
             }
+        }
 
-            // --- NOVA FUNÇÃO: CARREGAR ESTATÍSTICAS, PONTOS E NÍVEIS ---
-            async function carregarEstatisticas() {
-                try {
-                    const response = await fetch('/api/stats');
-                    if (!response.ok) throw new Error('Falha ao obter estatísticas');
+        async function carregarEstatisticas() {
+            try {
+                const response = await fetch('/api/stats');
+                if (!response.ok) return;
+                const stats = await response.json();
 
-                    const stats = await response.json();
+                document.getElementById('stat-quizzes').textContent = stats.quizzes;
+                document.getElementById('stat-precisao').textContent = stats.precisao + '%';
+                document.getElementById('stat-medalhas').textContent = stats.medalhas;
+                document.getElementById('stat-respostas').textContent = stats.respostas;
 
-                    // 1. Atualizar estatísticas dos retângulos
-                    document.getElementById('stat-quizzes').textContent = stats.quizzes;
-                    document.getElementById('stat-precisao').textContent = stats.precisao + '%';
-                    document.getElementById('stat-medalhas').textContent = stats.medalhas;
-                    document.getElementById('stat-respostas').textContent = stats.respostas;
+                document.getElementById('profile-points-badge').textContent = `${stats.pontos || 0} Pontos`;
+                document.getElementById('profile-level-badge').textContent = `Nível ${stats.nivel}`;
 
-                    // 2. Atualizar Pontos, Nível, Ranking e Streak
-                    const badgePontosPerfil = document.getElementById('profile-points-badge');
-                    const badgeNivelPerfil = document.getElementById('profile-level-badge');
-                    const badgeRanking = document.getElementById('profile-ranking-badge');
-                    const badgeStreak = document.getElementById('profile-streak-badge');
+                const badgeRanking = document.getElementById('profile-ranking-badge');
+                if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
 
-                    if (badgePontosPerfil) badgePontosPerfil.textContent = `${stats.pontos || 0} Pontos`;
-                    if (badgeNivelPerfil) badgeNivelPerfil.textContent = `Nível ${stats.nivel}`;
-                    
-                    if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
-                    if (badgeStreak) badgeStreak.textContent = `${stats.ofensiva || 0} Dias`;
+                const badgeStreak = document.getElementById('profile-streak-badge');
+                if (badgeStreak) badgeStreak.textContent = `${stats.ofensiva || 0} Dias`;
 
-                    // 3. Atualizar a Barra de Progresso
-                    const barraTexto = document.getElementById('profile-progress-text');
-                    const barraRestante = document.getElementById('profile-progress-remaining');
-                    const barraPreenchimento = document.getElementById('profile-progress-bar-fill');
-
-                    if (barraTexto) barraTexto.textContent = `Progresso para Nível ${stats.nivel + 1}`;
-                    if (barraRestante) barraRestante.textContent = `${stats.pontos_restantes} pontos restantes`;
-                    if (barraPreenchimento) barraPreenchimento.style.width = `${stats.progresso_perc}%`;
-
-                } catch (error) {
-                    console.error("Erro ao carregar estatísticas do Perfil:", error);
-                }
+                document.getElementById('profile-progress-text').textContent = `Progresso para Nível ${stats.nivel + 1}`;
+                document.getElementById('profile-progress-remaining').textContent = `${stats.pontos_restantes} pontos restantes`;
+                document.getElementById('profile-progress-bar-fill').style.width = `${stats.progresso_perc}%`;
+            } catch (error) {
+                console.error("Erro ao carregar estatísticas:", error);
             }
-
-            // Executar as funções ao carregar a página
-            carregarAtividadeRecente();
-            carregarEstatisticas();
-
-        });
+        }
 
         // ==========================================
         // FUNÇÕES GLOBAIS (MODAIS E TURMAS)
         // ==========================================
-
         window.openModal = function (id) { document.getElementById(id).classList.add('active'); }
         window.closeModal = function (id) { document.getElementById(id).classList.remove('active'); }
 
@@ -624,7 +676,7 @@
                 return;
             }
 
-            btn.textContent = "A desencriptar...";
+            btn.textContent = "A validar...";
             btn.disabled = true;
 
             try {
@@ -645,20 +697,13 @@
                     erroBox.style.display = 'block';
                 }
             } catch (e) {
-                erroBox.textContent = "Erro de comunicação com o servidor central.";
+                erroBox.textContent = "Erro de comunicação com o servidor.";
                 erroBox.style.display = 'block';
             } finally {
                 btn.textContent = "Validar Código";
                 btn.disabled = false;
             }
         }
-
-        // Atualizar Ofensiva e Ranking
-        const badgeRanking = document.getElementById('profile-ranking-badge');
-        const badgeStreak = document.getElementById('profile-streak-badge');
-
-        if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
-        if (badgeStreak) badgeStreak.textContent = `${stats.ofensiva || 0} Dias`;
     </script>
 </body>
 
