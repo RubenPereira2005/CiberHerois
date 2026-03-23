@@ -152,6 +152,9 @@ app.use('/api/leaderboard', leaderboardRoutes);
 const professorRoutes = require('./routes/professor')(supabase);
 app.use('/api/professor', professorRoutes);
 
+const shopRoutes = require('./routes/shop')(supabase);
+app.use('/api/shop', shopRoutes);
+
 // Rota principal (Frontend)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));

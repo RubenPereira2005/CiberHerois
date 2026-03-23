@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja - CiberHeróis</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
+    <link rel="stylesheet" href="shop.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+</head>
+
+<body class="site-body">
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+
+    <div class="auth-container" style="max-width: 1000px; padding: 20px; padding-top: 100px;">
+        
+        <header class="shop-header">
+            <h1 class="shop-header-title">
+                <i data-lucide="shopping-bag" style="width: 32px; height: 32px;"></i>
+                CiberShop
+            </h1>
+            <div class="shop-balance">
+                <img src="../img/coin.svg" class="shop-balance-icon">
+                <span id="user-coins-display">--</span> CiberCoins
+            </div>
+        </header>
+
+        <div class="shop-filters">
+            <button class="filter-btn active" onclick="filtrarLoja('todos', this)"><i data-lucide="layout-grid" style="width: 18px;"></i> Todos</button>
+            <button class="filter-btn" onclick="filtrarLoja('avatar', this)"><i data-lucide="user" style="width: 18px;"></i> Avatares</button>
+            <button class="filter-btn" onclick="filtrarLoja('moldura', this)"><i data-lucide="frame" style="width: 18px;"></i> Molduras</button>
+        </div>
+
+        <section class="shop-section">
+            <h2 class="shop-section-title">
+                <i data-lucide="unlock" style="color: #f59e0b;"></i>
+                Novidades para Desbloquear
+            </h2>
+            <div id="shop-available-grid" class="shop-grid">
+                <p style="color: var(--text-secondary);">A carregar loja...</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <h2 class="shop-section-title">
+                <i data-lucide="package-check" style="color: #10b981;"></i>
+                O Meu Inventário
+            </h2>
+            <div id="shop-owned-grid" class="shop-grid">
+                </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            await carregarLoja();
+        });
+
+        let saldoAtual = 0;
+
+        async function carregarLoja() {
+            try {
+                // 1. Vai buscar os dados do utilizador (para saber o saldo)
+                const userRes = await fetch('/api/me');
+                if (!userRes.ok) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                const userData = await userRes.json();
+                saldoAtual = userData.coins || 0;
+                document.getElementById('user-coins-display').innerText = saldoAtual;
+
+                // 2. Vai buscar os itens da loja
+                const shopRes = await fetch('/api/shop/itens');
+                if (!shopRes.ok) throw new Error('Falha ao carregar itens da loja');
+                const shopItems = await shopRes.json();
+
+                // 3. Limpa as grelhas
+                const availableGrid = document.getElementById('shop-available-grid');
+                const ownedGrid = document.getElementById('shop-owned-grid');
+                availableGrid.innerHTML = '';
+                ownedGrid.innerHTML = '';
+
+                let itemsDisponiveis = 0;
+                let itemsAdquiridos = 0;
+
+                // 4. Preenche as grelhas
+                shopItems.forEach(item => {
+                    if (item.preco === 0 && item.tipo === 'avatar') return; // Ignora avatares base
+
+                    // Verifica se o item está equipado (depende se é avatar ou moldura)
+                    const isEquipado = item.tipo === 'avatar' 
+                        ? item.imagem_url === userData.foto_perfil 
+                        : item.imagem_url === userData.moldura_perfil;
+                    
+                    // A função que o botão vai chamar
+                    const funcEquipar = item.tipo === 'avatar' ? 'equiparAvatar' : 'equiparMoldura';
+
+                    // O HTML de cada cartão ganha a class 'item-card' e o data-tipo para o filtro
+                    let cardHtml = '';
+                    
+                    if (item.comprado) {
+                        itemsAdquiridos++;
+                        let btnHtml = isEquipado 
+                            ? `<button class="shop-btn" style="background: #475569; color: white; margin-top: 10px; cursor: default;" disabled><i data-lucide="check-circle"></i> Em Uso</button>`
+                            : `<button class="shop-btn btn-equip" onclick="${funcEquipar}('${item.imagem_url}')"><i data-lucide="plus"></i> Equipar</button>`;
+
+                        cardHtml = `
+                            <div class="shop-card item-card" data-tipo="${item.tipo}">
+                                <img src="/img/${item.imagem_url}" class="shop-item-img" style="${isEquipado ? 'border-color: var(--primary-color);' : ''}">
+                                <h3 class="shop-item-name">${item.nome}</h3>
+                                <p class="shop-item-desc">${item.descricao}</p>
+                                <button class="shop-btn btn-owned" disabled><i data-lucide="check"></i> Adquirido</button>
+                                ${btnHtml}
+                            </div>
+                        `;
+                        ownedGrid.innerHTML += cardHtml;
+                    } else {
+                        itemsDisponiveis++;
+                        cardHtml = `
+                            <div class="shop-card item-card" data-tipo="${item.tipo}">
+                                <img src="/img/${item.imagem_url}" class="shop-item-img" style="filter: brightness(0.6);">
+                                <h3 class="shop-item-name">${item.nome}</h3>
+                                <p class="shop-item-desc">${item.descricao}</p>
+                                <button class="shop-btn btn-buy" onclick="comprarItem(${item.id_item}, ${item.preco}, '${item.nome}')">
+                                    <i data-lucide="circle-dollar-sign"></i> ${item.preco} CC
+                                </button>
+                            </div>
+                        `;
+                        availableGrid.innerHTML += cardHtml;
+                    }
+                });
+
+                if (itemsDisponiveis === 0) {
+                    availableGrid.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1 / -1;">Já compraste tudo o que havia na loja! 😎</p>`;
+                }
+                if (itemsAdquiridos === 0) {
+                    ownedGrid.innerHTML = `<p style="color: var(--text-secondary); grid-column: 1 / -1;">Ainda não tens itens no teu inventário.</p>`;
+                }
+
+                lucide.createIcons();
+
+            } catch (error) {
+                console.error("Erro na loja:", error);
+                document.getElementById('shop-available-grid').innerHTML = `<p style="color: #ef4444;">Erro ao carregar a loja. Tenta recarregar a página.</p>`;
+            }
+        }
+
+        // Função para comprar avatar na loja
+        async function comprarItem(idItem, preco, nomeItem) {
+            if (saldoAtual < preco) {
+                alert(`❌ Não tens CiberCoins suficientes!\nPrecisas de ${preco} moedas, mas só tens ${saldoAtual}. Faz mais quizzes!`);
+                return;
+            }
+
+            if (confirm(`Queres mesmo gastar ${preco} CiberCoins para comprar o "${nomeItem}"?`)) {
+                try {
+                    const response = await fetch('/api/shop/comprar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_item: idItem })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert(`🎉 Compra efetuada com sucesso! O avatar foi adicionado ao teu inventário.`);
+                        
+                        // --- O SEGREDO ESTÁ AQUI: REFRESH SILENCIOSO ---
+                        await carregarLoja(); // Atualiza as grelhas da loja e o saldo grande
+                        
+                        if (typeof window.atualizarHeaderGlobal === 'function') {
+                            await window.atualizarHeaderGlobal(); // Atualiza as moedas na Navbar de cima
+                        }
+                    } else {
+                        alert(`Erro: ${data.error}`);
+                    }
+                } catch (error) {
+                    console.error("Erro ao comprar:", error);
+                    alert("Erro de comunicação com o servidor.");
+                }
+            }
+        }
+
+        // Função para equipar diretamente pela loja
+        async function equiparAvatar(urlImagem) {
+            try {
+                const response = await fetch('/api/update-avatar', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ avatar: urlImagem })
+                });
+
+                if (response.ok) {
+                    // --- REFRESH SILENCIOSO DOS BOTÕES ---
+                    // Isto vai fazer com que o avatar escolhido passe a dizer "Em Uso" e o antigo passe a "Equipar"
+                    await carregarLoja(); 
+                    
+                    // Um pequeno alerta para o utilizador perceber que resultou
+                    alert("👕 Avatar equipado com sucesso!");
+                } else {
+                    alert("Erro ao equipar o avatar.");
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+            }
+        }
+
+        // Filtra os itens visíveis na loja
+        function filtrarLoja(tipo, btnClicado) {
+            // Muda a cor do botão ativo
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnClicado.classList.add('active');
+
+            // Esconde/Mostra os cartões
+            document.querySelectorAll('.item-card').forEach(card => {
+                if (tipo === 'todos' || card.getAttribute('data-tipo') === tipo) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Função para equipar Moldura
+        async function equiparMoldura(urlImagem) {
+            try {
+                const response = await fetch('/api/update-border', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ border: urlImagem })
+                });
+
+                if (response.ok) {
+                    await carregarLoja(); 
+                    alert("✨ Moldura equipada com sucesso!");
+                } else {
+                    alert("Erro ao equipar a moldura.");
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+            }
+        }
+    </script>
+</body>
+</html>

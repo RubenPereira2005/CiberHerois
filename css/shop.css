@@ -1,0 +1,191 @@
+/* =========================================================
+           ESTILOS BASE (LIGHT MODE)
+========================================================= */
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3b82f6;
+    /* Cor sólida de segurança */
+    background-image: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.shop-header-title {
+    margin: 0;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    /* Título garantido sempre a branco */
+}
+
+.shop-balance {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    /* Texto do saldo sempre a branco */
+}
+
+.shop-balance-icon {
+    color: #fbd38d;
+    height: 35px;
+}
+
+.shop-section {
+    margin-bottom: 3rem;
+}
+
+.shop-section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.shop-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.shop-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.shop-item-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 4px solid var(--border-color);
+}
+
+.shop-item-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+.shop-item-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    flex-grow: 1;
+    /* Preenche o espaço para alinhar botões */
+}
+
+.shop-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-buy {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btn-buy:hover {
+    background-color: #d97706;
+}
+
+.btn-owned {
+    background-color: #10b981;
+    color: white;
+    cursor: default;
+}
+
+.btn-equip {
+    background-color: var(--primary-color);
+    color: white;
+    margin-top: 10px;
+}
+
+.btn-equip:hover {
+    filter: brightness(0.9);
+}
+
+.shop-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 2px solid var(--border-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-btn.active {
+    background: purple;
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* =========================================================
+           ESTILOS ESPECÍFICOS (DARK MODE)
+========================================================= */
+body.dark-mode .shop-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .shop-item-img {
+    border-color: #334155;
+}
+
+body.dark-mode .filter-btn:not(.active) {
+    color: #f1f5f9;
+    border-color: #334155;
+}

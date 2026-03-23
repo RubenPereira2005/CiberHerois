@@ -88,7 +88,7 @@ module.exports = (supabase) => {
         }
     });
 
-    // --- ROTA: Guardar a pontuação do quiz ---
+    // --- ROTA: Guardar a pontuação do quiz e dar moedas ---
     router.post('/save-score', async (req, res) => {
         if (!req.session.userId) {
             return res.status(401).json({ error: "Utilizador não autenticado" });
@@ -123,25 +123,45 @@ module.exports = (supabase) => {
 
             if (errorProgresso) throw errorProgresso;
 
-            // 3. Atualiza a coluna 'pontos_totais' na tabela Utilizador
-            // Primeiro, busca o total atual para somar a nova pontuação
+            // 3. Atualiza a coluna 'pontos_totais' e 'coins' na tabela Utilizador
             const { data: userData, error: userError } = await supabase
                 .from('utilizador')
-                .select('pontos_totais')
+                .select('pontos_totais, coins')
                 .eq('id_utilizador', req.session.userId)
                 .single();
 
+            let moedasGanhas = 0;
+
             if (!userError && userData) {
+                // Soma os XP (pontos totais)
                 const novosPontos = (userData.pontos_totais || 0) + pontos;
                 
-                // Atualiza a pontuação total do utilizador
+                // --- LÓGICA DAS MOEDAS ---
+                // Se ele acertou pelo menos uma pergunta, ganha moedas (evita dar moedas a quem erra tudo)
+                if (respostas_corretas > 0) {
+                    const minCoins = 10;
+                    const maxCoins = 50;
+                    // Gera número aleatório entre 10 e 50
+                    moedasGanhas = Math.floor(Math.random() * (maxCoins - minCoins + 1)) + minCoins;
+                }
+                
+                const novasCoins = (userData.coins || 0) + moedasGanhas;
+                
+                // Atualiza a pontuação total e as coins do utilizador
                 await supabase
                     .from('utilizador')
-                    .update({ pontos_totais: novosPontos })
+                    .update({ 
+                        pontos_totais: novosPontos,
+                        coins: novasCoins // GUARDA AS MOEDAS NA DB
+                    })
                     .eq('id_utilizador', req.session.userId);
             }
 
-            res.json({ message: "Pontuação guardada com sucesso no histórico e no perfil!" });
+            // RETORNA AS MOEDAS GANHAS PARA O FRONTEND MOSTRAR!
+            res.json({ 
+                message: "Pontuação guardada com sucesso no histórico e no perfil!",
+                moedas_ganhas: moedasGanhas
+            });
 
         } catch (err) {
             console.error("Erro ao guardar pontuação:", err.message);

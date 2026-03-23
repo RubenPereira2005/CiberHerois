@@ -1,52 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - CiberHeróis</title>
     <link rel="icon" type="image/x-icon" href="img/favicon.svg">
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="global-init.js"></script>
+    <script src="theme.js"></script>
 </head>
+
 <body class="quiz-page-body">
 
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+
     <div id="stars-container" class="stars-container"></div>
-
-    <nav class="auth-navbar">
-        <div class="auth-navbar-inner">
-            <div class="auth-navbar-left">
-                <a href="quizzes.html" class="auth-brand">CiberHeróis</a>
-                <div class="auth-navbar-menu">
-                    <a href="resources.html" class="auth-navbar-link">Recursos</a>
-                    <a href="quizzes.html" class="auth-navbar-link auth-navbar-link-active">Quizzes</a>
-                </div>
-            </div>
-
-            <div class="auth-navbar-right">
-                <button class="auth-navbar-btn">
-                    <i data-lucide="sun" class="auth-navbar-icon"></i>
-                </button>
-                <button class="auth-navbar-btn">
-                    <i data-lucide="search" class="auth-navbar-icon"></i>
-                </button>
-                
-                <div class="auth-navbar-badge">
-                    <i data-lucide="trophy" class="auth-navbar-badge-icon"></i>
-                    <div class="auth-navbar-badge-content">
-                        <span class="auth-navbar-badge-label">Nível 2</span>
-                        <span class="auth-navbar-badge-value">150 pts</span>
-                    </div>
-                </div>
-
-                <a href="profile.html" class="auth-navbar-btn" title="Ver Perfil">
-                    <i data-lucide="user" class="auth-navbar-icon"></i>
-                </a>
-                <a href="index.html" class="auth-navbar-btn auth-navbar-logout" title="Sair">
-                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
-                </a>
-            </div>
-        </div>
-    </nav>
 
     <div id="quiz-ui" class="quiz-play-container">
         <div class="quiz-play-header">
@@ -55,15 +32,15 @@
                 <span id="score-counter">Pontuação: 0</span>
             </div>
             <div class="quiz-progress-track">
-                <div id="progress-bar" class="quiz-progress-fill"  style="width: 0%;"></div>
+                <div id="progress-bar" class="quiz-progress-fill" style="width: 0%;"></div>
             </div>
         </div>
 
         <div class="quiz-question-box">
             <h2 id="question-text" class="quiz-question-text">A ligar à Base de Dados...</h2>
-            
+
             <div id="options-container" class="quiz-options-container">
-                </div>
+            </div>
 
             <button id="next-btn" onclick="nextQuestion()" class="btn btn-primary quiz-next-btn quiz-hidden">
                 Próxima Questão
@@ -74,10 +51,10 @@
     <div id="results-ui" class="quiz-results-overlay quiz-hidden">
         <div class="quiz-results-card">
             <div id="result-icon" class="quiz-results-icon"></div>
-            
+
             <h2 class="quiz-results-title">Quiz Completo!</h2>
             <p id="result-text" class="quiz-results-text">Acertou X de Y questões</p>
-            
+
             <div class="quiz-results-score-box">
                 <p id="result-points" class="quiz-results-score-text">Ganhou 0 pontos!</p>
             </div>
@@ -100,11 +77,12 @@
     <script>
         // SETUP DO JOGO
         const urlParams = new URLSearchParams(window.location.search);
-        const category = urlParams.get('cat') || 'https'; // Ex: '?cat=https'
+        const category = urlParams.get('cat') || 'https';
 
         let questions = [];
         let currentQIndex = 0;
         let score = 0;
+        let totalPontosGanhos = 0;
         let answered = false;
 
         // Função para baralhar apenas as opções de resposta
@@ -116,19 +94,18 @@
             return array;
         }
 
-        // Função que comunica com a API para obter as questões do quiz com base na categoria
+        // Função que comunica com a API para obter as questões
         async function loadQuizData() {
             try {
-                
                 const response = await fetch(`/api/quiz/${category}`);
-                
+
                 if (!response.ok) throw new Error('Erro na resposta da API');
-                
+
                 questions = await response.json();
 
-                // Baralhar apenas as opções (para a resposta certa não estar sempre no mesmo sítio)
+                // Baralhar apenas as opções
                 questions.forEach(q => {
-                    if(q.options) {
+                    if (q.options) {
                         q.options = shuffleArray(q.options);
                     }
                 });
@@ -146,36 +123,32 @@
             if (questions.length === 0) return;
 
             const q = questions[currentQIndex];
-            
-            // Mostrar em que nível de dificuldade estamos (Fácil, Médio, Difícil)
+
+            // Mostrar em que nível de dificuldade estamos
             let diffText = q.dificuldade === 'facil' ? '🟢 Fácil' : q.dificuldade === 'medio' ? '🟡 Médio' : '🔴 Difícil';
-            
+
             document.getElementById('question-counter').textContent = `Questão ${currentQIndex + 1} de ${questions.length} | ${diffText}`;
-            document.getElementById('score-counter').textContent = `Pontuação: ${score}`;
+            document.getElementById('score-counter').textContent = `XP Acumulado: ${totalPontosGanhos}`; // Atualizado para mostrar XP
             document.getElementById('progress-bar').style.width = `${((currentQIndex + 1) / questions.length) * 100}%`;
             document.getElementById('question-text').textContent = q.question;
-            
+
             document.getElementById('next-btn').classList.add('quiz-hidden');
-            
+
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
-            
-            // Usamos os IDs reais (id_opcao) que vêm da Base de Dados
+
             q.options.forEach((opt, index) => {
-                const letras = ['A', 'B', 'C', 'D', 'E']; // Apenas para exibição visual
+                const letras = ['A', 'B', 'C', 'D', 'E'];
                 const btn = document.createElement('button');
                 btn.className = `quiz-option-btn`;
                 btn.innerHTML = `<span class="quiz-option-label">${letras[index]})</span> ${opt.text}`;
-                
-                // GUARDAR NO DATASET SE É A CORRETA OU NÃO (usando == para evitar problemas de tipos)
+
                 btn.dataset.isCorrect = (opt.id == q.correctAnswer) ? "true" : "false";
-                
-                // Passamos o botão, o id da opção escolhida, e o id da opção correta
                 btn.onclick = () => handleAnswer(btn, opt.id, q.correctAnswer);
-                
+
                 optionsContainer.appendChild(btn);
             });
-            
+
             answered = false;
         }
 
@@ -183,24 +156,38 @@
             if (answered) return;
             answered = true;
 
-            // COMPARAÇÃO SEGURA (usando ==)
             const isCorrect = (selectedId == correctId);
-            if (isCorrect) score++;
+            if (isCorrect) {
+                score++;
+
+                // === LÓGICA DE PONTOS POR DIFICULDADE ===
+                const dificuldade = questions[currentQIndex].dificuldade;
+                if (dificuldade === 'facil') {
+                    totalPontosGanhos += 10;
+                } else if (dificuldade === 'medio') {
+                    totalPontosGanhos += 20;
+                } else if (dificuldade === 'dificil') {
+                    totalPontosGanhos += 30;
+                } else {
+                    totalPontosGanhos += 10; // Valor por defeito
+                }
+            }
 
             const buttons = document.getElementById('options-container').children;
             for (let b of buttons) {
                 b.disabled = true;
-                
-                // MOSTRAR A CORRETA BASEADO NO DATASET
+
                 if (b.dataset.isCorrect === "true") {
                     b.classList.add('correct');
                 }
-                
-                // Marcar de vermelho se o utilizador clicou na errada
+
                 if (b === btn && !isCorrect) {
                     b.classList.add('wrong');
                 }
             }
+
+            // Atualiza o contador de XP imediatamente no ecrã para dar feedback ao utilizador
+            document.getElementById('score-counter').textContent = `XP Acumulado: ${totalPontosGanhos}`;
 
             const nextBtn = document.getElementById('next-btn');
             nextBtn.textContent = currentQIndex < questions.length - 1 ? 'Próxima Questão' : 'Ver Resultados';
@@ -216,14 +203,12 @@
             }
         }
 
-        // NOVA FUNÇÃO SHOWRESULTS
         async function showResults() {
             document.getElementById('quiz-ui').classList.add('quiz-hidden');
             document.getElementById('results-ui').classList.remove('quiz-hidden');
-            
+
             const percentage = (score / questions.length) * 100;
-            const pontosGanhos = score * 10; // Calcula os pontos
-            
+
             const iconContainer = document.getElementById('result-icon');
             if (percentage === 100) {
                 iconContainer.innerHTML = '<i data-lucide="trophy"  style="width: 80px; height: 80px; color: #eab308; stroke-width: 1.5;"></i>';
@@ -233,16 +218,15 @@
             } else {
                 iconContainer.innerHTML = '<i data-lucide="x-circle"  style="width: 80px; height: 80px; color: #9ca3af; stroke-width: 1.5;"></i>';
             }
-            
+
             document.getElementById('result-text').textContent = `Acertou ${score} de ${questions.length} questões`;
-            document.getElementById('result-points').textContent = `Ganhou ${pontosGanhos} pontos!`;
-            
-            // Recriar ícones para o ecrã de resultados ser renderizado corretamente
+            document.getElementById('result-points').textContent = `A calcular recompensas...`;
+
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
 
-            // --- ENVIAR PARA A BASE DE DADOS ---
+            // --- ENVIAR XP PARA A DB E RECEBER MOEDAS ---
             try {
                 const response = await fetch('/api/quiz/save-score', {
                     method: 'POST',
@@ -251,26 +235,36 @@
                     },
                     body: JSON.stringify({
                         categoria: category,
-                        pontos: pontosGanhos,
+                        pontos: totalPontosGanhos, // Usa os pontos calculados pela dificuldade
                         respostas_corretas: score,
                         total_perguntas: questions.length
                     })
                 });
 
-                if (!response.ok) {
-                    console.error("Falha ao guardar a pontuação no servidor.");
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Sucesso:", data.message);
+
+                    // Mostra o XP e as CiberCoins geradas no backend!
+                    if (data.moedas_ganhas && data.moedas_ganhas > 0) {
+                        document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong> e <strong>${data.moedas_ganhas} CiberCoins</strong>! 🪙`;
+                    } else {
+                        document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>!`;
+                    }
                 } else {
-                    console.log("Pontuação guardada na base de dados com sucesso!");
+                    console.error("Falha ao guardar a pontuação no servidor.");
+                    document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>! <br><small>(Modo Offline/Erro de Servidor)</small>`;
                 }
             } catch (erro) {
                 console.error("Erro de rede ao tentar guardar a pontuação:", erro);
+                document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>! <br><small>(Modo Offline/Erro de Rede)</small>`;
             }
         }
 
-        // Efeitos visuais (Estrelas no fundo)
+        // Efeitos visuais
         const starsContainer = document.getElementById('stars-container');
         if (starsContainer) {
-            for(let i=0; i<30; i++) {
+            for (let i = 0; i < 30; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.width = Math.random() * 3 + 'px';
@@ -282,12 +276,10 @@
             }
         }
 
-        // Inicializar ícones da Navbar
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
-        
-        // INICIAR O QUIZ: Vai buscar os dados e arranca!
+
         loadQuizData();
     </script>
 </body>
