@@ -8,6 +8,7 @@ body.dark-mode {
 /* Navbar e Containers */
 body.dark-mode .auth-navbar {
     background: #1e293b !important;
+    /* Azul muito escuro */
     border-bottom: 1px solid #334155;
 }
 
@@ -107,47 +108,60 @@ body.dark-mode .resources-section-title {
 /* Cartões de Recurso */
 body.dark-mode .resource-card {
     background-color: #1e293b !important;
+    /* [cite: 116, 158] */
     border: 1px solid #334155 !important;
+    /* [cite: 158] */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+    /* [cite: 116] */
 }
 
 body.dark-mode .resource-card-title {
     color: #ffffff !important;
+    /* [cite: 124] */
 }
 
 body.dark-mode .resource-card-description,
 body.dark-mode .resource-card-label {
     color: #94a3b8 !important;
+    /* [cite: 124, 125] */
 }
 
 /* Ajuste dos Botões Secundários nos Cards (Download/Opções) */
 body.dark-mode .resource-card-btn-secondary {
     background-color: #334155 !important;
+    /* [cite: 129] */
     color: #f1f5f9 !important;
+    /* [cite: 129] */
 }
 
 body.dark-mode .resource-card-btn-secondary:hover {
     background-color: #475569 !important;
+    /* [cite: 129] */
 }
 
 /* Ícones dentro dos cards (Garante que o SVG herda a cor correta) */
 body.dark-mode .resource-card-icon i,
 body.dark-mode .resource-card-icon svg {
     color: #ffffff !important;
+    /* [cite: 121] */
 }
 
 /* Secção de Sugestão (ao fundo da página) */
 body.dark-mode .suggestion-section {
     background-color: #1e293b !important;
+    /* [cite: 140] */
     border: 1px solid #334155 !important;
+    /* [cite: 140] */
 }
 
 body.dark-mode .suggestion-section-title {
     color: #ffffff !important;
+    /* [cite: 140] */
 }
 
 body.dark-mode .suggestion-section-description {
     color: #94a3b8 !important;
+    /* [cite: 141] */
 }
 
 
@@ -854,8 +868,7 @@ body.dark-mode .search-dropdown-footer:hover {
 }
 
 body.dark-mode .search-highlight {
-    color: #60a5fa;
-    /* Azul mais claro para destacar no fundo escuro */
+    color: #60a5fa; /* Azul mais claro para destacar no fundo escuro */
 }
 
 body.dark-mode .search-result-item.active-search-item {

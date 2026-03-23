@@ -1864,7 +1864,6 @@ body.site-body {
   display: block;
 }
 
-/* ====== Profile Page Styles ====== */
 /* ====== Profile Header ====== */
 .profile-header {
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
@@ -1887,26 +1886,50 @@ body.site-body {
   gap: 24px;
 }
 
-.profile-avatar {
+.profile-avatar-container {
+  position: relative;
+  display: inline-block;
   width: 96px;
   height: 96px;
+  flex-shrink: 0;
+}
+
+/* A foto redonda que fica por baixo */
+.profile-avatar {
+  width: 100%;
+  height: 100%;
   background: #fff;
   border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  flex-shrink: 0;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Moldura (Fica por cima e ligeiramente maior) */
+.profile-border {
+  position: absolute;
+  top: -25%;  /* Puxa para cima para centrar */
+  left: -25%; /* Puxa para a esquerda para centrar (Tem de se dividir os % a mais pela metade ex:140 - 40/2)*/ 
+  width: 150%;
+  height: 150%;
+  pointer-events: none; 
+  z-index: 5;
 }
 
 /* Botão do Lápis */
 .edit-avatar-btn {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: -4px; /* Ajustado ligeiramente para não sobrepor muito a moldura */
+  right: -4px;
   background: #3b82f6;
-  /* Azul CiberHeróis */
   color: white;
   border: none;
   border-radius: 50%;
@@ -1918,6 +1941,7 @@ body.site-body {
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s;
+  z-index: 10;
 }
 
 .edit-avatar-btn:hover {
@@ -1945,7 +1969,7 @@ body.site-body {
 .profile-header-badge {
   background: rgba(255, 255, 255, 0.2);
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   backdrop-filter: blur(10px);
 }
 

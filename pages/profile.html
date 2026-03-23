@@ -27,9 +27,9 @@
         <div class="profile-header">
             <div class="profile-header-content">
                 <div class="profile-header-left">
-                    <div class="profile-avatar-container" style="position: relative; display: inline-block;">
+                    <div class="profile-avatar-container">
                         <div class="profile-avatar">
-                        </div>
+                            </div>
                         <button id="edit-avatar-btn" class="edit-avatar-btn" title="Mudar Avatar">
                             <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
                         </button>
@@ -50,20 +50,16 @@
                                     <span class="profile-header-badge-text" id="profile-points-badge">-- Pontos</span>
                                 </div>
                             </div>
-                            <div class="profile-header-badge"
-                                style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
+                            <div class="profile-header-badge" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="globe" class="profile-header-icon" style="color: #f59e0b;"></i>
-                                    <span class="profile-header-badge-text" id="profile-ranking-badge"
-                                        style="color: #f59e0b;">Top --</span>
+                                    <span class="profile-header-badge-text" id="profile-ranking-badge" style="color: #f59e0b;">Top --</span>
                                 </div>
                             </div>
-                            <div class="profile-header-badge"
-                                style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                            <div class="profile-header-badge" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="flame" class="profile-header-icon" style="color: #ef4444;"></i>
-                                    <span class="profile-header-badge-text" id="profile-streak-badge"
-                                        style="color: #ef4444;">-- Dias</span>
+                                    <span class="profile-header-badge-text" id="profile-streak-badge" style="color: #ef4444;">-- Dias</span>
                                 </div>
                             </div>
                         </div>
@@ -91,7 +87,6 @@
 
         <div class="profile-grid">
             <div class="profile-content">
-
                 <div class="profile-card">
                     <h2 class="profile-card-title">
                         <i data-lucide="trending-up" class="profile-card-icon"></i>
@@ -128,21 +123,18 @@
                 </div>
 
                 <div class="profile-card">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h2 class="profile-card-title" style="margin: 0;">
                             <i data-lucide="calendar" class="profile-card-icon"></i>
                             Atividade Recente
                         </h2>
-                        <a href="historico.html?id=${id}"
-                            style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                        <a href="historico.html" id="btn-ver-historico" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                             Ver Tudo <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                         </a>
                     </div>
                     <div class="profile-activity">
                     </div>
                 </div>
-
             </div>
 
             <div class="profile-card profile-medals">
@@ -193,32 +185,37 @@
         <div class="avatar-modal-overlay" id="close-modal-overlay"></div>
         <div class="avatar-modal-content">
             <div class="avatar-modal-header">
-                <h2>Escolhe o teu Herói</h2>
+                <h2>Inventário</h2>
                 <button id="close-avatar-btn" class="close-modal-btn">
                     <i data-lucide="x"></i>
                 </button>
             </div>
 
-            <div class="avatar-grid">
-                <img src="/img/avatar1.avif" class="avatar-option" data-avatar="avatar1.avif" alt="Avatar 1">
-                <img src="/img/avatar2.jpg" class="avatar-option" data-avatar="avatar2.jpg" alt="Avatar 2">
-                <img src="/img/avatar3.avif" class="avatar-option" data-avatar="avatar3.avif" alt="Avatar 3">
-                <img src="/img/default_avatar.png" class="avatar-option" data-avatar="default_avatar.png"
-                    alt="Avatar Default">
+            <div class="modal-filters">
+                <button class="modal-filter-btn active" onclick="window.filtrarModalPerfil('avatar', this)">
+                    <i data-lucide="user" style="width: 16px;"></i> Avatares
+                </button>
+                <button class="modal-filter-btn" onclick="window.filtrarModalPerfil('moldura', this)">
+                    <i data-lucide="frame" style="width: 16px;"></i> Molduras
+                </button>
             </div>
 
-            <div class="upload-divider">
-                <span>As Tuas Fotografias</span>
-            </div>
+            <div class="avatar-grid" id="modal-items-grid"></div>
 
-            <div id="personal-avatars-section" class="personal-avatars-section"></div>
+            <div id="seccao-fotos-pessoais">
+                <div class="upload-divider">
+                    <span>As Tuas Fotografias</span>
+                </div>
 
-            <div class="avatar-upload-section">
-                <input type="file" id="custom-avatar-input" accept="image/png, image/jpeg, image/jpg" hidden>
-                <label for="custom-avatar-input" class="upload-btn">
-                    <i data-lucide="upload" style="margin-right: 8px;"></i>
-                    Nova fotografia
-                </label>
+                <div id="personal-avatars-section" class="personal-avatars-section"></div>
+
+                <div class="avatar-upload-section">
+                    <input type="file" id="custom-avatar-input" accept="image/png, image/jpeg, image/jpg" hidden>
+                    <label for="custom-avatar-input" class="upload-btn">
+                        <i data-lucide="upload" style="margin-right: 8px;"></i>
+                        Nova fotografia
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -263,57 +260,85 @@
     <script>
         lucide.createIcons();
 
+        // ==========================================
+        // FUNÇÕES GLOBAIS DE ATUALIZAÇÃO VISUAL
+        // ==========================================
+        
+        // 1. Filtros do Modal (Avatares vs Molduras)
+        window.filtrarModalPerfil = function(tipo, btnClicado) {
+            document.querySelectorAll('.modal-filter-btn').forEach(b => b.classList.remove('active'));
+            btnClicado.classList.add('active');
+
+            document.querySelectorAll('.avatar-option-container').forEach(card => {
+                if (card.getAttribute('data-tipo') === tipo) card.style.display = 'flex';
+                else card.style.display = 'none';
+            });
+
+            const secFotos = document.getElementById('seccao-fotos-pessoais');
+            if (secFotos) secFotos.style.display = tipo === 'moldura' ? 'none' : 'block';
+        };
+
+        // 2. Atualiza a foto principal do ecrã na hora (A "Sanduíche" Visual)
+        window.atualizarVisualDoAvatar = function(fotoUrl, molduraUrl) {
+            const avatarElement = document.querySelector('.profile-avatar');
+            if (!avatarElement) return;
+            
+            let caminhoImagem = fotoUrl || 'default_avatar.png';
+            if (!caminhoImagem.startsWith('http')) {
+                caminhoImagem = caminhoImagem.startsWith('upload-') ? `/img/uploads/${caminhoImagem}` : `/img/${caminhoImagem}`;
+            }
+            
+            let molduraHTML = '';
+            if (molduraUrl) {
+                molduraHTML = `<img src="/img/${molduraUrl}" class="profile-border" alt="Moldura">`;
+            }
+
+            avatarElement.innerHTML = `
+                <img src="${caminhoImagem}" alt="Avatar" referrerpolicy="no-referrer" class="profile-avatar-img">
+                ${molduraHTML}
+            `;
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Verificar se é Perfil Próprio ou Perfil Público (através do URL)
+            // 1. Verificar se é Perfil Próprio ou Perfil Público
             const urlParams = new URLSearchParams(window.location.search);
             const publicUserId = urlParams.get('id');
-            const isPublicProfile = !!publicUserId; // Retorna true se houver um ID
-
+            const isPublicProfile = !!publicUserId; 
             const endpointUrl = isPublicProfile ? '/api/user/' + publicUserId : '/api/me';
 
             try {
                 const response = await fetch(endpointUrl);
 
-                if (response.status === 401) {
-                    window.location.href = 'index.html';
-                    return;
-                }
-                
-                if (response.status === 404) {
-                    window.location.href = '404.html'; 
-                    return;
-                }
+                if (response.status === 401) { window.location.href = 'index.html'; return; }
+                if (response.status === 404) { window.location.href = '404.html'; return; }
 
                 const data = await response.json();
 
                 if (response.ok) {
                     const nomeElement = document.querySelector('.profile-header-title');
                     const emailElement = document.querySelector('.profile-header-email');
-                    const avatarElement = document.querySelector('.profile-avatar');
-
+                    
                     if (nomeElement) nomeElement.textContent = data.nome;
 
-                    // LÓGICA DE PRIVACIDADE: O que esconder no Perfil Público
+                    // LÓGICA DE PRIVACIDADE PARA PERFIL PÚBLICO
                     if (isPublicProfile) {
                         if (emailElement) emailElement.style.display = 'none';
                         document.getElementById('edit-avatar-btn').style.display = 'none';
                         document.querySelector('.profile-header-right').style.display = 'none';
                         document.querySelector('.profile-progress').style.display = 'none';
 
-                        // ESTATÍSTICAS (Quizzes, Precisão, Respostas, Medalhas)
-                            if (!data.showEstatisticas) { 
-                                const statsGrid = document.querySelector('.profile-stats-grid');
-                                if (statsGrid) {
-                                    statsGrid.closest('.profile-card').style.display = 'none';
-                                }
-                            } else if (data.estatisticas) {
-                                document.getElementById('stat-quizzes').textContent = data.estatisticas.quizzes;
-                                document.getElementById('stat-precisao').textContent = data.estatisticas.precisao + '%';
-                                document.getElementById('stat-respostas').textContent = data.estatisticas.respostas;
-                                document.getElementById('stat-medalhas').textContent = data.showMedalhas ? (data.total_medalhas || 0) : 'Oculto';
-                            }
+                        // Estatísticas
+                        if (!data.showEstatisticas) { 
+                            const statsGrid = document.querySelector('.profile-stats-grid');
+                            if (statsGrid) statsGrid.closest('.profile-card').style.display = 'none';
+                        } else if (data.estatisticas) {
+                            document.getElementById('stat-quizzes').textContent = data.estatisticas.quizzes;
+                            document.getElementById('stat-precisao').textContent = data.estatisticas.precisao + '%';
+                            document.getElementById('stat-respostas').textContent = data.estatisticas.respostas;
+                            document.getElementById('stat-medalhas').textContent = data.showMedalhas ? (data.total_medalhas || 0) : 'Oculto';
+                        }
 
-                        // PONTOS E NÍVEIS
+                        // Pontos e Níveis
                         if (data.priv_pontos === false) {
                             document.getElementById('profile-level-badge').parentElement.parentElement.style.display = 'none';
                             document.getElementById('profile-points-badge').parentElement.parentElement.style.display = 'none';
@@ -322,7 +347,7 @@
                             document.getElementById('profile-points-badge').textContent = `${data.pontos_totais || 0} pts`;
                         }
 
-                        // RANKING
+                        // Ranking
                         if (data.showRanking === false) {
                             document.getElementById('profile-ranking-badge').parentElement.parentElement.style.display = 'none';
                         } else {
@@ -330,7 +355,7 @@
                             document.getElementById('profile-ranking-badge').textContent = data.posicao_ranking ? `Top #${data.posicao_ranking}` : 'Top --';
                         }
 
-                        // OFENSIVA (STREAK)
+                        // Ofensiva
                         if (data.showOfensiva === false) {
                             document.getElementById('profile-streak-badge').parentElement.parentElement.style.display = 'none';
                         } else {
@@ -338,75 +363,28 @@
                             document.getElementById('profile-streak-badge').textContent = `${data.ofensiva || 0} Dias`;
                         }
 
-                        // MEDALHAS
-                        if (data.showMedalhas === false) {
-                            document.querySelector('.profile-medals').style.display = 'none';
-                        }
-
-                        // TURMA (ESQUADRÃO)
-                        if (data.priv_turma === false) {
-                            document.getElementById('esquadrao-content').parentElement.style.display = 'none';
-                        }
-
-                        // ATIVIDADE / HISTÓRICO
+                        // Medalhas & Turma & Histórico
+                        if (data.showMedalhas === false) document.querySelector('.profile-medals').style.display = 'none';
+                        if (data.priv_turma === false) document.getElementById('esquadrao-content').parentElement.style.display = 'none';
                         if (data.showHistorico === false) {
                             document.querySelector('.profile-activity').parentElement.style.display = 'none';
                         } else {
-                            const contentor = document.querySelector('.profile-activity');
-
-                            // Atualiza o link do botão "Ver Tudo" para garantir que leva ao histórico correto (com ID para perfis públicos)
-                            const btnVerHistorico = contentor.previousElementSibling.querySelector('a');
-                            if (btnVerHistorico) {
-                                btnVerHistorico.href = 'historico.html?id=' + publicUserId;
-                            }
-
-                            if (data.atividades_recentes && data.atividades_recentes.length > 0) {
-                                contentor.innerHTML = data.atividades_recentes.map(act => {
-                                    const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
-                                    const dataRealizacao = new Date(act.data_realizacao).toLocaleDateString('pt-PT');
-                                    let textoDescricao = act.total_perguntas ? `${act.respostas_corretas}/${act.total_perguntas} corretas` : 'Concluído';
-
-                                    return `
-                                        <div class="profile-activity-item">
-                                            <div>
-                                                <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
-                                                <div class="profile-activity-desc">${textoDescricao}</div>
-                                            </div>
-                                            <div class="profile-activity-right">
-                                                <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
-                                                <div class="profile-activity-time">${dataRealizacao}</div>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('');
-                            } else {
-                                contentor.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Ainda não existem atividades registadas.</p>';
-                            }
+                            const btnVerHistorico = document.getElementById('btn-ver-historico');
+                            if (btnVerHistorico) btnVerHistorico.href = 'historico.html?id=' + publicUserId;
                         }
-
                     } else {
-                        // Se for o próprio utilizador, mostra o email
+                        // Perfil Próprio
                         if (emailElement) emailElement.textContent = data.email;
-
-                        // Garante que o link do histórico leva ao histórico pessoal (sem ID)
-                        const btnVerHistorico = document.querySelector('.profile-activity').previousElementSibling.querySelector('a');
-                        if (btnVerHistorico) {
-                            btnVerHistorico.href = 'historico.html';
-                        }
+                        const btnVerHistorico = document.getElementById('btn-ver-historico');
+                        if (btnVerHistorico) btnVerHistorico.href = 'historico.html';
                     }
 
-
-                    // --- ATUALIZAR PATENTE (ROLE) ---
+                    // --- ATUALIZAR PATENTE E CARTÕES (Resumo) ---
                     let patenteHTML = '';
-                    if (data.role === 'admin') {
-                        patenteHTML = `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Administrador</span>`;
-                    } else if (data.role === 'professor') {
-                        patenteHTML = `<span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Professor</span>`;
-                    } else {
-                        patenteHTML = `<span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle; box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);">Aluno</span>`;
-                    }
+                    if (data.role === 'admin') patenteHTML = `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Administrador</span>`;
+                    else if (data.role === 'professor') patenteHTML = `<span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Professor</span>`;
+                    else patenteHTML = `<span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">Aluno</span>`;
                     if (nomeElement) nomeElement.innerHTML = `${data.nome} ${patenteHTML}`;
-
 
                     // --- ATUALIZAR CARTÃO DO ESQUADRÃO ---
                     const esquadraoCardTitle = document.getElementById('esquadrao-card-title');
@@ -490,110 +468,256 @@
                         }
                     }
 
-
-                    // --- ATUALIZAR IMAGEM DE PERFIL ---
-                    if (data.foto_perfil) {
-                        let caminhoImagem = data.foto_perfil;
-                        if (!caminhoImagem.startsWith('http')) {
-                            caminhoImagem = caminhoImagem.startsWith('upload-') ? `/img/uploads/${data.foto_perfil}` : `/img/${data.foto_perfil}`;
-                        }
-                        avatarElement.innerHTML = `<img src="${caminhoImagem}" alt="Avatar" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    } else {
-                        avatarElement.innerHTML = `<img src="/img/default_avatar.png" alt="Avatar"  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    }
-
+                    // --- RENDERIZAR O AVATAR E MOLDURA ---
+                    window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
+                    
                     lucide.createIcons();
 
-                    // --- SE FOR O PRÓPRIO UTILIZADOR, CARREGA AS FUNCIONALIDADES PRIVADAS ---
+                    // --- SE FOR O PRÓPRIO UTILIZADOR, CARREGA AS FUNCIONALIDADES DE EDIÇÃO ---
                     if (!isPublicProfile) {
                         inicializarSistemaAvatares(data);
                         carregarAtividadeRecente();
                         carregarEstatisticas();
+                    } else {
+                        // Se for perfil público, preenche a atividade recente recebida do servidor
+                        if (data.showHistorico !== false && data.atividades_recentes) {
+                            const contentor = document.querySelector('.profile-activity');
+                            if (data.atividades_recentes.length > 0) {
+                                contentor.innerHTML = data.atividades_recentes.map(act => {
+                                    const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
+                                    const dataRealizacao = new Date(act.data_realizacao).toLocaleDateString('pt-PT');
+                                    let textoDescricao = act.total_perguntas ? `${act.respostas_corretas}/${act.total_perguntas} corretas` : 'Concluído';
+                                    return `
+                                        <div class="profile-activity-item">
+                                            <div>
+                                                <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
+                                                <div class="profile-activity-desc">${textoDescricao}</div>
+                                            </div>
+                                            <div class="profile-activity-right">
+                                                <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
+                                                <div class="profile-activity-time">${dataRealizacao}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                            } else {
+                                contentor.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Ainda não existem atividades registadas.</p>';
+                            }
+                        }
                     }
                 }
-            } catch (error) {
-                console.error("Erro ao carregar perfil:", error);
-            }
+            } catch (error) { console.error("Erro ao carregar perfil:", error); }
         });
 
         // ==========================================
-        // FUNCIONALIDADES DO AVATAR E MODAIS
+        // INICIALIZAR SISTEMA DE AVATARES NO MODAL
         // ==========================================
         function inicializarSistemaAvatares(data) {
             const modalAvatar = document.getElementById('avatar-modal');
             const btnOpen = document.getElementById('edit-avatar-btn');
-            const btnClose = document.getElementById('close-avatar-btn');
             const overlay = document.getElementById('close-modal-overlay');
+            const btnClose = document.getElementById('close-avatar-btn');
 
-            if (btnOpen) btnOpen.addEventListener('click', () => modalAvatar.classList.remove('hidden'));
-            if (btnClose) btnClose.addEventListener('click', () => modalAvatar.classList.add('hidden'));
-            if (overlay) overlay.addEventListener('click', () => modalAvatar.classList.add('hidden'));
+            // 1. Abrir e Fechar o Modal
+            if (btnOpen) {
+                btnOpen.onclick = (e) => {
+                    e.preventDefault();
+                    modalAvatar.classList.remove('hidden');
+                    carregarGrelhaModal(); 
+                };
+            }
+            if (overlay) overlay.onclick = () => modalAvatar.classList.add('hidden');
+            if (btnClose) btnClose.onclick = () => modalAvatar.classList.add('hidden');
 
-            const personalSection = document.getElementById('personal-avatars-section');
-            if (data.foto_upload || data.foto_google) {
-                if (data.foto_upload) {
-                    let linkUpload = data.foto_upload;
-                    if (!linkUpload.startsWith('http')) linkUpload = `/img/uploads/${data.foto_upload}`;
-                    personalSection.innerHTML += `
-                        <div class="personal-avatar-wrapper">
-                            <img src="${linkUpload}" class="avatar-option" data-avatar="${data.foto_upload}" referrerpolicy="no-referrer">
-                            <span class="personal-avatar-label">Upload</span>
-                        </div>`;
-                }
-                if (data.foto_google) {
-                    personalSection.innerHTML += `
-                        <div class="personal-avatar-wrapper">
-                            <img src="${data.foto_google}" class="avatar-option" data-avatar="${data.foto_google}" referrerpolicy="no-referrer">
-                            <span class="personal-avatar-label">Google</span>
-                        </div>`;
+            // 2. Carregar Itens no Modal via API
+            async function carregarGrelhaModal() {
+                try {
+                    const response = await fetch('/api/shop/itens');
+                    if (!response.ok) return;
+                    const shopItems = await response.json();
+                    
+                    const grid = document.getElementById('modal-items-grid');
+                    grid.innerHTML = ''; 
+
+                    // Opção "Sem Moldura" 
+                    const isNenhumaMoldura = !data.moldura_perfil;
+                    grid.innerHTML += `
+                        <div class="avatar-option-container ${isNenhumaMoldura ? 'active-item' : ''}" data-tipo="moldura" data-url="" data-comprado="true" data-nome="Sem Moldura" style="display: none;">
+                            <div class="avatar-option is-border" style="border: 2px dashed #94a3b8; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                <i data-lucide="ban" style="color: #94a3b8; width: 32px; height: 32px;"></i>
+                            </div>
+                        </div>
+                    `;
+
+                    shopItems.forEach(item => {
+                        const isEquipado = item.tipo === 'avatar' 
+                            ? item.imagem_url === data.foto_perfil 
+                            : item.imagem_url === data.moldura_perfil;
+
+                        const classeLocked = item.comprado ? '' : 'locked-avatar';
+                        const classeExtraImagem = item.tipo === 'moldura' ? 'is-border' : '';
+                        
+                        let estiloContainer = '';
+                        if (isEquipado) {
+                            estiloContainer = item.tipo === 'avatar' 
+                                ? 'border: 3px solid var(--primary-color);' 
+                                : 'box-shadow: inset 0 0 0 3px var(--primary-color); background: rgba(59,130,246,0.1); border-radius: 50%;';
+                        }
+
+                        const cadeadoHtml = item.comprado ? '' : `<i data-lucide="lock" class="avatar-lock-icon" style="width: 32px; height: 32px;"></i>`;
+                        
+                        // Esconde o preço se for grátis (preco 0) ou se já estiver comprado
+                        const pricePillHtml = (item.comprado || item.preco === 0) ? '' : `
+                            <div class="avatar-price-pill">
+                                ${item.preco} <i data-lucide="circle-dollar-sign" style="width: 14px; height: 14px;"></i>
+                            </div>
+                        `;
+
+                        grid.innerHTML += `
+                            <div class="avatar-option-container ${isEquipado ? 'active-item' : ''}" data-tipo="${item.tipo}" data-id="${item.id_item}" data-url="${item.imagem_url}" data-preco="${item.preco}" data-nome="${item.nome}" data-comprado="${item.comprado}">
+                                <img src="/img/${item.imagem_url}" class="avatar-option ${classeLocked} ${classeExtraImagem}" style="${item.tipo === 'avatar' ? estiloContainer : ''}" alt="${item.nome}">
+                                ${cadeadoHtml}
+                                ${pricePillHtml}
+                            </div>
+                        `;
+                    });
+                    lucide.createIcons();
+                    
+                    // Força o clique no separador que estiver ativo para filtrar corretamente
+                    const btnAtivo = document.querySelector('.modal-filter-btn.active');
+                    if(btnAtivo) btnAtivo.click();
+
+                } catch (error) { console.error("Erro ao carregar modal:", error); }
+
+                // Injetar Fotos Pessoais (Upload/Google)
+                const personalSection = document.getElementById('personal-avatars-section');
+                if (personalSection) {
+                    personalSection.innerHTML = ''; 
+                    if (data.foto_upload) {
+                        let linkUpload = data.foto_upload.startsWith('http') ? data.foto_upload : `/img/uploads/${data.foto_upload}`;
+                        const isEquipado = data.foto_upload === data.foto_perfil ? 'border: 3px solid var(--primary-color);' : '';
+                        personalSection.innerHTML += `
+                            <div class="personal-avatar-wrapper">
+                                <div class="avatar-option-container" data-tipo="avatar" data-url="${data.foto_upload}" data-comprado="true" style="max-width: 70px;">
+                                    <img src="${linkUpload}" class="avatar-option" style="${isEquipado}" referrerpolicy="no-referrer">
+                                </div>
+                                <span class="personal-avatar-label">Upload</span>
+                            </div>`;
+                    }
+                    if (data.foto_google) {
+                        const isEquipado = data.foto_google === data.foto_perfil ? 'border: 3px solid var(--primary-color);' : '';
+                        personalSection.innerHTML += `
+                            <div class="personal-avatar-wrapper">
+                                <div class="avatar-option-container" data-tipo="avatar" data-url="${data.foto_google}" data-comprado="true" style="max-width: 70px;">
+                                    <img src="${data.foto_google}" class="avatar-option" style="${isEquipado}" referrerpolicy="no-referrer">
+                                </div>
+                                <span class="personal-avatar-label">Google</span>
+                            </div>`;
+                    }
                 }
             }
 
-            document.querySelectorAll('.avatar-option').forEach(img => {
-                if (img.getAttribute('data-avatar') === data.foto_perfil) img.classList.add('active-avatar');
-            });
+            // 3. Evento de Clique Unificado
+            const modalContent = document.querySelector('.avatar-modal-content');
+            modalContent.onclick = async (e) => {
+                // Ignorar se clicar nos botões de filtro, eles já têm o seu próprio onClick
+                if (e.target.closest('.modal-filter-btn')) return;
 
-            document.querySelector('.avatar-modal-content').addEventListener('click', async (e) => {
-                if (e.target.classList.contains('avatar-option')) {
-                    const novoAvatar = e.target.getAttribute('data-avatar');
+                const container = e.target.closest('.avatar-option-container');
+                if (!container) return; 
+
+                const tipoItem = container.getAttribute('data-tipo');
+                const comprado = container.getAttribute('data-comprado') === 'true';
+                const url = container.getAttribute('data-url');
+                const preco = container.getAttribute('data-preco');
+                const nome = container.getAttribute('data-nome');
+                const idItem = container.getAttribute('data-id');
+
+                const apiEndpoint = tipoItem === 'avatar' ? '/api/update-avatar' : '/api/update-border';
+                const payload = tipoItem === 'avatar' ? { avatar: url } : { border: url };
+
+                if (comprado) {
                     try {
-                        const response = await fetch('/api/update-avatar', {
+                        const res = await fetch(apiEndpoint, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ avatar: novoAvatar })
+                            body: JSON.stringify(payload)
                         });
-
-                        if (response.ok) {
-                            window.location.reload();
+                        if (res.ok) {
+                            if (tipoItem === 'avatar') data.foto_perfil = url;
+                            if (tipoItem === 'moldura') data.moldura_perfil = url;
+                            
+                            window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
+                            modalAvatar.classList.add('hidden');
                         }
-                    } catch (error) {
-                        console.error("Erro:", error);
+                    } catch (error) { console.error(error); }
+                } else {
+                    const userCoins = data.coins || 0;
+                    if (confirm(`🔐 Bloqueado: "${nome}"\n\nDesbloquear por ${preco} CiberCoins?\n(Saldo: ${userCoins} CC)`)) {
+                        if (userCoins < parseInt(preco)) {
+                            alert("❌ CiberCoins insuficientes!");
+                            return;
+                        }
+                        try {
+                            const res = await fetch('/api/shop/comprar', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id_item: idItem })
+                            });
+                            const resultData = await res.json();
+                            
+                            if (res.ok) {
+                                data.coins = resultData.novasCoins;
+
+                                await fetch(apiEndpoint, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(payload)
+                                });
+
+                                if (tipoItem === 'avatar') data.foto_perfil = url;
+                                if (tipoItem === 'moldura') data.moldura_perfil = url;
+                                
+                                window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
+
+                                if (typeof window.atualizarHeaderGlobal === 'function') window.atualizarHeaderGlobal();
+                                const badgeCoins = document.getElementById('profile-coins-badge');
+                                if (badgeCoins) badgeCoins.textContent = `${data.coins} CC`;
+
+                                modalAvatar.classList.add('hidden');
+                                setTimeout(() => alert(`🎉 "${nome}" equipado com sucesso!`), 200);
+                            } else {
+                                alert(`Erro: ${resultData.error}`);
+                            }
+                        } catch (err) { console.error(err); }
                     }
                 }
-            });
+            };
 
+            // 4. Upload de Ficheiro
             const inputUpload = document.getElementById('custom-avatar-input');
             if (inputUpload) {
-                inputUpload.addEventListener('change', async (e) => {
+                inputUpload.onchange = async (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
-
                     const formData = new FormData();
                     formData.append('ficheiroAvatar', file);
-
                     try {
                         const response = await fetch('/api/upload-avatar', { method: 'POST', body: formData });
-                        if (response.ok) window.location.reload();
-                        else alert('Erro ao fazer upload da imagem.');
-                    } catch (error) {
-                        console.error("Erro no upload:", error);
-                    }
-                });
+                        const resData = await response.json();
+                        if (response.ok) {
+                            data.foto_upload = resData.filename; 
+                            data.foto_perfil = resData.filename;
+                            window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
+                            modalAvatar.classList.add('hidden');
+                        } else alert('Erro no upload.');
+                    } catch (error) { console.error(error); }
+                };
             }
         }
 
         // ==========================================
-        // ATIVIDADE RECENTE & ESTATÍSTICAS
+        // ATIVIDADE RECENTE & ESTATÍSTICAS DO UTILIZADOR
         // ==========================================
         async function carregarAtividadeRecente() {
             try {
@@ -641,9 +765,9 @@
                 document.getElementById('stat-medalhas').textContent = stats.medalhas;
                 document.getElementById('stat-respostas').textContent = stats.respostas;
 
-                document.getElementById('profile-points-badge').textContent = `${stats.pontos || 0} Pontos`;
+                document.getElementById('profile-points-badge').textContent = `${stats.pontos || 0} pts`;
                 document.getElementById('profile-level-badge').textContent = `Nível ${stats.nivel}`;
-
+                
                 const badgeRanking = document.getElementById('profile-ranking-badge');
                 if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
 

@@ -4,21 +4,20 @@ const multer = require('multer');
 
 // --- CONFIGURAÇÃO DO MULTER (Memória em vez de Disco) ---
 const storage = multer.memoryStorage();
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     limits: { fileSize: 2 * 1024 * 1024 } // Limite de 2MB!
 });
 
 module.exports = (supabase) => {
-    
+
     // --- ROTA 1: Obter dados (Agora puxa também as opções de privacidade) ---
     router.get('/me', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
         const { data, error } = await supabase
             .from('utilizador')
-            // CORREÇÃO: Adicionado priv_ofensiva
-            .select('nome, email, role, mfa_ativo, foto_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva')
+            .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins')
             .eq('id_utilizador', req.session.userId)
             .single();
 
@@ -65,12 +64,12 @@ module.exports = (supabase) => {
         const { priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, priv_estatisticas } = req.body;
 
         try {
-            const { error } = await supabase.from('utilizador').update({ 
-                priv_perfil_publico, 
-                priv_turma, 
-                priv_pontos, 
-                priv_medalhas, 
-                priv_historico, 
+            const { error } = await supabase.from('utilizador').update({
+                priv_perfil_publico,
+                priv_turma,
+                priv_pontos,
+                priv_medalhas,
+                priv_historico,
                 priv_ranking,
                 priv_ofensiva,
                 priv_estatisticas
@@ -87,7 +86,7 @@ module.exports = (supabase) => {
     // --- ROTA 3: Apagar Conta ---
     router.delete('/delete', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
-        
+
         try {
             const { data, error } = await supabase.auth.admin.deleteUser(req.session.userId);
             if (error) throw error;
@@ -111,6 +110,19 @@ module.exports = (supabase) => {
         const { error } = await supabase.from('utilizador').update({ foto_perfil: avatar }).eq('id_utilizador', req.session.userId);
         if (error) return res.status(500).json({ error: "Erro ao atualizar avatar." });
         res.json({ message: "Avatar atualizado com sucesso!" });
+    });
+
+    // --- ROTA 4.5: Atualizar Moldura ---
+    router.put('/update-border', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
+        const { border } = req.body;
+        
+        // Se ele enviar string vazia, tira a moldura
+        const molduraFinal = border === '' ? null : border;
+
+        const { error } = await supabase.from('utilizador').update({ moldura_perfil: molduraFinal }).eq('id_utilizador', req.session.userId);
+        if (error) return res.status(500).json({ error: "Erro ao atualizar moldura." });
+        res.json({ message: "Moldura atualizada com sucesso!" });
     });
 
     // --- ROTA 5: Upload de Nova Foto Personalizada ---
@@ -170,10 +182,10 @@ module.exports = (supabase) => {
 
                 if (userDados && userDados.mfa_recompensa_recebida === false) {
                     const novosPontos = (userDados.pontos_totais || 0) + 50;
-                    
+
                     const { error: updateError } = await supabase
                         .from('utilizador')
-                        .update({ 
+                        .update({
                             mfa_ativo: true,
                             pontos_totais: novosPontos,
                             mfa_recompensa_recebida: true
@@ -219,7 +231,7 @@ module.exports = (supabase) => {
             res.json(data);
         } catch (error) { res.status(500).json({ error: "Erro ao carregar histórico." }); }
     });
-    
+
     // --- ROTA 8.5: Histórico PÚBLICO (Com censura de Privacidade) ---
     router.get('/history/:id', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
@@ -249,10 +261,10 @@ module.exports = (supabase) => {
 
             if (error) throw error;
             res.json(data);
-            
-        } catch (error) { 
+
+        } catch (error) {
             console.error("Erro no histórico público:", error);
-            res.status(500).json({ error: "Erro ao carregar histórico." }); 
+            res.status(500).json({ error: "Erro ao carregar histórico." });
         }
     });
 
@@ -276,9 +288,9 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
         const query = req.query.q;
-        const limit = parseInt(req.query.limit) || 6; 
+        const limit = parseInt(req.query.limit) || 6;
 
-        if (!query || query.length < 2) return res.json([]); 
+        if (!query || query.length < 2) return res.json([]);
 
         try {
             const { data, error } = await supabase
@@ -297,7 +309,7 @@ module.exports = (supabase) => {
             res.status(500).json({ error: "Erro na pesquisa" });
         }
     });
-    
+
     // --- ROTA 11: PÚBLICA DE PERFIL (CENSURADA CONFORME A PRIVACIDADE) ---
     router.get('/user/:id', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
@@ -306,8 +318,7 @@ module.exports = (supabase) => {
         try {
             const { data, error } = await supabase
                 .from('utilizador')
-                // 👇 AQUI ESTÃO TODAS AS COLUNAS, INCLUINDO A priv_estatisticas
-                .select('nome, role, foto_perfil, id_turma, pontos_totais, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, priv_estatisticas') 
+                .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins')
                 .eq('id_utilizador', id)
                 .single();
 
@@ -321,7 +332,7 @@ module.exports = (supabase) => {
             }
 
             // 🟢 2. SE FOR PÚBLICO: Avalia as restantes opções de privacidade
-            
+
             // Privacidade de Pontos e Nível
             if (data.priv_pontos === false) {
                 delete data.pontos_totais;
@@ -336,7 +347,7 @@ module.exports = (supabase) => {
                     nivel++;
                     pontosParaSubir = Math.floor(pontosParaSubir * 1.5);
                 }
-                data.nivel = nivel; 
+                data.nivel = nivel;
             }
 
             // Privacidade de Turma
@@ -379,8 +390,8 @@ module.exports = (supabase) => {
                     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
                     const ontem = new Date(hoje); ontem.setDate(ontem.getDate() - 1);
                     let tempoCheck = hoje.getTime();
-                    
-                    if (diasJogados.includes(tempoCheck)) { ofensiva = 1; tempoCheck = ontem.getTime(); } 
+
+                    if (diasJogados.includes(tempoCheck)) { ofensiva = 1; tempoCheck = ontem.getTime(); }
                     else if (diasJogados.includes(ontem.getTime())) {
                         ofensiva = 1;
                         const anteontem = new Date(ontem); anteontem.setDate(anteontem.getDate() - 1);
@@ -404,15 +415,15 @@ module.exports = (supabase) => {
                     .from('progresso')
                     .select('respostas_corretas, total_perguntas, atividade!inner(tipo)')
                     .eq('id_utilizador', id)
-                    .eq('atividade.tipo', 'quiz'); 
+                    .eq('atividade.tipo', 'quiz');
 
                 let quizzes = 0, respostas = 0, corretas = 0;
-                
+
                 if (progressoStats && progressoStats.length > 0) {
                     quizzes = progressoStats.length;
                     progressoStats.forEach(p => {
-                        if(p.total_perguntas !== null) respostas += p.total_perguntas;
-                        if(p.respostas_corretas !== null) corretas += p.respostas_corretas;
+                        if (p.total_perguntas !== null) respostas += p.total_perguntas;
+                        if (p.respostas_corretas !== null) corretas += p.respostas_corretas;
                     });
                 }
                 data.estatisticas = {
@@ -428,7 +439,7 @@ module.exports = (supabase) => {
                     .from('utilizador_medalha')
                     .select('*', { count: 'exact', head: true })
                     .eq('id_utilizador', id);
-                
+
                 data.total_medalhas = (!erroMedalhas) ? (count || 0) : 0;
             }
 
@@ -437,7 +448,7 @@ module.exports = (supabase) => {
             data.showHistorico = data.priv_historico;
             data.showRanking = data.priv_ranking;
             data.showOfensiva = data.priv_ofensiva;
-            data.showEstatisticas = data.priv_estatisticas; 
+            data.showEstatisticas = data.priv_estatisticas;
 
             res.json(data);
 

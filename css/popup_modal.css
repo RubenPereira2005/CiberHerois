@@ -44,7 +44,7 @@
     -webkit-backdrop-filter: blur(8px);
     
     opacity: 0;
-    transform: translateZ(0);
+    transform: translateZ(0); /* Força aceleração de hardware / fluidez */
     transition: opacity 0.3s ease;
     z-index: 1000;
 }
@@ -137,14 +137,26 @@ body.dark-mode .close-modal-btn:hover {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 1.5rem;
+    justify-items: center; /* Centra os itens na grelha */
+}
+
+/* O contentor adapta-se à grelha, mas permite que o preço "saia" para fora */
+.avatar-option-container {
+    position: relative;
+    width: 100%;
+    max-width: 100px;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .avatar-option {
     width: 100%;
-    aspect-ratio: 1/1;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    cursor: pointer;
     border: 3px solid transparent;
     transition: all 0.2s;
 }
@@ -153,6 +165,57 @@ body.dark-mode .close-modal-btn:hover {
     transform: scale(1.05);
     border-color: #3b82f6;
 }
+
+/* Efeito do Avatar Bloqueado */
+.locked-avatar {
+    filter: brightness(0.4) blur(2px);
+    border-color: transparent !important; /* Para não mostrar a borda azul ao passar o rato se estiver bloqueado */
+}
+
+.avatar-option-container:hover .locked-avatar {
+    filter: brightness(0.6) blur(1px);
+    transform: scale(1.05);
+}
+
+/* Ícone do Cadeado no Centro */
+.avatar-lock-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #f1f5f9; /* Branco mais suave */
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.9;
+    transition: all 0.2s;
+}
+
+.avatar-option-container:hover .avatar-lock-icon {
+    transform: translate(-50%, -50%) scale(1.1);
+    color: #f59e0b; /* Fica dourado ao passar o rato */
+}
+
+/* A nova "Pílula" de Preço (Badge) */
+.avatar-price-pill {
+    position: absolute;
+    bottom: -10px; /* Fica um pouco abaixo do limite do círculo */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f59e0b;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px; /* Formato de pílula */
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    z-index: 15;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
 
 .upload-divider {
     text-align: center;
@@ -322,4 +385,60 @@ body.dark-mode .toast-notification {
     display: flex;
     justify-content: flex-end;
     margin-top: 5px;
+}
+
+
+
+/* =========================================================
+   FILTROS DO MODAL DE PERFIL (Avatares e Molduras)
+   ========================================================= */
+.modal-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 15px;
+}
+
+body.dark-mode .modal-filters {
+    border-color: #334155;
+}
+
+.modal-filter-btn {
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 2px solid transparent;
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.dark-mode .modal-filter-btn {
+    background: #334155;
+    color: #94a3b8;
+}
+
+.modal-filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+/* Ajuste para as imagens das molduras não ficarem distorcidas no modal */
+.avatar-option.is-border {
+    object-fit: contain; /* Não corta a moldura */
+    transform: scale(1.15); /* Aumenta ligeiramente para se ver bem */
+    border: none !important; /* Molduras não levam a borda azul normal */
+}
+.avatar-option-container[data-tipo="moldura"].active-item {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 3px var(--primary-color);
 }
