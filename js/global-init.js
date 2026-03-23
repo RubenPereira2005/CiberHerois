@@ -30,8 +30,13 @@ window.atualizarHeaderGlobal = async function() {
             const stats = await response.json();
             const navPoints = document.getElementById('nav-global-points');
             const navLevel = document.getElementById('nav-global-level');
+            const navCoins = document.getElementById('nav-coin-balance');
+
             if (navPoints) navPoints.textContent = `${stats.pontos || 0} pts`;
             if (navLevel) navLevel.textContent = `Nível ${stats.nivel || 1}`;
+            
+            if (navCoins) navCoins.textContent = `${stats.coins || 0} CC`; 
+            
             return stats;
         }
     } catch (error) {
@@ -45,7 +50,7 @@ window.iniciarPesquisa = function() {
     const searchInput = document.getElementById('global-search-input');
     const dropdown = document.getElementById('search-results-dropdown');
     const searchBtn = document.querySelector('.search-trigger');
-    const clearBtn = document.getElementById('search-clear-btn'); // O nosso novo botão
+    const clearBtn = document.getElementById('search-clear-btn'); 
     
     if (!searchInput || !dropdown) return;
 

@@ -7,14 +7,15 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
         try {
-            // 1. Pontuação total do utilizador
+            // 1. Pontuação total e MOEDAS do utilizador
             const { data: userData, error: userError } = await supabase
                 .from('utilizador')
-                .select('pontos_totais, role')
+                .select('pontos_totais, role, coins')
                 .eq('id_utilizador', req.session.userId)
                 .single();
 
             const totalPontos = userData ? (userData.pontos_totais || 0) : 0;
+            const totalMoedas = userData ? (userData.coins || 0) : 0;
 
             // Lógica de níveis (exponencial)
             let nivel = 1;
@@ -32,7 +33,6 @@ module.exports = (supabase) => {
             const progressoPerc = Math.round((pontosFeitosNesteNivel / pontosParaSubir) * 100);
 
             // 2. Calcular a precisão e ir buscar datas para a OFENSIVA (Streak)
-            // CORTAMOS O !inner PARA EVITAR ERROS CRÍTICOS SE A RELAÇÃO FALHAR
             const { data: progresso, error: erroProgresso } = await supabase
                 .from('progresso')
                 .select('respostas_corretas, total_perguntas, data_realizacao, atividade(tipo)')
@@ -44,7 +44,6 @@ module.exports = (supabase) => {
             let ofensiva = 0;
 
             if (!erroProgresso && progresso && progresso.length > 0) {
-                // Filtramos os Quizzes de forma segura no JavaScript
                 const quizzes = progresso.filter(p => p.atividade && p.atividade.tipo === 'quiz');
                 totalQuizzes = quizzes.length;
 
@@ -53,7 +52,7 @@ module.exports = (supabase) => {
                     if (p.total_perguntas !== null) totalRespostas += p.total_perguntas;
                 });
 
-                // --- CÁLCULO DA OFENSIVA (Qualquer atividade conta para a chama!) ---
+                // --- CÁLCULO DA OFENSIVA ---
                 const diasJogados = [...new Set(progresso.map(p => {
                     const d = new Date(p.data_realizacao);
                     d.setHours(0, 0, 0, 0); 
@@ -94,8 +93,7 @@ module.exports = (supabase) => {
                 precisao = Math.round((totalCorretas / totalRespostas) * 100);
             }
 
-            // 3. Contar as Medalhas (MÉTODO FAIL-SAFE)
-            // Se a tabela das medalhas falhar, ele apenas diz que tens 0, em vez de crashar!
+            // 3. Contar as Medalhas
             let totalMedalhas = 0;
             const { count, error: erroMedalhas } = await supabase
                 .from('utilizador_medalha')
@@ -113,7 +111,7 @@ module.exports = (supabase) => {
                     .from('utilizador')
                     .select('id_utilizador, pontos_totais')
                     .eq('role', 'aluno')
-                    .eq('priv_ranking', true) // <-- ADICIONADO: Só conta contigo se estiveres público!
+                    .eq('priv_ranking', true)
                     .order('pontos_totais', { ascending: false });
                     
                 if (!rankErr && rankingData) {
@@ -131,6 +129,7 @@ module.exports = (supabase) => {
                 respostas: totalRespostas,
                 medalhas: totalMedalhas,
                 pontos: totalPontos,
+                coins: totalMoedas,
                 nivel: nivel,
                 pontos_restantes: pontosRestantes,
                 progresso_perc: progressoPerc,
