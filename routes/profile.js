@@ -17,7 +17,8 @@ module.exports = (supabase) => {
 
         const { data, error } = await supabase
             .from('utilizador')
-            .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins')
+            // 👇 CORREÇÃO: Adicionado pontos_totais e priv_estatisticas para não faltar nada!
+            .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins, pontos_totais, priv_estatisticas')
             .eq('id_utilizador', req.session.userId)
             .single();
 
@@ -60,7 +61,6 @@ module.exports = (supabase) => {
     router.put('/update-privacy', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
-        // 👇 AQUI: Recebe a nova variável priv_estatisticas
         const { priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, priv_estatisticas } = req.body;
 
         try {
@@ -318,7 +318,7 @@ module.exports = (supabase) => {
         try {
             const { data, error } = await supabase
                 .from('utilizador')
-                .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins')
+                .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins, pontos_totais, priv_estatisticas')
                 .eq('id_utilizador', id)
                 .single();
 
@@ -327,7 +327,6 @@ module.exports = (supabase) => {
 
             // 🔴 1. SE O PERFIL FOR PRIVADO
             if (data.priv_perfil_publico === false) {
-                // Ao devolver .status(404), o frontend percebe que o utilizador não existe e redireciona!
                 return res.status(404).json({ error: "Utilizador não encontrado." });
             }
 
@@ -410,7 +409,6 @@ module.exports = (supabase) => {
 
             // 🟢 PRIVACIDADE DE ESTATÍSTICAS (Quizzes, Precisão, Respostas)
             if (data.priv_estatisticas) {
-                // Filtramos só os Quizzes para a matemática ficar certa
                 const { data: progressoStats } = await supabase
                     .from('progresso')
                     .select('respostas_corretas, total_perguntas, atividade!inner(tipo)')
