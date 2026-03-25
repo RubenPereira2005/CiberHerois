@@ -17,7 +17,6 @@
 </head>
 
 <body class="site-body">
-
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
         <div class="loader-spinner"></div>
@@ -28,7 +27,6 @@
             <div class="auth-navbar-left">
                 <a href="quizzes.html" class="auth-brand">CiberHeróis | <span style="color: #ef4444;">Gestão</span></a>
             </div>
-
             <div class="auth-navbar-right">
                 <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
@@ -77,12 +75,20 @@
                 <button class="btn btn-primary" onclick="prepararNovoQuiz()">
                     <i data-lucide="plus"></i> Adicionar Pergunta
                 </button>
-
-                <div class="filter-container">
-                    <label for="filter-categoria" style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">Filtrar Categoria:</label>
-                    <select id="filter-categoria" class="filter-select" onchange="renderQuizzes()">
-                        <option value="todas">Todas</option>
-                    </select>
+                <div class="filter-container" style="display: flex; gap: 15px; align-items: flex-end;">
+                    <div>
+                        <label for="search-quiz" style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Pesquisar Pergunta:</label>
+                        <div style="position: relative;">
+                            <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-secondary);"></i>
+                            <input type="text" id="search-quiz" class="form-input" placeholder="Ex: Qual é..." oninput="resetPaginationQuizzes()" style="padding-left: 30px; height: 36px; min-width: 250px;">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="filter-categoria" style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Filtrar Categoria:</label>
+                        <select id="filter-categoria" class="filter-select" onchange="resetPaginationQuizzes()" style="height: 36px;">
+                            <option value="todas">Todas</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -107,6 +113,11 @@
                     </thead>
                     <tbody id="quizzes-tbody"></tbody>
                 </table>
+                <div class="pagination-container">
+                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaQuizzes(-1)" id="btn-prev-quiz"><i data-lucide="chevron-left"></i> Anterior</button>
+                    <span id="page-info-quiz" class="page-info">Pág 1 de 1</span>
+                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaQuizzes(1)" id="btn-next-quiz">Próxima <i data-lucide="chevron-right"></i></button>
+                </div>
             </div>
         </div>
 
@@ -142,14 +153,8 @@
                 <button type="button" class="close-modal-btn" onclick="closeModal('modal-criar-turma-admin')"><i data-lucide="x"></i></button>
             </div>
             <form id="form-criar-turma-admin" onsubmit="salvarNovaTurmaAdmin(event)">
-                <div class="form-group">
-                    <label>Nome do Esquadrão</label>
-                    <input type="text" id="nova-turma-nome" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label>Ano Letivo</label>
-                    <input type="text" id="nova-turma-ano" class="form-input" required>
-                </div>
+                <div class="form-group"><label>Nome do Esquadrão</label><input type="text" id="nova-turma-nome" class="form-input" required></div>
+                <div class="form-group"><label>Ano Letivo</label><input type="text" id="nova-turma-ano" class="form-input" required></div>
                 <div class="form-group">
                     <label>Professor Comandante</label>
                     <select id="nova-turma-prof" class="form-input" required>
@@ -178,14 +183,8 @@
             </div>
             <form id="form-editar-turma" onsubmit="salvarEdicaoTurma(event)">
                 <input type="hidden" id="edit-turma-id">
-                <div class="form-group">
-                    <label>Nome do Esquadrão</label>
-                    <input type="text" id="edit-turma-nome" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label>Ano Letivo</label>
-                    <input type="text" id="edit-turma-ano" class="form-input" required>
-                </div>
+                <div class="form-group"><label>Nome do Esquadrão</label><input type="text" id="edit-turma-nome" class="form-input" required></div>
+                <div class="form-group"><label>Ano Letivo</label><input type="text" id="edit-turma-ano" class="form-input" required></div>
                 <div class="form-group">
                     <label>Professor Comandante</label>
                     <select id="edit-turma-professor" class="form-input" required>
@@ -231,13 +230,11 @@
                         <div class="form-group" style="flex: 1;"><label>Ícone (Lucide)</label><input type="text" id="rec-icone" value="shield-alert" required></div>
                     </div>
                 </div>
-
                 <div class="gestao-panel-section">
                     <h3 class="gestao-panel-title green">2. Conteúdo da Página HTML</h3>
                     <div id="seccoes-container"></div>
                     <div style="text-align: center;"><button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Adicionar Outro Retângulo</button></div>
                 </div>
-
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
                     <button type="submit" id="btn-submit-recurso" class="btn btn-primary">Gravar e Gerar HTML</button>
@@ -250,22 +247,33 @@
         <div class="modal-content">
             <h2 id="titulo-modal-quiz">Adicionar Pergunta à BD</h2>
             <form id="form-quiz" onsubmit="salvarPergunta(event)">
-                <div class="form-group"><label>Categoria</label><input type="text" id="quiz-cat" required></div>
+                
                 <div class="form-group">
-                    <label>Dificuldade</label>
-                    <select id="quiz-diff">
-                        <option value="facil">Fácil</option>
-                        <option value="medio">Médio</option>
-                        <option value="dificil">Difícil</option>
+                    <label>Categoria</label>
+                    <select id="quiz-cat" class="form-input" required>
+                        <option value="" disabled selected>A carregar da Base de Dados...</option>
                     </select>
                 </div>
-                <div class="form-group"><label>A Pergunta</label><textarea id="quiz-texto" rows="2" required></textarea></div>
+                
+                <div class="form-group">
+                    <label>Dificuldade</label>
+                    <select id="quiz-diff" class="form-input" required>
+                        <option value="" disabled selected>A carregar da Base de Dados...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>A Pergunta</label>
+                    <textarea id="quiz-texto" class="form-input" rows="2" required></textarea>
+                </div>
+                
                 <div class="form-group">
                     <label>Opções de Resposta (Marque a certa)</label>
-                    <div class="radio-group"><input type="radio" name="correta" id="radio0" value="0" required> <input type="text" id="op0" placeholder="Opção 1" required></div>
-                    <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input type="text" id="op1" placeholder="Opção 2" required></div>
-                    <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input type="text" id="op2" placeholder="Opção 3" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio0" value="0" required> <input type="text" id="op0" class="form-input" placeholder="Opção 1" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input type="text" id="op1" class="form-input" placeholder="Opção 2" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input type="text" id="op2" class="form-input" placeholder="Opção 3" required></div>
                 </div>
+                
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quiz')">Cancelar</button>
                     <button type="submit" id="btn-submit-quiz" class="btn btn-primary">Guardar Pergunta</button>
@@ -321,37 +329,64 @@
                     </thead>
                     <tbody id="alunos-tbody"></tbody>
                 </table>
-                <p id="msg-sem-alunos" style="text-align: center; color: var(--text-secondary); display: none; margin-top: 20px; font-style: italic;">Não existem alunos neste esquadrão.</p>
+                <p id="msg-sem-alunos" style="text-align: center; color: var(--text-secondary); display: none; margin-top: 20px; font-style: italic;">
+                    Não existem alunos neste esquadrão.</p>
             </div>
         </div>
     </div>
 
     <script>
+        // Inicializa os ícones do Lucide
         lucide.createIcons();
 
-        // Variáveis Globais
+        // ==========================================
+        // VARIÁVEIS GLOBAIS
+        // ==========================================
         let editandoRecursoId = null;
         let editandoQuizId = null;
-        let editandoQuizAtividadeId = null;
-        
         let allQuizzes = [];
-        let sortDiffDir = null;
-        let sortIdDir = null;
+        
+        // Pesos para ordenar as categorias exatamente como aparecem no site!
+        const catWeights = {
+            'https': 1,
+            'passwords': 2,
+            'phishing': 3,
+            'network': 4,
+            'data': 5,
+            'malware': 6
+        };
+
+        // Estado Padrão da Ordenação de Dificuldade
+        let sortDiffDir = 'asc'; 
         const diffWeights = { 'facil': 1, 'medio': 2, 'dificil': 3 };
 
-        // Variáveis para guardar Professores e Escolas carregadas
+        // Variáveis de Paginação dos Quizzes
+        let currentPageQuizzes = 1;
+        const itemsPerPageQuizzes = 15;
+
+        // Variáveis para carregar opções de Professores e Escolas
         let listaProfessores = [];
         let listaEscolas = [];
 
+        // ==========================================
+        // FUNÇÕES DE UI E NAVEGAÇÃO
+        // ==========================================
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.gestao-tab').forEach(t => t.classList.remove('active'));
+            
             document.getElementById('tab-' + tabId).classList.add('active');
             event.target.classList.add('active');
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.add('active'); 
+        }
+
+        function closeModal(id) { 
+            document.getElementById(id).classList.remove('active'); 
+        }
+
         function selectColor(color) {
             document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
             document.querySelector(`.color-circle[data-color="${color}"]`).classList.add('active');
@@ -359,34 +394,43 @@
         }
 
         // ==========================================
-        // LÓGICA RECURSOS E QUIZZES (MANTIDA INTACTA)
+        // 1. LÓGICA DE RECURSOS
         // ==========================================
         async function carregarRecursos() {
-            const res = await fetch('/api/gestao/resources');
-            const dados = await res.json();
-            const tbody = document.getElementById('resources-tbody');
-            tbody.innerHTML = '';
-            dados.forEach(r => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>#${r.id_material}</strong></td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--color-${r.cor_card || 'blue'});"></span> 
-                                <i data-lucide="${r.icone_card || 'book'}" style="width: 18px; height: 18px; color: var(--text-secondary);"></i>
-                            </div>
-                        </td>
-                        <td><strong>${r.titulo}</strong></td>
-                        <td>${r.tipo}</td>
-                        <td><code>${r.url_conteudo}</code></td>
-                        <td>
-                            <button type="button" class="btn-edit" onclick="editarRecurso(${r.id_material})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width: 16px; height: 16px;"></i></button>
-                            <button type="button" class="btn-danger" onclick="apagarRecurso(${r.id_material})" title="Apagar"><i data-lucide="trash-2" style="width: 16px; height: 16px;"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-            lucide.createIcons();
+            try {
+                const res = await fetch('/api/gestao/resources');
+                const dados = await res.json();
+                const tbody = document.getElementById('resources-tbody');
+                tbody.innerHTML = '';
+                
+                dados.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>#${r.id_material}</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--color-${r.cor_card || 'blue'});"></span> 
+                                    <i data-lucide="${r.icone_card || 'book'}" style="width: 18px; height: 18px; color: var(--text-secondary);"></i>
+                                </div>
+                            </td>
+                            <td><strong>${r.titulo}</strong></td>
+                            <td>${r.tipo}</td>
+                            <td><code>${r.url_conteudo}</code></td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="editarRecurso(${r.id_material})" title="Editar" style="margin-right: 5px;">
+                                    <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                                </button>
+                                <button type="button" class="btn-danger" onclick="apagarRecurso(${r.id_material})" title="Apagar">
+                                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                lucide.createIcons();
+            } catch (e) {
+                console.error("Erro ao carregar recursos", e);
+            }
         }
 
         function adicionarSeccao(icone = 'info', titulo = '', texto = '') {
@@ -394,10 +438,17 @@
             const html = `
                 <div class="form-group seccao-item">
                     <div class="gestao-flex-row">
-                        <div style="flex: 1;"><label>Ícone</label><input type="text" class="sec-icon" value="${icone}" required></div>
-                        <div style="flex: 3;"><label>Título</label><input type="text" class="sec-title" value="${titulo}" required></div>
+                        <div style="flex: 1;">
+                            <label>Ícone</label>
+                            <input type="text" class="sec-icon" value="${icone}" required>
+                        </div>
+                        <div style="flex: 3;">
+                            <label>Título</label>
+                            <input type="text" class="sec-title" value="${titulo}" required>
+                        </div>
                     </div>
-                    <label>Texto</label><textarea class="sec-text" rows="3" required>${texto}</textarea>
+                    <label>Texto</label>
+                    <textarea class="sec-text" rows="3" required>${texto}</textarea>
                 </div>`;
             container.insertAdjacentHTML('beforeend', html);
         }
@@ -406,7 +457,9 @@
             editandoRecursoId = null;
             document.getElementById('form-recurso').reset();
             document.getElementById('seccoes-container').innerHTML = '';
+            
             adicionarSeccao();
+            
             document.getElementById('titulo-modal-recurso').textContent = 'Criar Novo Recurso';
             document.getElementById('btn-submit-recurso').textContent = 'Gravar e Gerar HTML';
             openModal('modal-recurso');
@@ -414,55 +467,67 @@
 
         async function editarRecurso(id) {
             editandoRecursoId = id;
-            const res = await fetch(`/api/gestao/resources/${id}`);
-            const r = await res.json();
-            document.getElementById('rec-titulo').value = r.titulo;
-            document.getElementById('rec-cat').value = r.tipo || '';
-            document.getElementById('rec-desc').value = r.descricao;
-            document.getElementById('rec-cor').value = r.cor_card;
-            document.getElementById('rec-icone').value = r.icone_card;
+            
+            try {
+                const res = await fetch(`/api/gestao/resources/${id}`);
+                const r = await res.json();
+                
+                document.getElementById('rec-titulo').value = r.titulo;
+                document.getElementById('rec-cat').value = r.tipo || '';
+                document.getElementById('rec-desc').value = r.descricao;
+                document.getElementById('rec-cor').value = r.cor_card;
+                document.getElementById('rec-icone').value = r.icone_card;
 
-            document.querySelectorAll('.color-circle').forEach(c => {
-                c.classList.remove('active');
-                if (c.getAttribute('data-color') === r.cor_card) c.classList.add('active');
-            });
+                document.querySelectorAll('.color-circle').forEach(c => {
+                    c.classList.remove('active');
+                    if (c.getAttribute('data-color') === r.cor_card) {
+                        c.classList.add('active');
+                    }
+                });
 
-            const container = document.getElementById('seccoes-container');
-            container.innerHTML = '';
-            let seccoesGuardadas = [];
-            if (r.seccoes) { try { seccoesGuardadas = JSON.parse(r.seccoes); } catch (e) { } }
-            if (seccoesGuardadas.length > 0) {
-                seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto));
-            } else { adicionarSeccao(); }
+                const container = document.getElementById('seccoes-container');
+                container.innerHTML = '';
+                
+                let seccoesGuardadas = [];
+                if (r.seccoes) { 
+                    try { 
+                        seccoesGuardadas = JSON.parse(r.seccoes); 
+                    } catch (e) { console.error("Erro a ler seções", e); } 
+                }
+                
+                if (seccoesGuardadas.length > 0) {
+                    seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto));
+                } else { 
+                    adicionarSeccao(); 
+                }
 
-            document.getElementById('titulo-modal-recurso').textContent = 'Editar Recurso #' + id;
-            document.getElementById('btn-submit-recurso').textContent = 'Atualizar Recurso';
-            openModal('modal-recurso');
+                document.getElementById('titulo-modal-recurso').textContent = 'Editar Recurso #' + id;
+                document.getElementById('btn-submit-recurso').textContent = 'Atualizar Recurso';
+                openModal('modal-recurso');
+            } catch (e) {
+                alert("Erro ao carregar os dados do recurso.");
+            }
         }
 
         async function salvarRecurso(e) {
             e.preventDefault();
+            
             let seccoesArray = [];
             const icones = document.querySelectorAll('.sec-icon'); 
             const titulos = document.querySelectorAll('.sec-title'); 
             const textos = document.querySelectorAll('.sec-text');
+            
             for (let i = 0; i < titulos.length; i++) { 
-                seccoesArray.push({ icone: icones[i].value, titulo: titulos[i].value, texto: textos[i].value }); 
+                seccoesArray.push({ 
+                    icone: icones[i].value, 
+                    titulo: titulos[i].value, 
+                    texto: textos[i].value 
+                }); 
             }
-
+            
             const tituloInserido = document.getElementById('rec-titulo').value;
-
-            // Cria um link automático limpo e adiciona o prefixo "resource-"
-            // Ex: "O que é Phishing?" -> "resource-o-que-e-phishing"
-            const slug = tituloInserido
-                .toLowerCase()
-                .normalize("NFD") // Separa os acentos das letras
-                .replace(/[\u0300-\u036f]/g, "") // Remove os acentos
-                .replace(/[^a-z0-9 ]/g, "") // Remove caracteres especiais como ? ! @
-                .trim()
-                .replace(/\s+/g, '-'); // Troca espaços por traços
-
-            const urlGeradaAutomatica = `resource-${slug}`; // Adiciona o prefixo aqui!
+            const slug = tituloInserido.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "").trim().replace(/\s+/g, '-');
+            const urlGeradaAutomatica = `resource-${slug}`;
 
             const payload = { 
                 titulo: tituloInserido, 
@@ -470,7 +535,7 @@
                 descricao: document.getElementById('rec-desc').value, 
                 cor_card: document.getElementById('rec-cor').value, 
                 icone_card: document.getElementById('rec-icone').value, 
-                url_conteudo: urlGeradaAutomatica, // Usa a variável atualizada
+                url_conteudo: urlGeradaAutomatica, 
                 seccoes: seccoesArray 
             };
 
@@ -482,81 +547,212 @@
             const metodo = editandoRecursoId ? 'PUT' : 'POST';
             
             try {
-                const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const res = await fetch(url, { 
+                    method: metodo, 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                
                 if (res.ok) { 
                     closeModal('modal-recurso'); 
                     carregarRecursos(); 
                     mostrarSucesso(editandoRecursoId ? 'Recurso atualizado!' : 'Novo recurso criado!'); 
-                } else {
-                    alert("Erro ao guardar recurso.");
+                } else { 
+                    alert("Erro ao guardar recurso no servidor."); 
                 }
-            } catch (err) { alert("Erro de ligação."); } 
-            finally { btn.textContent = editandoRecursoId ? 'Atualizar Recurso' : 'Gravar e Gerar HTML'; btn.disabled = false; }
+            } catch (err) { 
+                alert("Erro de comunicação."); 
+            } finally { 
+                btn.textContent = editandoRecursoId ? 'Atualizar Recurso' : 'Gravar e Gerar HTML'; 
+                btn.disabled = false; 
+            }
         }
 
         async function apagarRecurso(id) {
             const confirmado = await confirmarAcao('Tem a certeza? Isto apaga a página HTML do servidor e o cartão.');
-            if (confirmado) {
-                await fetch(`/api/gestao/resources/${id}`, { method: 'DELETE' });
-                carregarRecursos();
+            if (confirmado) { 
+                try {
+                    await fetch(`/api/gestao/resources/${id}`, { method: 'DELETE' }); 
+                    carregarRecursos(); 
+                } catch (e) {
+                    alert("Erro ao tentar apagar recurso.");
+                }
             }
         }
 
+        // ==========================================
+        // 2. CARREGAR OPÇÕES DINÂMICAS DO QUIZ (BD)
+        // ==========================================
+        async function carregarOpcoesQuiz() {
+            try {
+                const baseUrl = window.location.pathname.includes('gestao') ? '/api/gestao' : '/api/professor';
+                const res = await fetch(`${baseUrl}/opcoes-quiz`);
+                const data = await res.json();
+                
+                const catSelect = document.getElementById('quiz-cat');
+                const diffSelect = document.getElementById('quiz-diff');
+                
+                // Preencher Categorias
+                catSelect.innerHTML = '<option value="" disabled selected>-- Escolhe uma Categoria --</option>';
+                data.categorias.forEach(cat => {
+                    const nomeStr = cat.charAt(0).toUpperCase() + cat.slice(1);
+                    catSelect.innerHTML += `<option value="${cat}">${nomeStr}</option>`;
+                });
+                
+                // Preencher Dificuldades
+                diffSelect.innerHTML = '<option value="" disabled selected>-- Escolhe a Dificuldade --</option>';
+                const pesos = { 'facil': 1, 'medio': 2, 'dificil': 3 };
+                data.dificuldades.sort((a, b) => (pesos[a] || 99) - (pesos[b] || 99)).forEach(diff => {
+                    const nomeStr = diff.charAt(0).toUpperCase() + diff.slice(1);
+                    diffSelect.innerHTML += `<option value="${diff}">${nomeStr}</option>`;
+                });
+
+            } catch (e) {
+                console.error("Erro a carregar opções do quiz", e);
+            }
+        }
+
+        // ==========================================
+        // 3. LÓGICA QUIZZES (COM PAGINAÇÃO E ORDENAÇÃO)
+        // ==========================================
         async function carregarQuizzes() {
-            const res = await fetch('/api/gestao/quizzes');
-            allQuizzes = await res.json();
-            const categoriasUnicas = [...new Set(allQuizzes.map(q => q.categoria))];
-            const filterSelect = document.getElementById('filter-categoria');
-            const valorAtual = filterSelect.value || 'todas';
-            filterSelect.innerHTML = '<option value="todas">Todas</option>';
-            categoriasUnicas.forEach(cat => filterSelect.innerHTML += `<option value="${cat}">${cat}</option>`);
-            filterSelect.value = valorAtual;
+            try {
+                const res = await fetch('/api/gestao/quizzes');
+                allQuizzes = await res.json();
+                
+                // Extrai as categorias únicas
+                const categoriasUnicas = [...new Set(allQuizzes.map(q => q.categoria))];
+                
+                // Ordena as categorias no Filtro seguindo a ordem do site
+                categoriasUnicas.sort((a, b) => {
+                    const pesoA = catWeights[a.toLowerCase()] || 99;
+                    const pesoB = catWeights[b.toLowerCase()] || 99;
+                    return pesoA - pesoB;
+                });
+
+                const filterSelect = document.getElementById('filter-categoria');
+                const valorAtual = filterSelect.value || 'todas';
+                
+                filterSelect.innerHTML = '<option value="todas">Todas</option>';
+                
+                categoriasUnicas.forEach(cat => {
+                    const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
+                    filterSelect.innerHTML += `<option value="${cat}">${catName}</option>`;
+                });
+                
+                filterSelect.value = valorAtual;
+                
+                renderQuizzes();
+            } catch (e) {
+                console.error("Erro ao carregar quizzes", e);
+            }
+        }
+
+        function resetPaginationQuizzes() {
+            currentPageQuizzes = 1;
             renderQuizzes();
         }
 
-        function toggleSortDificuldade() { sortIdDir = null; sortDiffDir = sortDiffDir === 'asc' ? 'desc' : 'asc'; renderQuizzes(); }
-        function toggleSortID() { sortDiffDir = null; sortIdDir = sortIdDir === 'asc' ? 'desc' : 'asc'; renderQuizzes(); }
+        function mudarPaginaQuizzes(delta) {
+            currentPageQuizzes += delta;
+            renderQuizzes();
+        }
+
+        function toggleSortDificuldade() { 
+            sortDiffDir = sortDiffDir === 'asc' ? 'desc' : 'asc'; 
+            renderQuizzes(); 
+        }
 
         function renderQuizzes() {
-            const tbody = document.getElementById('quizzes-tbody');
-            tbody.innerHTML = '';
             const categoriaSelecionada = document.getElementById('filter-categoria').value;
+            const termoPesquisa = document.getElementById('search-quiz').value.toLowerCase().trim();
+            
             let quizzesFiltrados = [...allQuizzes];
             
+            // Filtros...
             if (categoriaSelecionada !== 'todas') {
                 quizzesFiltrados = quizzesFiltrados.filter(q => q.categoria === categoriaSelecionada);
             }
-            if (sortDiffDir !== null) {
-                quizzesFiltrados.sort((a, b) => {
-                    const pesoA = diffWeights[a.dificuldade] || 0;
-                    const pesoB = diffWeights[b.dificuldade] || 0;
-                    return sortDiffDir === 'asc' ? pesoA - pesoB : pesoB - pesoA;
+            if (termoPesquisa !== '') {
+                quizzesFiltrados = quizzesFiltrados.filter(q => 
+                    q.texto_pergunta.toLowerCase().includes(termoPesquisa) || 
+                    q.id_pergunta.toString() === termoPesquisa 
+                );
+            }
+            
+            // Ordenação...
+            quizzesFiltrados.sort((a, b) => {
+                const pesoCatA = catWeights[a.categoria.toLowerCase()] || 99;
+                const pesoCatB = catWeights[b.categoria.toLowerCase()] || 99;
+                if (pesoCatA !== pesoCatB) return pesoCatA - pesoCatB;
+
+                const pesoDiffA = diffWeights[a.dificuldade.toLowerCase()] || 0;
+                const pesoDiffB = diffWeights[b.dificuldade.toLowerCase()] || 0;
+                if (pesoDiffA !== pesoDiffB) {
+                    return sortDiffDir === 'asc' ? pesoDiffA - pesoDiffB : pesoDiffB - pesoDiffA;
+                }
+
+                return a.id_pergunta - b.id_pergunta;
+            });
+
+            // Paginação...
+            const totalItems = quizzesFiltrados.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPageQuizzes) || 1;
+            
+            if (currentPageQuizzes > totalPages) currentPageQuizzes = totalPages;
+            if (currentPageQuizzes < 1) currentPageQuizzes = 1;
+
+            const startIndex = (currentPageQuizzes - 1) * itemsPerPageQuizzes;
+            const endIndex = startIndex + itemsPerPageQuizzes;
+            const paginatedQuizzes = quizzesFiltrados.slice(startIndex, endIndex);
+
+            document.getElementById('page-info-quiz').textContent = `Pág ${currentPageQuizzes} de ${totalPages}`;
+            document.getElementById('btn-prev-quiz').disabled = (currentPageQuizzes === 1);
+            document.getElementById('btn-next-quiz').disabled = (currentPageQuizzes === totalPages);
+
+            // ==========================================
+            // A MAGIA QUE IMPEDE O ECRÃ DE SALTAR
+            // ==========================================
+            let novoHtmlContent = ''; // Construímos o HTML na memória
+
+            if (paginatedQuizzes.length === 0) {
+                novoHtmlContent = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 20px;">Nenhuma pergunta encontrada para "${termoPesquisa}".</td></tr>`;
+            } else {
+                paginatedQuizzes.forEach(q => {
+                    let badge = q.dificuldade === 'facil' ? '🟢' : q.dificuldade === 'medio' ? '🟡' : '🔴';
+                    let catCapitalized = q.categoria.charAt(0).toUpperCase() + q.categoria.slice(1);
+                    
+                    novoHtmlContent += `
+                        <tr>
+                            <td><strong>#${q.id_pergunta}</strong></td>
+                            <td>
+                                <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    ${catCapitalized}
+                                </span>
+                            </td>
+                            <td>${badge} <span style="text-transform: capitalize;">${q.dificuldade}</span></td>
+                            <td title="${q.texto_pergunta}" style="max-width: 350px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${q.texto_pergunta}
+                            </td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="editarQuiz(${q.id_pergunta})" title="Editar" style="margin-right: 5px;">
+                                    <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                                </button>
+                                <button type="button" class="btn-danger" onclick="apagarQuiz(${q.id_pergunta})" title="Apagar">
+                                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
                 });
             }
-            if (sortIdDir !== null) {
-                quizzesFiltrados.sort((a, b) => sortIdDir === 'asc' ? a.id_pergunta - b.id_pergunta : b.id_pergunta - a.id_pergunta);
-            }
-
-            quizzesFiltrados.forEach(q => {
-                let badge = q.dificuldade === 'facil' ? '🟢' : q.dificuldade === 'medio' ? '🟡' : '🔴';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>#${q.id_pergunta}</strong></td>
-                        <td><span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">${q.categoria}</span></td>
-                        <td>${badge} <span style="text-transform: capitalize;">${q.dificuldade}</span></td>
-                        <td title="${q.texto_pergunta}" style="max-width: 350px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q.texto_pergunta}</td>
-                        <td>
-                            <button type="button" class="btn-edit" onclick="editarQuiz(${q.id_pergunta})" title="Editar" style="margin-right: 5px;"><i data-lucide="edit-3" style="width: 16px; height: 16px;"></i></button>
-                            <button type="button" class="btn-danger" onclick="apagarQuiz(${q.id_pergunta})" title="Apagar"><i data-lucide="trash-2" style="width: 16px; height: 16px;"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
+            
+            document.getElementById('quizzes-tbody').innerHTML = novoHtmlContent;
             lucide.createIcons();
         }
 
         function prepararNovoQuiz() {
-            editandoQuizId = null; editandoQuizAtividadeId = null;
+            editandoQuizId = null;
             document.getElementById('form-quiz').reset();
             document.getElementById('titulo-modal-quiz').textContent = 'Adicionar Pergunta à BD';
             document.getElementById('btn-submit-quiz').textContent = 'Guardar Pergunta';
@@ -565,318 +761,377 @@
 
         async function editarQuiz(id) {
             editandoQuizId = id;
-            const res = await fetch(`/api/gestao/quizzes/${id}`);
-            const data = await res.json();
-            const q = data.pergunta;
-            editandoQuizAtividadeId = q.id_atividade;
+            try {
+                const res = await fetch(`/api/gestao/quizzes/${id}`);
+                const data = await res.json();
+                const q = data.pergunta;
+                
+                const catValue = q.categoria || (q.atividade ? q.atividade.categoria : '');
+                const diffValue = q.dificuldade || (q.atividade ? q.atividade.dificuldade : '');
 
-            document.getElementById('quiz-cat').value = q.categoria;
-            document.getElementById('quiz-diff').value = q.dificuldade;
-            document.getElementById('quiz-texto').value = q.texto_pergunta;
-            document.querySelectorAll('input[name="correta"]').forEach(r => r.checked = false);
-            data.opcoes.forEach((op, index) => {
-                const inputTexto = document.getElementById('op' + index);
-                if (inputTexto) {
-                    inputTexto.value = op.texto_opcao;
-                    if (op.e_correta === true) document.getElementById('radio' + index).checked = true;
-                }
-            });
+                document.getElementById('quiz-cat').value = catValue;
+                document.getElementById('quiz-diff').value = diffValue;
+                document.getElementById('quiz-texto').value = q.texto_pergunta;
+                
+                document.querySelectorAll('input[name="correta"]').forEach(r => r.checked = false);
+                
+                data.opcoes.forEach((op, index) => {
+                    const inputTexto = document.getElementById('op' + index);
+                    if (inputTexto) {
+                        inputTexto.value = op.texto_opcao;
+                        if (op.e_correta === true) {
+                            document.getElementById('radio' + index).checked = true;
+                        }
+                    }
+                });
 
-            document.getElementById('titulo-modal-quiz').textContent = 'Editar Pergunta #' + id;
-            document.getElementById('btn-submit-quiz').textContent = 'Atualizar Pergunta';
-            openModal('modal-quiz');
+                document.getElementById('titulo-modal-quiz').textContent = 'Editar Pergunta #' + id;
+                document.getElementById('btn-submit-quiz').textContent = 'Atualizar Pergunta';
+                openModal('modal-quiz');
+            } catch (e) {
+                alert("Erro ao carregar a pergunta.");
+            }
         }
 
         async function salvarPergunta(e) {
             e.preventDefault();
-            let opcoesArray = [document.getElementById('op0').value, document.getElementById('op1').value, document.getElementById('op2').value];
-            if (document.getElementById('op3') && document.getElementById('op3').value !== '') opcoesArray.push(document.getElementById('op3').value);
+            
+            let opcoesArray = [
+                document.getElementById('op0').value, 
+                document.getElementById('op1').value, 
+                document.getElementById('op2').value
+            ];
+            
+            const op3 = document.getElementById('op3');
+            if (op3 && op3.value !== '') {
+                opcoesArray.push(op3.value);
+            }
 
             const payload = {
-                texto_pergunta: document.getElementById('quiz-texto').value, categoria: document.getElementById('quiz-cat').value,
-                dificuldade: document.getElementById('quiz-diff').value, opcoes: opcoesArray,
-                corretaIndex: document.querySelector('input[name="correta"]:checked').value, id_atividade: editandoQuizAtividadeId
+                texto_pergunta: document.getElementById('quiz-texto').value, 
+                categoria: document.getElementById('quiz-cat').value,
+                dificuldade: document.getElementById('quiz-diff').value, 
+                opcoes: opcoesArray,
+                corretaIndex: document.querySelector('input[name="correta"]:checked').value
             };
 
             const url = editandoQuizId ? `/api/gestao/quizzes/${editandoQuizId}` : '/api/gestao/quiz';
             const metodo = editandoQuizId ? 'PUT' : 'POST';
-            const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (res.ok) {
-                closeModal('modal-quiz');
-                carregarQuizzes();
-                mostrarSucesso(editandoQuizId ? 'Pergunta atualizada com sucesso!' : 'Nova pergunta adicionada com sucesso!');
+            
+            try {
+                const res = await fetch(url, { 
+                    method: metodo, 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                if (res.ok) {
+                    closeModal('modal-quiz');
+                    carregarQuizzes();
+                    mostrarSucesso(editandoQuizId ? 'Pergunta atualizada com sucesso!' : 'Nova pergunta adicionada com sucesso!');
+                } else {
+                    alert("Erro ao guardar a pergunta no servidor.");
+                }
+            } catch (e) {
+                alert("Erro de comunicação ao gravar a pergunta.");
             }
         }
 
         async function apagarQuiz(id) {
             const confirmado = await confirmarAcao('Tem a certeza? As opções ligadas a esta pergunta também serão apagadas.');
             if (confirmado) {
-                await fetch(`/api/gestao/quizzes/${id}`, { method: 'DELETE' });
-                carregarQuizzes();
+                try {
+                    await fetch(`/api/gestao/quizzes/${id}`, { method: 'DELETE' });
+                    carregarQuizzes();
+                } catch (e) {
+                    alert("Erro ao apagar pergunta.");
+                }
             }
         }
 
-
         // ==========================================
-        // LÓGICA DE TURMAS (LIMPA E OTIMIZADA)
+        // 4. LÓGICA DE TURMAS (ADMIN)
         // ==========================================
-        
-        // 1. Carregar Professores e Escolas UMA VEZ na inicialização
         async function carregarDadosFormulariosTurma() {
             try {
                 const [resProf, resEscola] = await Promise.all([
-                    fetch('/api/gestao/professores'),
+                    fetch('/api/gestao/professores'), 
                     fetch('/api/gestao/escolas')
                 ]);
-                listaProfessores = await resProf.json();
+                listaProfessores = await resProf.json(); 
                 listaEscolas = await resEscola.json();
-            } catch(e) {
-                console.error("Erro ao carregar listas de apoio para Turmas", e);
+            } catch(e) { 
+                console.error("Erro ao carregar listas de suporte de turmas", e); 
             }
         }
 
-        // 2. Carregar a Tabela
         async function carregarTurmasAdmin() {
-            const res = await fetch('/api/gestao/turmas');
-            const turmas = await res.json();
-            const tbody = document.getElementById('turmas-admin-tbody');
-            tbody.innerHTML = '';
-
-            turmas.forEach(t => {
-                const escolaNome = t.escola ? t.escola.nome : '<span style="color: var(--error);">Sem Escola</span>';
-                const professorNome = t.utilizador ? t.utilizador.nome : '<span style="color: var(--error);">Sem Professor</span>';
-                const codigo = t.codigo_acesso || 'N/A';
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>#${t.id_turma}</strong></td>
-                        <td>${professorNome}</td>
-                        <td>${escolaNome}</td>
-                        <td><strong>${t.nome}</strong></td>
-                        <td>
-                            ${t.ano_letivo}<br>
-                            <span style="font-size: 12px; font-family: monospace; color: var(--text-secondary);">${codigo}</span>
-                        </td>
-                        <td>
-                            <button type="button" class="btn-edit" onclick="verAlunosTurma(${t.id_turma})" title="Ver Alunos" style="margin-right: 5px; background: rgba(59, 130, 246, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color);"><i data-lucide="users" style="width: 16px; height: 16px;"></i></button>
-                            
-                            <button type="button" class="btn-edit" onclick="abrirEdicaoTurma(${t.id_turma}, '${t.nome}', '${t.ano_letivo}', ${t.id_professor || 'null'}, ${t.id_escola || 'null'})" title="Editar"><i data-lucide="edit-3" style="width: 16px; height: 16px;"></i></button>
-                            
-                            <button type="button" class="btn-danger" onclick="apagarTurmaAdmin(${t.id_turma})" title="Apagar" style="margin-left: 5px;"><i data-lucide="trash-2" style="width: 16px; height: 16px;"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-            lucide.createIcons();
+            try {
+                const res = await fetch('/api/gestao/turmas');
+                const turmas = await res.json();
+                const tbody = document.getElementById('turmas-admin-tbody');
+                tbody.innerHTML = '';
+                
+                turmas.forEach(t => {
+                    const escolaNome = t.escola ? t.escola.nome : '<span style="color: var(--error);">Sem Escola</span>';
+                    const professorNome = t.utilizador ? t.utilizador.nome : '<span style="color: var(--error);">Sem Professor</span>';
+                    const codigo = t.codigo_acesso || 'N/A';
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>#${t.id_turma}</strong></td>
+                            <td>${professorNome}</td>
+                            <td>${escolaNome}</td>
+                            <td><strong>${t.nome}</strong></td>
+                            <td>
+                                ${t.ano_letivo}<br>
+                                <span style="font-size: 12px; font-family: monospace; color: var(--text-secondary);">${codigo}</span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="verAlunosTurma(${t.id_turma})" title="Ver Alunos" style="margin-right: 5px; background: rgba(59, 130, 246, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color);">
+                                    <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+                                </button>
+                                <button type="button" class="btn-edit" onclick="abrirEdicaoTurma(${t.id_turma}, '${t.nome}', '${t.ano_letivo}', ${t.id_professor || 'null'}, ${t.id_escola || 'null'})" title="Editar">
+                                    <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                                </button>
+                                <button type="button" class="btn-danger" onclick="apagarTurmaAdmin(${t.id_turma})" title="Apagar" style="margin-left: 5px;">
+                                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+                lucide.createIcons();
+            } catch (e) {
+                console.error("Erro ao carregar turmas", e);
+            }
         }
 
-        // 3. Abrir Modal de Criação
         function prepararNovaTurmaAdmin() {
             document.getElementById('form-criar-turma-admin').reset();
-            
             const selectProf = document.getElementById('nova-turma-prof');
             const selectEscola = document.getElementById('nova-turma-escola');
             
-            selectProf.innerHTML = '<option value="" disabled selected>-- Seleciona um Professor --</option>' + 
+            selectProf.innerHTML = '<option value="" disabled selected>-- Seleciona --</option>' + 
                 listaProfessores.map(p => `<option value="${p.id_utilizador}">${p.nome}</option>`).join('');
                 
-            selectEscola.innerHTML = '<option value="" disabled selected>-- Seleciona uma Escola --</option>' + 
+            selectEscola.innerHTML = '<option value="" disabled selected>-- Seleciona --</option>' + 
                 listaEscolas.map(e => `<option value="${e.id_escola}">${e.nome}</option>`).join('');
-
+                
             openModal('modal-criar-turma-admin');
         }
 
-        // 4. Gravar Nova Turma
         async function salvarNovaTurmaAdmin(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-nova-turma');
-            btn.textContent = 'A criar...'; btn.disabled = true;
-
-            const payload = {
-                nome: document.getElementById('nova-turma-nome').value,
-                ano_letivo: document.getElementById('nova-turma-ano').value,
-                id_professor: document.getElementById('nova-turma-prof').value,
-                id_escola: document.getElementById('nova-turma-escola').value
-            };
-
-            try {
-                const res = await fetch('/api/gestao/turmas', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    closeModal('modal-criar-turma-admin');
-                    carregarTurmasAdmin();
-                    mostrarSucesso('Turma gerada com sucesso!');
-                } else {
-                    const err = await res.json();
-                    alert("Erro ao criar turma: " + err.error);
-                }
-            } catch(e) { alert("Erro de comunicação com o servidor."); }
-            finally { btn.textContent = 'Criar Turma'; btn.disabled = false; }
-        }
-
-        // 5. Abrir Modal de Edição
-        function abrirEdicaoTurma(id, nome, ano, idProf, idEscola) {
-            document.getElementById('edit-turma-id').value = id;
-            document.getElementById('edit-turma-nome').value = nome;
-            document.getElementById('edit-turma-ano').value = ano;
-
-            const selectProf = document.getElementById('edit-turma-professor');
-            const selectEscola = document.getElementById('edit-turma-escola');
+            btn.textContent = 'A criar...'; 
+            btn.disabled = true;
             
-            selectProf.innerHTML = '<option value="" disabled>-- Seleciona um Professor --</option>' + 
-                listaProfessores.map(p => `<option value="${p.id_utilizador}">${p.nome}</option>`).join('');
-                
-            selectEscola.innerHTML = '<option value="" disabled>-- Seleciona uma Escola --</option>' + 
-                listaEscolas.map(e => `<option value="${e.id_escola}">${e.nome}</option>`).join('');
-
-            if (idProf && idProf !== 'null') selectProf.value = idProf;
-            if (idEscola && idEscola !== 'null') selectEscola.value = idEscola;
-
-            openModal('modal-editar-turma');
-        }
-
-        // 6. Gravar Edição
-        async function salvarEdicaoTurma(e) {
-            e.preventDefault();
-            const id = document.getElementById('edit-turma-id').value;
-            const btn = document.getElementById('btn-submit-edit-turma');
-            btn.textContent = 'A guardar...'; btn.disabled = true;
-
-            const payload = {
-                nome: document.getElementById('edit-turma-nome').value,
-                ano_letivo: document.getElementById('edit-turma-ano').value,
-                id_professor: document.getElementById('edit-turma-professor').value,
-                id_escola: document.getElementById('edit-turma-escola').value
+            const payload = { 
+                nome: document.getElementById('nova-turma-nome').value, 
+                ano_letivo: document.getElementById('nova-turma-ano').value, 
+                id_professor: document.getElementById('nova-turma-prof').value, 
+                id_escola: document.getElementById('nova-turma-escola').value 
             };
-
+            
             try {
-                const res = await fetch(`/api/gestao/turmas/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                const res = await fetch('/api/gestao/turmas', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
                 });
                 
-                if (res.ok) {
-                    closeModal('modal-editar-turma');
+                if (res.ok) { 
+                    closeModal('modal-criar-turma-admin'); 
                     carregarTurmasAdmin(); 
-                    mostrarSucesso('Os dados do esquadrão foram atualizados!');
-                } else { alert('Erro ao atualizar a turma.'); }
-            } catch (err) { alert('Erro de comunicação com o servidor.'); } 
-            finally { btn.textContent = 'Guardar Alterações'; btn.disabled = false; }
-        }
-
-        // 7. Apagar Turma
-        async function apagarTurmaAdmin(id) {
-            const confirmado = await confirmarAcao('Tem a certeza? Se apagar a turma, os alunos associados a ela perdem a associação.');
-            if (confirmado) {
-                await fetch(`/api/gestao/turmas/${id}`, { method: 'DELETE' });
-                carregarTurmasAdmin();
+                    mostrarSucesso('Turma gerada com sucesso!'); 
+                } else { 
+                    alert("Erro ao criar turma."); 
+                }
+            } catch(e) { 
+                alert("Erro de comunicação com o servidor."); 
+            } finally { 
+                btn.textContent = 'Criar Turma'; 
+                btn.disabled = false; 
             }
         }
 
+        function abrirEdicaoTurma(id, nome, ano, idProf, idEscola) {
+            document.getElementById('edit-turma-id').value = id; 
+            document.getElementById('edit-turma-nome').value = nome; 
+            document.getElementById('edit-turma-ano').value = ano;
+            
+            const selectProf = document.getElementById('edit-turma-professor'); 
+            const selectEscola = document.getElementById('edit-turma-escola');
+            
+            selectProf.innerHTML = '<option value="" disabled>-- Seleciona --</option>' + 
+                listaProfessores.map(p => `<option value="${p.id_utilizador}">${p.nome}</option>`).join('');
+                
+            selectEscola.innerHTML = '<option value="" disabled>-- Seleciona --</option>' + 
+                listaEscolas.map(e => `<option value="${e.id_escola}">${e.nome}</option>`).join('');
+                
+            if (idProf && idProf !== 'null') selectProf.value = idProf; 
+            if (idEscola && idEscola !== 'null') selectEscola.value = idEscola;
+            
+            openModal('modal-editar-turma');
+        }
 
-        // ==========================================
-        // GESTÃO E REMOÇÃO DE ALUNOS
-        // ==========================================
+        async function salvarEdicaoTurma(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-turma-id').value;
+            const btn = document.getElementById('btn-submit-edit-turma'); 
+            btn.textContent = 'A guardar...'; 
+            btn.disabled = true;
+            
+            const payload = { 
+                nome: document.getElementById('edit-turma-nome').value, 
+                ano_letivo: document.getElementById('edit-turma-ano').value, 
+                id_professor: document.getElementById('edit-turma-professor').value, 
+                id_escola: document.getElementById('edit-turma-escola').value 
+            };
+            
+            try {
+                const res = await fetch(`/api/gestao/turmas/${id}`, { 
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                if (res.ok) { 
+                    closeModal('modal-editar-turma'); 
+                    carregarTurmasAdmin(); 
+                    mostrarSucesso('Os dados do esquadrão foram atualizados!'); 
+                } else { 
+                    alert('Erro ao atualizar a turma.'); 
+                }
+            } catch (err) { 
+                alert('Erro de comunicação.'); 
+            } finally { 
+                btn.textContent = 'Guardar Alterações'; 
+                btn.disabled = false; 
+            }
+        }
+
+        async function apagarTurmaAdmin(id) {
+            const confirmado = await confirmarAcao('Tem a certeza? Se apagar a turma, os alunos associados a ela perdem a associação.');
+            if (confirmado) { 
+                try {
+                    await fetch(`/api/gestao/turmas/${id}`, { method: 'DELETE' }); 
+                    carregarTurmasAdmin(); 
+                } catch (e) {
+                    alert("Erro ao apagar a turma.");
+                }
+            }
+        }
+
         async function verAlunosTurma(idTurma) {
-            const tbody = document.getElementById('alunos-tbody');
+            const tbody = document.getElementById('alunos-tbody'); 
             const msgVazio = document.getElementById('msg-sem-alunos');
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">A recolher dados...</td></tr>';
+            
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">A recolher dados...</td></tr>'; 
             msgVazio.style.display = 'none';
             openModal('modal-ver-alunos');
-
+            
             try {
                 const baseUrl = window.location.pathname.includes('gestao') ? '/api/gestao' : '/api/professor';
-                const res = await fetch(`${baseUrl}/turmas/${idTurma}/alunos`);
-                const alunos = await res.json();
-
+                const res = await fetch(`${baseUrl}/turmas/${idTurma}/alunos`); 
+                const alunos = await res.json(); 
+                
                 tbody.innerHTML = '';
-                if (alunos.length === 0) {
-                    msgVazio.style.display = 'block';
+                
+                if (alunos.length === 0) { 
+                    msgVazio.style.display = 'block'; 
                 } else {
                     alunos.forEach(a => {
                         tbody.innerHTML += `
-                            <tr>
-                                <td><strong>${a.nome}</strong></td>
-                                <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${a.email}</span></td>
-                                <td><span style="font-weight: bold; color: var(--primary-color);">${a.pontos_totais || 0} pts</span></td>
-                                <td>
-                                    <button type="button" class="btn-danger" onclick="removerAlunoDaTurma(${idTurma}, '${a.id_utilizador}')" title="Remover Aluno" style="padding: 6px; border-radius: 6px;">
-                                        <i data-lucide="user-minus" style="width: 18px; height: 18px;"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
+                        <tr>
+                            <td><strong>${a.nome}</strong></td>
+                            <td><span style="font-size: 0.85rem; color: var(--text-secondary);">${a.email}</span></td>
+                            <td><span style="font-weight: bold; color: var(--primary-color);">${a.pontos_totais || 0} pts</span></td>
+                            <td>
+                                <button type="button" class="btn-danger" onclick="removerAlunoDaTurma(${idTurma}, '${a.id_utilizador}')" title="Remover Aluno" style="padding: 6px; border-radius: 6px;">
+                                    <i data-lucide="user-minus" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </td>
+                        </tr>`;
                     });
                 }
                 lucide.createIcons();
-            } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #ef4444;">Erro ao carregar ficheiros.</td></tr>';
+            } catch (e) { 
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: #ef4444;">Erro ao carregar alunos.</td></tr>'; 
             }
         }
 
         async function removerAlunoDaTurma(idTurma, idAluno) {
             const confirmado = await confirmarAcao("Tem a certeza absoluta? O aluno será expulso deste esquadrão.");
             if (!confirmado) return;
-
+            
             try {
                 const baseUrl = window.location.pathname.includes('gestao') ? '/api/gestao' : '/api/professor';
-                const res = await fetch(`${baseUrl}/turmas/${idTurma}/alunos/${idAluno}/remover`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' }
+                const res = await fetch(`${baseUrl}/turmas/${idTurma}/alunos/${idAluno}/remover`, { 
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' } 
                 });
-                if(res.ok) {
-                    mostrarSucesso("O aluno foi removido do esquadrão com sucesso.");
+                
+                if (res.ok) { 
+                    mostrarSucesso("O aluno foi removido com sucesso."); 
                     verAlunosTurma(idTurma); 
-                } else {
-                    const data = await res.json();
-                    alert("Erro ao remover o aluno: " + (data.error || "Desconhecido"));
+                } else { 
+                    alert("Erro ao remover o aluno."); 
                 }
-            } catch(e) { alert("Erro de comunicação com o servidor."); }
+            } catch(e) { 
+                alert("Erro de comunicação com o servidor."); 
+            }
         }
 
         // ==========================================
-        // UTILITÁRIOS GLOBAIS
+        // UTILITÁRIOS GLOBAIS (MODAIS)
         // ==========================================
         function confirmarAcao(mensagem) {
             return new Promise((resolve) => {
-                const modal = document.getElementById('modal-confirmacao');
                 const texto = document.getElementById('texto-confirmacao');
                 const btnAceitar = document.getElementById('btn-aceitar-confirmacao');
                 const btnCancelar = document.getElementById('btn-cancelar-confirmacao');
-
+                
                 texto.textContent = mensagem;
                 openModal('modal-confirmacao');
                 lucide.createIcons();
-
-                const novoBtnAceitar = btnAceitar.cloneNode(true);
+                
+                const novoBtnAceitar = btnAceitar.cloneNode(true); 
                 const novoBtnCancelar = btnCancelar.cloneNode(true);
-                btnAceitar.parentNode.replaceChild(novoBtnAceitar, btnAceitar);
+                
+                btnAceitar.parentNode.replaceChild(novoBtnAceitar, btnAceitar); 
                 btnCancelar.parentNode.replaceChild(novoBtnCancelar, btnCancelar);
-
-                novoBtnAceitar.addEventListener('click', () => { closeModal('modal-confirmacao'); resolve(true); });
-                novoBtnCancelar.addEventListener('click', () => { closeModal('modal-confirmacao'); resolve(false); });
+                
+                novoBtnAceitar.addEventListener('click', () => { 
+                    closeModal('modal-confirmacao'); 
+                    resolve(true); 
+                });
+                
+                novoBtnCancelar.addEventListener('click', () => { 
+                    closeModal('modal-confirmacao'); 
+                    resolve(false); 
+                });
             });
         }
 
-        function mostrarSucesso(mensagem) {
-            document.getElementById('texto-sucesso').textContent = mensagem;
-            openModal('modal-sucesso');
-            lucide.createIcons();
+        function mostrarSucesso(mensagem) { 
+            document.getElementById('texto-sucesso').textContent = mensagem; 
+            openModal('modal-sucesso'); 
+            lucide.createIcons(); 
         }
 
+        // ==========================================
         // INICIALIZAÇÃO DA PÁGINA
+        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            carregarDadosFormulariosTurma().then(() => {
-                carregarTurmasAdmin();
+            carregarDadosFormulariosTurma().then(() => { 
+                carregarTurmasAdmin(); 
             });
-            carregarRecursos();
+            carregarRecursos(); 
             carregarQuizzes();
+            carregarOpcoesQuiz();
         });
-
     </script>
 </body>
+
 </html>

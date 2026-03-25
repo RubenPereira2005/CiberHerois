@@ -9,9 +9,7 @@ module.exports = (supabase) => {
     // MIDDLEWARE DE SEGURANÇA: Apenas ADMIN
     // ==========================================
     const verificarAdmin = async (req, res, next) => {
-        if (!req.session.userId) {
-            return res.redirect('/404.html');
-        }
+        if (!req.session.userId) return res.redirect('/404.html');
 
         const { data: user, error } = await supabase
             .from('utilizador')
@@ -19,10 +17,7 @@ module.exports = (supabase) => {
             .eq('id_utilizador', req.session.userId)
             .single();
 
-        if (error || !user || user.role !== 'admin') {
-            return res.redirect('/404.html');
-        }
-        
+        if (error || !user || user.role !== 'admin') return res.redirect('/404.html');
         next();
     };
 
@@ -45,12 +40,9 @@ module.exports = (supabase) => {
             <div class="loader-logo">Ciber<span>Heróis</span></div>
             <div class="loader-spinner"></div>
         </div>
-
         <div id="includedContent"></div>
-
         <div class="auth-container resource-detail-container">
             <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
-            
             <div class="resource-header">
                 <div class="resource-header-icon resource-header-icon-${cor_card}">
                     <i data-lucide="${icone_card}" class="icon-32"></i>
@@ -60,11 +52,9 @@ module.exports = (supabase) => {
                     <h1 class="resource-title">${titulo}</h1>
                 </div>
             </div>
-
             <div class="resource-content">
                 ${htmlSeccoes}
             </div>
-
             <div class="resource-buttons">
                 <button class="resource-btn resource-btn-secondary" onclick="window.location.href='/api/pdf/download/${url_conteudo.replace('.html', '')}'">
                     <i data-lucide="download" class="icon-20"></i> Descarregar PDF
@@ -78,21 +68,18 @@ module.exports = (supabase) => {
     // RECURSOS
     // ==========================================
     
-    // Obter todos
     router.get('/resources', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').order('id_material', { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
         res.json(data);
     });
 
-    // Obter um específico para editar
     router.get('/resources/:id', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').eq('id_material', req.params.id).single();
         if (error || !data) return res.status(404).json({ error: 'Não encontrado' });
         res.json(data);
     });
 
-    // Criar novo
     router.post('/resources', async (req, res) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
         const id_professor = req.session.userId || 1; 
@@ -117,27 +104,16 @@ module.exports = (supabase) => {
         catch (fsError) { return res.status(500).json({ error: "Erro ao criar ficheiro HTML." }); }
 
         const seccoesStr = JSON.stringify(seccoes);
-        const tipoMinusculo = tipo.toLowerCase(); // Garantir que o tipo é armazenado em minúsculas para consistência
+        const tipoMinusculo = tipo.toLowerCase();
 
         const { error } = await supabase.from('materialpedagogico').insert([{
-            titulo, 
-            descricao, 
-            tipo: tipoMinusculo,
-            cor_card, 
-            icone_card, 
-            url_conteudo: nomeFicheiro, 
-            id_professor, 
-            seccoes: seccoesStr
+            titulo, descricao, tipo: tipoMinusculo, cor_card, icone_card, url_conteudo: nomeFicheiro, id_professor, seccoes: seccoesStr
         }]);
 
-        if (error) {
-            console.error("❌ ERRO SUPABASE (INSERT):", error);
-            return res.status(500).json({ error: error.message });
-        }
+        if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Recurso criado com sucesso!' });
     });
 
-    // Atualizar existente
     router.put('/resources/:id', async (req, res) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
         const id = req.params.id;
@@ -158,49 +134,34 @@ module.exports = (supabase) => {
 
         const htmlTemplate = gerarHtmlTemplate(titulo, cor_card, icone_card, tipo, htmlSeccoes, nomeFicheiro);
         const seccoesStr = JSON.stringify(seccoes);
-        const tipoMinusculo = tipo.toLowerCase(); // Garantir que o tipo é armazenado em minúsculas para consistência
+        const tipoMinusculo = tipo.toLowerCase(); 
 
         try {
             fs.writeFileSync(caminhoFicheiro, htmlTemplate, 'utf8');
-            
             const { error } = await supabase.from('materialpedagogico').update({
-                titulo, 
-                descricao, 
-                tipo: tipoMinusculo,
-                cor_card, 
-                icone_card, 
-                url_conteudo: nomeFicheiro, 
-                seccoes: seccoesStr
+                titulo, descricao, tipo: tipoMinusculo, cor_card, icone_card, url_conteudo: nomeFicheiro, seccoes: seccoesStr
             }).eq('id_material', id);
 
-            if (error) {
-                console.error("❌ ERRO SUPABASE (UPDATE):", error);
-                return res.status(500).json({ error: error.message });
-            }
+            if (error) return res.status(500).json({ error: error.message });
             res.json({ message: 'Recurso atualizado!' });
-
         } catch (err) { res.status(500).json({ error: "Erro ao atualizar ficheiro HTML." }); }
     });
 
-    // Apagar
     router.delete('/resources/:id', async (req, res) => {
         const { data, error: selectErr } = await supabase.from('materialpedagogico').select('url_conteudo').eq('id_material', req.params.id).single();
-        
         if (!selectErr && data) {
             const ficheiro = path.join(__dirname, '../pages', data.url_conteudo);
             if (fs.existsSync(ficheiro)) fs.unlinkSync(ficheiro); 
         }
-
         const { error } = await supabase.from('materialpedagogico').delete().eq('id_material', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Apagado!' });
     });
 
     // ==========================================
-    // QUIZZES
+    // QUIZZES: Lógica de Mudança Dinâmica
     // ==========================================
-
-    // Obter todos
+    
     router.get('/quizzes', async (req, res) => {
         const { data, error } = await supabase
             .from('pergunta')
@@ -209,18 +170,15 @@ module.exports = (supabase) => {
 
         if (error) return res.status(500).json({ error: error.message });
         
-        // Mapear para ter as propriedades flat
         const formatado = data.map(p => ({
             id_pergunta: p.id_pergunta,
             categoria: p.atividade.categoria,
             dificuldade: p.atividade.dificuldade,
             texto_pergunta: p.texto_pergunta
         }));
-
         res.json(formatado);
     });
 
-    // Obter um específico para editar
     router.get('/quizzes/:id', async (req, res) => {
         const { data: pData, error: pErr } = await supabase
             .from('pergunta')
@@ -250,27 +208,80 @@ module.exports = (supabase) => {
         });
     });
 
-    // Criar novo
+    // Procura Atividade + Procura Pontuação Automática
+    async function obterAtividadeEPontos(categoria, dificuldade, id_professor) {
+        let { data: ativ } = await supabase.from('atividade')
+            .select('id_atividade, pontos')
+            .ilike('categoria', categoria.trim())
+            .ilike('dificuldade', dificuldade.trim())
+            .eq('tipo', 'quiz')
+            .limit(1)
+            .maybeSingle();
+            
+        let id_atividade;
+        let pontos_pergunta = 10; // Fallback
+        
+        if (ativ) {
+            id_atividade = ativ.id_atividade;
+            // Procurar uma pergunta desta atividade para descobrir o valor exato dos pontos nela!
+            let { data: perg } = await supabase.from('pergunta')
+                .select('pontos_pergunta')
+                .eq('id_atividade', id_atividade)
+                .limit(1)
+                .maybeSingle();
+                
+            if (perg && perg.pontos_pergunta) {
+                pontos_pergunta = perg.pontos_pergunta; // Copia o valor da BD
+            } else if (ativ.pontos) {
+                // Se não houver perguntas, divide os pontos globais por 5 (como configuraste na DB)
+                pontos_pergunta = Math.round(ativ.pontos / 5);
+            } else {
+                if(dificuldade === 'medio') pontos_pergunta = 20;
+                if(dificuldade === 'dificil') pontos_pergunta = 30;
+            }
+        } else {
+            // Se a Atividade ainda não existir, cria-a com as tuas regras
+            let pontosAtiv = 50;
+            if(dificuldade === 'medio') { pontosAtiv = 100; pontos_pergunta = 20; }
+            else if(dificuldade === 'dificil') { pontosAtiv = 150; pontos_pergunta = 30; }
+            else { pontosAtiv = 50; pontos_pergunta = 10; }
+            
+            const { data: newAtiv, error } = await supabase.from('atividade').insert([{
+                titulo: `Quiz de ${categoria} (${dificuldade})`, 
+                tipo: 'quiz', 
+                categoria: categoria.trim().toLowerCase(), 
+                descricao: 'Gerado via Admin', 
+                dificuldade: dificuldade.trim().toLowerCase(),
+                pontos: pontosAtiv,
+                id_professor
+            }]).select('id_atividade').single();
+            
+            if (error) throw error;
+            id_atividade = newAtiv.id_atividade;
+        }
+        
+        return { id_atividade, pontos_pergunta };
+    }
+
     router.post('/quiz', async (req, res) => {
         const { texto_pergunta, categoria, dificuldade, opcoes, corretaIndex } = req.body;
         const id_professor = req.session.userId || 1;
 
         try {
-            // 1. Inserir Atividade
-            const { data: ativ, error: ativErr } = await supabase.from('atividade').insert([{
-                titulo: `Quiz de ${categoria}`, tipo: 'quiz', categoria, descricao: 'Quiz gerado via Admin', dificuldade, id_professor
-            }]).select();
-            if (ativErr) throw ativErr;
+            // Usa o sistema automático
+            const { id_atividade, pontos_pergunta } = await obterAtividadeEPontos(categoria, dificuldade, id_professor);
 
-            // 2. Inserir Pergunta
+            // Insere Pergunta
             const { data: perg, error: pergErr } = await supabase.from('pergunta').insert([{
-                id_atividade: ativ[0].id_atividade, texto_pergunta
-            }]).select();
+                id_atividade: id_atividade, 
+                texto_pergunta,
+                pontos_pergunta: pontos_pergunta // Envia a pontuação para a DB!
+            }]).select('id_pergunta').single();
             if (pergErr) throw pergErr;
 
-            // 3. Inserir Opções
+            // Insere Opções
             const opcoesArray = opcoes.map((texto, index) => ({
-                id_pergunta: perg[0].id_pergunta,
+                id_pergunta: perg.id_pergunta,
                 texto_opcao: texto,
                 e_correta: index === parseInt(corretaIndex)
             }));
@@ -278,32 +289,31 @@ module.exports = (supabase) => {
             if (opcErr) throw opcErr;
 
             res.json({ message: 'Criado!' });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+        } catch (error) { res.status(500).json({ error: error.message }); }
     });
 
-    // Atualizar existente
     router.put('/quizzes/:id', async (req, res) => {
-        const { texto_pergunta, categoria, dificuldade, opcoes, corretaIndex, id_atividade } = req.body;
+        const { texto_pergunta, categoria, dificuldade, opcoes, corretaIndex } = req.body;
+        const id_professor = req.session.userId || 1;
         
         try {
-            // 1. Update Atividade
-            const { error: ativErr } = await supabase.from('atividade')
-                .update({ categoria, dificuldade }).eq('id_atividade', id_atividade);
-            if (ativErr) throw ativErr;
+            // Obter dados dinâmicos
+            const { id_atividade, pontos_pergunta } = await obterAtividadeEPontos(categoria, dificuldade, id_professor);
 
-            // 2. Update Pergunta
+            // MOVE a pergunta e ATUALIZA a pontuação, deixando o resto quieto
             const { error: pergErr } = await supabase.from('pergunta')
-                .update({ texto_pergunta }).eq('id_pergunta', req.params.id);
+                .update({ 
+                    texto_pergunta, 
+                    id_atividade: id_atividade, 
+                    pontos_pergunta: pontos_pergunta 
+                }).eq('id_pergunta', req.params.id);
             if (pergErr) throw pergErr;
 
-            // 3. Apagar opções antigas
+            // Apagar opções velhas e Inserir Novas
             const { error: delErr } = await supabase.from('opcao_resposta')
                 .delete().eq('id_pergunta', req.params.id);
             if (delErr) throw delErr;
 
-            // 4. Inserir opções novas
             const opcoesArray = opcoes.map((texto, index) => ({
                 id_pergunta: req.params.id,
                 texto_opcao: texto,
@@ -313,14 +323,10 @@ module.exports = (supabase) => {
             if (opcErr) throw opcErr;
 
             res.json({ message: 'Atualizado!' });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+        } catch (error) { res.status(500).json({ error: error.message }); }
     });
 
-    // Apagar
     router.delete('/quizzes/:id', async (req, res) => {
-        // Devido ao "ON DELETE CASCADE" na BD, apagar a pergunta irá apagar as Opcoes_Resposta associadas.
         const { error } = await supabase.from('pergunta').delete().eq('id_pergunta', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Pergunta apagada!' });
@@ -330,142 +336,88 @@ module.exports = (supabase) => {
     // ==========================================
     // TURMAS
     // ==========================================
-
-    // Função para gerar um código aleatório de 6 caracteres
     const gerarCodigoAcesso = () => {
         const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let codigo = '';
-        for (let i = 0; i < 6; i++) {
-            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-        }
+        for (let i = 0; i < 6; i++) codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
         return codigo;
     };
 
-    // Obter todas as turmas
     router.get('/turmas', verificarAdmin, async (req, res) => {
         const { data, error } = await supabase
             .from('turma')
-            .select(`
-                id_turma, 
-                nome, 
-                ano_letivo,
-                codigo_acesso,
-                escola (nome),
-                utilizador!turma_id_professor_fkey (nome)
-            `)
+            .select(`id_turma, nome, ano_letivo, codigo_acesso, escola (nome), utilizador!turma_id_professor_fkey (nome)`)
             .order('id_turma', { ascending: false });
-
         if (error) return res.status(500).json({ error: error.message });
         res.json(data);
     });
 
-    // Obter lista de professores para o Admin poder escolher
     router.get('/professores', verificarAdmin, async (req, res) => {
-        const { data, error } = await supabase
-            .from('utilizador')
-            .select('id_utilizador, nome')
-            .eq('role', 'professor');
-
+        const { data, error } = await supabase.from('utilizador').select('id_utilizador, nome').eq('role', 'professor');
         if (error) return res.status(500).json({ error: error.message });
         res.json(data);
     });
 
-    // Admin Criar uma Turma
     router.post('/turmas', verificarAdmin, async (req, res) => {
         const { nome, ano_letivo, id_professor } = req.body;
-        
         try {
             const { data: escolas } = await supabase.from('escola').select('id_escola').limit(1);
             const id_escola = (escolas && escolas.length > 0) ? escolas[0].id_escola : null;
-
             if (!id_escola) return res.status(400).json({ error: 'Nenhuma escola registada.' });
-
-            const codigo_acesso = gerarCodigoAcesso();
-
-            const { error } = await supabase.from('turma').insert([{
-                nome,
-                ano_letivo,
-                id_escola: id_escola,
-                id_professor: id_professor,
-                codigo_acesso: codigo_acesso
-            }]);
-
+            const { error } = await supabase.from('turma').insert([{ nome, ano_letivo, id_escola, id_professor, codigo_acesso: gerarCodigoAcesso() }]);
             if (error) throw error;
-            res.json({ message: 'Turma criada pelo Admin!' });
-
-        } catch (err) {
-            res.status(500).json({ error: 'Erro interno ao criar turma.' });
-        }
+            res.json({ message: 'Turma criada!' });
+        } catch (err) { res.status(500).json({ error: 'Erro interno.' }); }
     });
 
-    // Editar uma Turma
     router.put('/turmas/:id', verificarAdmin, async (req, res) => {
-        const { nome, ano_letivo } = req.body;
-        const { error } = await supabase.from('turma').update({ nome, ano_letivo }).eq('id_turma', req.params.id);
+        const { nome, ano_letivo, id_escola, id_professor } = req.body;
+        const { error } = await supabase.from('turma').update({ nome, ano_letivo, id_escola, id_professor }).eq('id_turma', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Turma atualizada!' });
     });
 
-    // Apagar uma Turma
     router.delete('/turmas/:id', verificarAdmin, async (req, res) => {
         const { error } = await supabase.from('turma').delete().eq('id_turma', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
-        res.json({ message: 'Turma apagada!' });
+        res.json({ message: 'Apagada!' });
     });
 
-    // Ver alunos da turma (ADMIN)
     router.get('/turmas/:id/alunos', verificarAdmin, async (req, res) => {
-        const { data, error } = await supabase
-            .from('utilizador')
-            .select('id_utilizador, nome, email, pontos_totais')
-            .eq('id_turma', req.params.id)
-            .order('nome', { ascending: true });
+        const { data, error } = await supabase.from('utilizador').select('id_utilizador, nome, email, pontos_totais').eq('id_turma', req.params.id).order('nome');
         if (error) return res.status(500).json({ error: error.message });
         res.json(data || []);
     });
 
-    // Remover aluno da turma (ADMIN)
     router.put('/turmas/:id_turma/alunos/:id_aluno/remover', verificarAdmin, async (req, res) => {
         try {
-            const { error } = await supabase
-                .from('utilizador')
-                .update({ id_turma: null })
-                .eq('id_utilizador', req.params.id_aluno);
-                
+            const { error } = await supabase.from('utilizador').update({ id_turma: null }).eq('id_utilizador', req.params.id_aluno);
             if (error) throw error;
-            res.json({ message: 'Aluno removido com sucesso!' });
-        } catch (error) {
-            console.error("Erro ao remover aluno (Admin):", error);
-            res.status(500).json({ error: "Erro interno na base de dados." });
-        }
+            res.json({ message: 'Aluno removido!' });
+        } catch (error) { res.status(500).json({ error: "Erro interno." }); }
     });
 
-    // --- ROTAS AUXILIARES PARA EDIÇÃO DE TURMAS ---
     router.get('/escolas', verificarAdmin, async (req, res) => {
         const { data, error } = await supabase.from('escola').select('*').order('nome');
         if (error) return res.status(500).json({ error: error.message });
         res.json(data || []);
     });
 
-    router.get('/professores', verificarAdmin, async (req, res) => {
-        const { data, error } = await supabase.from('utilizador').select('id_utilizador, nome, email').eq('role', 'professor').order('nome');
-        if (error) return res.status(500).json({ error: error.message });
-        res.json(data || []);
-    });
 
-    // --- ATUALIZAR TURMA (ADMIN - CONTROLO TOTAL) ---
-    router.put('/turmas/:id', verificarAdmin, async (req, res) => {
-        const { nome, ano_letivo, id_escola, id_professor } = req.body;
+    // --- ROTA DINÂMICA DE OPÇÕES (ESCALÁVEL) ---
+    router.get('/opcoes-quiz', async (req, res) => {
         try {
-            const { error } = await supabase
-                .from('turma')
-                .update({ nome, ano_letivo, id_escola, id_professor })
-                .eq('id_turma', req.params.id);
-            
+            // Vai buscar tudo à tabela atividade
+            const { data, error } = await supabase.from('atividade').select('categoria, dificuldade').eq('tipo', 'quiz');
             if (error) throw error;
-            res.json({ message: 'Turma atualizada com sucesso!' });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+            
+            // Remove os duplicados automaticamente (cria arrays únicos)
+            const categorias = [...new Set(data.map(item => item.categoria))].filter(Boolean).sort();
+            const dificuldades = [...new Set(data.map(item => item.dificuldade))].filter(Boolean);
+            
+            res.json({ categorias, dificuldades });
+        } catch (err) {
+            res.status(500).json({ error: err.message });
         }
     });
     
