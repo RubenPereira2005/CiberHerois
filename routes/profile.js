@@ -17,8 +17,7 @@ module.exports = (supabase) => {
 
         const { data, error } = await supabase
             .from('utilizador')
-            // 👇 CORREÇÃO: Adicionado pontos_totais e priv_estatisticas para não faltar nada!
-            .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins, pontos_totais, priv_estatisticas')
+            .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins, pontos_totais, priv_estatisticas, mfa_recompensa_recebida')
             .eq('id_utilizador', req.session.userId)
             .single();
 
@@ -164,48 +163,55 @@ module.exports = (supabase) => {
         }
     });
 
-    // --- ROTA 6: Ligar/Desligar MFA (COM RECOMPENSA ÚNICA) ---
+    // --- ROTA 6: Ligar/Desligar MFA (COM RECOMPENSA ÚNICA E SEGURANÇA DE MISSÃO) ---
     router.put('/update-mfa', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
-        const { mfa_ativo } = req.body;
+        // Adicionamos a variável 'veio_da_missao' que o Frontend vai ter de enviar!
+        const { mfa_ativo, veio_da_missao } = req.body;
+        const isAtivando = (mfa_ativo === true || mfa_ativo === 'true');
 
         try {
-            if (mfa_ativo === true || mfa_ativo === 'true') {
-                const { data: userDados, error: userError } = await supabase
+            const { data: userDados, error: userError } = await supabase
+                .from('utilizador')
+                .select('pontos_totais, coins, mfa_recompensa_recebida')
+                .eq('id_utilizador', req.session.userId)
+                .single();
+
+            if (userError) throw userError;
+
+            // Só dá pontos se estiver a ativar + nunca recebeu + VEIO DA MISSÃO!
+            if (isAtivando && userDados && userDados.mfa_recompensa_recebida === false && veio_da_missao === true) {
+                const novosPontos = (userDados.pontos_totais || 0) + 50;
+                const novasMoedas = (userDados.coins || 0) + 10;
+
+                const { error: updateError } = await supabase
                     .from('utilizador')
-                    .select('pontos_totais, mfa_recompensa_recebida')
-                    .eq('id_utilizador', req.session.userId)
-                    .single();
+                    .update({
+                        mfa_ativo: true,
+                        pontos_totais: novosPontos,
+                        coins: novasMoedas, 
+                        mfa_recompensa_recebida: true 
+                    })
+                    .eq('id_utilizador', req.session.userId);
 
-                if (userError) throw userError;
+                if (updateError) throw updateError;
 
-                if (userDados && userDados.mfa_recompensa_recebida === false) {
-                    const novosPontos = (userDados.pontos_totais || 0) + 50;
-
-                    const { error: updateError } = await supabase
-                        .from('utilizador')
-                        .update({
-                            mfa_ativo: true,
-                            pontos_totais: novosPontos,
-                            mfa_recompensa_recebida: true
-                        })
-                        .eq('id_utilizador', req.session.userId);
-
-                    if (updateError) throw updateError;
-
-                    return res.json({ message: "MFA ativado! Ganhaste +50 Pontos de XP!", recompensa: true });
-                }
+                return res.json({ message: "Missão Concluída! Ganhaste +50 XP e +10 CiberCoins!", recompensa: true });
             }
 
+            // SE FOR UMA ATIVAÇÃO NORMAL (SEM VIR DO BANNER) OU SE ESTIVER A DESLIGAR
             const { error: normalUpdateError } = await supabase
                 .from('utilizador')
-                .update({ mfa_ativo: mfa_ativo === true || mfa_ativo === 'true' })
+                .update({ mfa_ativo: isAtivando })
                 .eq('id_utilizador', req.session.userId);
 
             if (normalUpdateError) throw normalUpdateError;
 
-            res.json({ message: mfa_ativo ? "MFA reativado com sucesso." : "MFA desativado.", recompensa: false });
+            res.json({ 
+                message: isAtivando ? "MFA ativado com sucesso." : "MFA desativado. A tua conta está vulnerável!", 
+                recompensa: false 
+            });
 
         } catch (error) {
             console.error("Erro ao atualizar estado MFA:", error);
@@ -318,6 +324,7 @@ module.exports = (supabase) => {
         try {
             const { data, error } = await supabase
                 .from('utilizador')
+                // 👇 CORREÇÃO: Adicionado pontos_totais e priv_estatisticas AQUI TAMBÉM!
                 .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins, pontos_totais, priv_estatisticas')
                 .eq('id_utilizador', id)
                 .single();

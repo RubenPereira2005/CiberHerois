@@ -311,6 +311,8 @@
     <script>
         lucide.createIcons();
 
+        let isMfaMission = false;
+
         document.addEventListener('DOMContentLoaded', async () => {
             const nameInput = document.getElementById('settings-name');
             const emailInput = document.getElementById('settings-email');
@@ -347,21 +349,21 @@
             const initialTab = (hash && document.getElementById(hash)) ? hash : 'account';
             showTab(initialTab);
 
-            // --- LÓGICA DO GLOW DO MFA (WAYFINDING) ---
+            // --- LÓGICA DO GLOW DO MFA (WAYFINDING) E CONTROLO DE MISSÃO ---
             const shouldHighlightMFA = sessionStorage.getItem('highlightMFA');
+            
+            if (shouldHighlightMFA === 'true') {
+                isMfaMission = true;
+            }
+
             if (shouldHighlightMFA === 'true' && initialTab === 'security') {
                 const mfaBox = document.getElementById('mfa-container-box');
                 if (mfaBox) {
-                    // Espera 300ms para a transição do separador acontecer
                     setTimeout(() => {
                         mfaBox.classList.add('highlight-glow');
-                        // Foca a atenção no checkbox
                         mfaToggle.focus();
-
-                        // Limpa a memória
                         sessionStorage.removeItem('highlightMFA');
 
-                        // Remove a classe após a animação acabar (4.5s total)
                         setTimeout(() => {
                             mfaBox.classList.remove('highlight-glow');
                         }, 4500);
@@ -386,7 +388,7 @@
                     // Privacidade (Atribuir valores aos checkboxes)
                     const checks = ['priv_perfil_publico', 'priv_turma', 'priv_pontos', 'priv_medalhas', 'priv_historico', 'priv_ranking', 'priv_ofensiva'];
                     checks.forEach(campo => {
-                        const el = document.getElementById(campo.replace(/_/g, '-')); // Converte priv_turma para priv-turma
+                        const el = document.getElementById(campo.replace(/_/g, '-')); 
                         if (el && data[campo] !== undefined) el.checked = data[campo];
                     });
                 }
@@ -434,10 +436,11 @@
 
 
             // --- ATUALIZAR NOME DA CONTA ---
-            if (accountForm) {
-                accountForm.addEventListener('submit', async (e) => {
+            const accountFormRef = document.getElementById('account-form');
+            if (accountFormRef) {
+                accountFormRef.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const btn = accountForm.querySelector('button[type="submit"]');
+                    const btn = accountFormRef.querySelector('button[type="submit"]');
                     const originalText = btn.innerText;
                     btn.innerText = "A encriptar...";
                     btn.disabled = true;
@@ -458,7 +461,7 @@
                 });
             }
 
-            // --- SALVAR A ESCOLHA DO MFA QUANDO O UTILIZADOR CLICA NO CHECKBOX ---
+            // --- SALVAR A ESCOLHA DO MFA E ENVIAR A SENHA 'veio_da_missao' ---
             if (mfaToggle) {
                 mfaToggle.addEventListener('change', async (e) => {
                     const isChecked = e.target.checked;
@@ -466,27 +469,29 @@
                         const response = await fetch('/api/update-mfa', {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ mfa_ativo: isChecked })
+                            // 👇 ENVIA A FLAG isMfaMission PARA O BACKEND 👇
+                            body: JSON.stringify({ 
+                                mfa_ativo: isChecked,
+                                veio_da_missao: isMfaMission 
+                            })
                         });
 
                         const data = await response.json();
 
                         if (response.ok) {
-                            // 1. Mostra a mensagem ao utilizador
                             alert(data.message);
 
-                            // 2. SE ELE GANHOU A RECOMPENSA, FORÇA A ATUALIZAÇÃO VISUAL NA HORA!
+                            // SE ELE GANHOU A RECOMPENSA DA MISSÃO
                             if (data.recompensa === true) {
+                                isMfaMission = false; // Desativa para ele não poder desligar/ligar no mesmo segundo
+                                
                                 try {
-                                    // Pede os pontos novos diretamente à base de dados
+                                    // Atualiza visualmente no Header do site
                                     const statsRes = await fetch('/api/stats');
                                     if (statsRes.ok) {
                                         const stats = await statsRes.json();
-
-                                        // Atualiza os elementos da Navbar injetada diretamente
                                         const navPoints = document.getElementById('nav-global-points');
                                         const navLevel = document.getElementById('nav-global-level');
-
                                         if (navPoints) navPoints.textContent = `${stats.pontos} pts`;
                                         if (navLevel) navLevel.textContent = `Nível ${stats.nivel}`;
                                     }
@@ -551,7 +556,6 @@
             const modalTudoDesativado = document.getElementById('modal-tudo-desativado');
             let checkboxQueQueriaAtivar = null;
 
-            // 1. Se desligar o perfil público no switch principal, desliga tudo o resto
             if (checkPerfilPublico) {
                 checkPerfilPublico.addEventListener('change', (e) => {
                     if (!e.target.checked) {
@@ -563,30 +567,25 @@
                 });
             }
 
-            // 2. Controlar os cliques nas caixas individuais
             checksOpcionais.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.addEventListener('click', (e) => {
-                        // CENÁRIO A: O perfil está Privado e tenta ligar uma opção
                         if (checkPerfilPublico && !checkPerfilPublico.checked && e.target.checked) {
-                            e.preventDefault(); // Impede a caixa de ficar marcada
-                            checkboxQueQueriaAtivar = el; // Memoriza a caixa
-                            modalAvisoPrivado.classList.add('active'); // Abre o Modal Laranja
+                            e.preventDefault(); 
+                            checkboxQueQueriaAtivar = el; 
+                            modalAvisoPrivado.classList.add('active'); 
                             lucide.createIcons();
                         }
                         
-                        // CENÁRIO B: O perfil está Público e ele desligou uma caixa
                         if (checkPerfilPublico && checkPerfilPublico.checked && !e.target.checked) {
-                            // Verifica se ainda sobrou alguma caixa ligada
                             const algumaLigada = checksOpcionais.some(optId => {
                                 const optEl = document.getElementById(optId);
                                 return optEl && optEl.checked;
                             });
 
-                            // Se não sobrou nenhuma ligada, dispara o aviso do Fantasma!
                             if (!algumaLigada) {
-                                modalTudoDesativado.classList.add('active'); // Abre o Modal Azul
+                                modalTudoDesativado.classList.add('active'); 
                                 lucide.createIcons();
                             }
                         }
@@ -594,7 +593,6 @@
                 }
             });
 
-            // --- AÇÕES DO MODAL LARANJA (Tornar Público) ---
             const btnAtivarTudo = document.getElementById('btn-ativar-perfil-publico');
             if (btnAtivarTudo) {
                 btnAtivarTudo.addEventListener('click', () => {
@@ -613,11 +611,9 @@
                 });
             }
 
-            // --- AÇÕES DO MODAL AZUL (Perfil Fantasma) ---
             const btnTornarPrivado = document.getElementById('btn-tornar-total-privado');
             if (btnTornarPrivado) {
                 btnTornarPrivado.addEventListener('click', () => {
-                    // Desliga o perfil público principal
                     if (checkPerfilPublico) checkPerfilPublico.checked = false; 
                     modalTudoDesativado.classList.remove('active');
                 });
@@ -626,7 +622,6 @@
             const btnManterPesquisa = document.getElementById('btn-manter-pesquisa');
             if (btnManterPesquisa) {
                 btnManterPesquisa.addEventListener('click', () => {
-                    // Não faz nada à caixa pública, apenas fecha o aviso
                     modalTudoDesativado.classList.remove('active'); 
                 });
             }
@@ -642,22 +637,19 @@
                 const btnCancelar = document.getElementById('btn-cancelar-confirmacao');
 
                 texto.textContent = mensagem;
-                modal.classList.add('active'); // Mostra o modal
-                lucide.createIcons(); // Recarrega o ícone de alerta
+                modal.classList.add('active'); 
+                lucide.createIcons(); 
 
-                // Clonar os botões remove eventos antigos para evitar múltiplos cliques acumulados
                 const novoBtnAceitar = btnAceitar.cloneNode(true);
                 const novoBtnCancelar = btnCancelar.cloneNode(true);
                 btnAceitar.parentNode.replaceChild(novoBtnAceitar, btnAceitar);
                 btnCancelar.parentNode.replaceChild(novoBtnCancelar, btnCancelar);
 
-                // O que acontece ao clicar no Confirmar
                 novoBtnAceitar.addEventListener('click', () => {
                     modal.classList.remove('active');
                     resolve(true);
                 });
 
-                // O que acontece ao clicar no Cancelar
                 novoBtnCancelar.addEventListener('click', () => {
                     modal.classList.remove('active');
                     resolve(false);
