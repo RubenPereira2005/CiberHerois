@@ -47,7 +47,7 @@
                             </div>
                         </div>
                         <div class="resource-card-actions">
-                            <a href="resource-https.html" class="resource-card-btn resource-card-btn-primary">
+                            <a href="resource-https" class="resource-card-btn resource-card-btn-primary">
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </a>
@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div class="resource-card-actions">
-                            <a href="resource-passwords.html" class="resource-card-btn resource-card-btn-primary">
+                            <a href="resource-passwords" class="resource-card-btn resource-card-btn-primary">
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </a>
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <div class="resource-card-actions">
-                            <a href="resource-phishing.html" class="resource-card-btn resource-card-btn-primary">
+                            <a href="resource-phishing" class="resource-card-btn resource-card-btn-primary">
                                 <i data-lucide="external-link"></i>
                                 Ver
                             </a>
@@ -199,7 +199,7 @@
                     <p class="game-banner-description">
                         Teste as suas habilidades! Analise emails reais e identifique tentativas de phishing. Ganhe pontos por cada identificação correta.
                     </p>
-                    <a href="phishing.html" class="game-banner-btn">
+                    <a href="phishing" class="game-banner-btn">
                         <i data-lucide="gamepad-2"></i>
                         Jogar Agora
                     </a>
@@ -274,7 +274,7 @@
 
                 recursosNovos.forEach(rec => {
                     // Todos os recursos novos vão abrir usando o nosso ficheiro "molde"
-                    let linkVer = `resource-template.html?id=${rec.id_material}`;
+                    let linkVer = `resource-template?id=${rec.id_material}`;
 
                     // Previne erros caso a cor ou ícone não venham preenchidos
                     let cor = rec.cor_card || 'blue';
@@ -301,7 +301,7 @@
                                         <i data-lucide="external-link"></i>
                                         Ver
                                     </a>
-                                    <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('${rec.url_conteudo.replace('.html', '')}')">
+                                    <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('${rec.url_conteudo.replace('', '')}')">
                                         <i data-lucide="download"></i>
                                     </button>
                                 </div>

@@ -93,7 +93,7 @@
                         if (user.role === 'admin') { roleNome = 'Administrador'; roleClass = 'role-admin'; }
 
                         html += `
-                            <a href="profile.html?id=${user.id_utilizador}" class="user-card">
+                            <a href="profile?id=${user.id_utilizador}" class="user-card">
                                 <img src="${avatarSrc}" alt="${user.nome}" class="user-card-avatar" referrerpolicy="no-referrer">
                                 <h3 class="user-card-name">${user.nome}</h3>
                                 <span class="user-card-role ${roleClass}">${roleNome}</span>

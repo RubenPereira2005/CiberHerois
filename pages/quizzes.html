@@ -137,7 +137,7 @@
                 </div>
             </div>
             <div class="mfa-banner-actions">
-                <a href="settings.html#security" class="btn btn-primary" id="btn-activate-mfa-banner" style="background-color: #f59e0b; color: #fff; border: none;">Ativar MFA</a>
+                <a href="settings#security" class="btn btn-primary" id="btn-activate-mfa-banner" style="background-color: #f59e0b; color: #fff; border: none;">Ativar MFA</a>
             </div>
             <button id="closeMfaBanner" class="btn-close-banner" title="Ignorar por agora">
                 <i data-lucide="x" style="width: 18px; height: 18px;"></i>
@@ -288,7 +288,7 @@
                 <div class="game-banner-content">
                     <h3 class="game-banner-title">Jogo: Detetor de Phishing</h3>
                     <p class="game-banner-description">Teste as suas habilidades! Analise emails reais e identifique tentativas de phishing. Ganhe pontos por cada identificação correta.</p>
-                    <a href="phishing.html" class="game-banner-btn">
+                    <a href="phishing" class="game-banner-btn">
                         <i data-lucide="gamepad-2"></i> Jogar Agora
                     </a>
                 </div>
@@ -586,7 +586,7 @@
                 return;
             }
             
-            window.location.href = `quiz.html?cat=${quizCategoriaSelecionada}&diff=${dificuldade}`;
+            window.location.href = `quiz?cat=${quizCategoriaSelecionada}&diff=${dificuldade}`;
         };
 
         // ==========================================

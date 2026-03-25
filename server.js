@@ -51,51 +51,61 @@ app.use(session({
 // ==========================================
 // MIDDLEWARE DE AUTENTICAÇÃO DAS PÁGINAS
 // ==========================================
-// Lista Branca (Ficheiros que qualquer um pode abrir)
+// Lista Branca (Ficheiros que qualquer um pode abrir) - Agora sem o .html
 const publicPages = [
     '/',
-    '/index.html',
-    '/login.html',
-    '/register.html',
-    '/forgot-password.html',
-    '/update-password.html',
-    '/404.html'
+    '/index',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/update-password',
+    '/404'
 ];
 
 app.use((req, res, next) => {
-    // Se não for um ficheiro HTML ou tentar aceder ao '/', ignorar (as rotas API, CSS, etc, resolvem-se sozinhas)
-    if (!req.path.endsWith('.html') && req.path !== '/') {
-        return next();
-    }
+    // Ignorar as rotas de API (deixamos os routers da API tratarem da sua própria segurança)
+    if (req.path.startsWith('/api')) return next();
+
+    // Lidar com a página inicial explicitamente
+    if (req.path === '/') return next();
+
+    // Se o ficheiro tiver uma extensão que não seja .html (ex: .css, .js, .png, .svg), ignoramos a verificação
+    const ext = path.extname(req.path);
+    if (ext !== '' && ext !== '.html') return next();
+
+    // Normalizar o caminho: remove o .html caso o utilizador tente aceder à moda antiga
+    const cleanPath = req.path.endsWith('.html') ? req.path.slice(0, -5) : req.path;
 
     // Se estiver na lista branca, deixa passar
-    if (publicPages.includes(req.path)) {
+    if (publicPages.includes(cleanPath)) {
         return next();
     }
 
-    // Se tentar aceder a um ficheiro que não está na lista branca sem sessão iniciada: bloquear
+    // Se tentar aceder a uma página protegida sem sessão iniciada: bloquear e redirecionar
     if (!req.session.userId) {
-        logger.warn(`[403] Acesso negado a ${req.path} - Sem sessão. A redirecionar para index.html`);
-        // Adicionamos a query string "?erro=sem_sessao" para o frontend saber o que aconteceu
+        logger.warn(`[403] Acesso negado a ${cleanPath} - Sem sessão. A redirecionar para index`);
         return res.redirect('/?erro=sem_sessao'); 
     }
 
     // Verificação de Roles para páginas específicas (Role-Based Access Control)
-    if (req.path === '/gestao.html' && req.session.role !== 'admin') {
-        logger.warn(`[403] Acesso negado a gestao.html - Utilizador ${req.session.userName} (${req.session.role})`);
-        return res.redirect('/404.html');
+    if (cleanPath === '/gestao' && req.session.role !== 'admin') {
+        logger.warn(`[403] Acesso negado a gestao - Utilizador ${req.session.userName} (${req.session.role})`);
+        return res.redirect('/404');
     }
 
-    if (req.path === '/professor.html' && req.session.role !== 'professor' && req.session.role !== 'admin') {
-        logger.warn(`[403] Acesso negado a professor.html - Utilizador ${req.session.userName} (${req.session.role})`);
-        return res.redirect('/404.html');
+    if (cleanPath === '/professor' && req.session.role !== 'professor' && req.session.role !== 'admin') {
+        logger.warn(`[403] Acesso negado a professor - Utilizador ${req.session.userName} (${req.session.role})`);
+        return res.redirect('/404');
     }
 
     next();
 });
 
-// Servir Estáticos
-app.use(express.static(path.join(__dirname, 'pages')));
+// ==========================================
+// SERVIR FICHEIROS ESTÁTICOS
+// ==========================================
+// O { extensions: ['html'] } diz ao Express para assumir o .html nas páginas
+app.use(express.static(path.join(__dirname, 'pages'), { extensions: ['html'] }));
 app.use(express.static(path.join(__dirname, 'css')));
 app.use(express.static(path.join(__dirname, 'js')));
 app.use('/img', express.static(path.join(__dirname, 'img')));
@@ -162,6 +172,7 @@ app.get('/', (req, res) => {
 
 // Middleware de Erros Globais
 app.use((err, req, res, next) => {
+    console.error(err);
     res.status(500).json({ erro: 'Ups! Ocorreu um erro interno.' });
 });
 

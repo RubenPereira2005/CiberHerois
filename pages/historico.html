@@ -23,7 +23,7 @@
     <div class="auth-container profile-main" style="max-width: 800px;">
         
         <div style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
-            <a href="profile.html" id="btn-voltar-perfil" class="btn btn-secondary" style="display: flex; justify-content: center; align-items: center; width: 45px; height: 45px; padding: 0; border-radius: 50%; flex-shrink: 0; overflow: hidden;">
+            <a href="profile" id="btn-voltar-perfil" class="btn btn-secondary" style="display: flex; justify-content: center; align-items: center; width: 45px; height: 45px; padding: 0; border-radius: 50%; flex-shrink: 0; overflow: hidden;">
                 <i data-lucide="arrow-left" style="min-width: 22px; min-height: 22px;"></i>
             </a>
             <h1 style="color: var(--text-color); margin: 0; font-size: 1.8rem;">Histórico de Atividades</h1>
@@ -48,9 +48,9 @@
             // 2. Atualizar o Botão Voltar
             const btnVoltar = document.getElementById('btn-voltar-perfil');
             if (targetId) {
-                btnVoltar.href = `profile.html?id=${targetId}`; // Volta para o perfil da pessoa
+                btnVoltar.href = `profile?id=${targetId}`; // Volta para o perfil da pessoa
             } else {
-                btnVoltar.href = `profile.html`; // Volta para o teu perfil
+                btnVoltar.href = `profile`; // Volta para o teu perfil
             }
 
             // 3. Escolher o endpoint certo para pedir à base de dados
@@ -61,7 +61,7 @@
                 const container = document.getElementById('historico-container');
 
                 if (response.status === 401) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'index';
                     return;
                 }
                 

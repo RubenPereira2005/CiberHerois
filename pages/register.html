@@ -98,12 +98,12 @@
                     </div>
 
                     <p class="login-link">
-                        Já tem uma conta? <a href="login.html" class="link-highlight">Iniciar sessão</a>
+                        Já tem uma conta? <a href="login" class="link-highlight">Iniciar sessão</a>
                     </p>
 
                     <p class="back-link">
                         <i data-lucide="arrow-left"></i>
-                        <a href="index.html" class="link-highlight">Voltar à página inicial</a>
+                        <a href="index" class="link-highlight">Voltar à página inicial</a>
                     </p>
                 </form>
             </div>
@@ -127,7 +127,7 @@
                     Não recebeste? <button type="button" id="btnResendEmail"  style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: bold; padding: 0;">Reenviar e-mail</button>
                 </p>
                 <p  style="margin-top: 15px;">
-                    <a href="register.html" class="link-highlight"  style="font-size: 0.85rem;">Usar um e-mail diferente</a>
+                    <a href="register" class="link-highlight"  style="font-size: 0.85rem;">Usar um e-mail diferente</a>
                 </p>
             </div>
 
@@ -254,7 +254,7 @@
                     showToast('Identidade verificada! A entrar...', 'success');
                     setTimeout(() => {
                         sessionStorage.setItem('showLoginToast', 'true');
-                        window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html';
+                        window.location.href = data.role === 'admin' ? 'gestao' : 'quizzes';
                     }, 1000);
                 } else {
                     // Deu erro (provavelmente porque o e-mail ainda não está confirmado)
@@ -320,7 +320,7 @@
                 if (response.ok) {
                     showToast('Conta Google associada com sucesso!', 'success');
                     sessionStorage.setItem('showLoginToast', 'true');
-                    setTimeout(() => { window.location.href = data.role === 'admin' ? 'gestao.html' : 'quizzes.html'; }, 1000);
+                    setTimeout(() => { window.location.href = data.role === 'admin' ? 'gestao' : 'quizzes'; }, 1000);
                 } else { 
                     showToast(data.error || "Erro no Google Login", "error"); 
                 }

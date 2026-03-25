@@ -16,12 +16,12 @@ module.exports = (supabase) => {
 
     // Middleware de segurança (AGORA GUARDA O NOME DO PROFESSOR)
     const verificarProfessor = async (req, res, next) => {
-        if (!req.session.userId) return res.redirect('/404.html');
+        if (!req.session.userId) return res.redirect('/404');
 
         // Puxamos o "nome" da base de dados também!
         const { data: user, error } = await supabase.from('utilizador').select('role, nome').eq('id_utilizador', req.session.userId).single();
 
-        if (error || !user || (user.role !== 'professor' && user.role !== 'admin')) return res.redirect('/404.html');
+        if (error || !user || (user.role !== 'professor' && user.role !== 'admin')) return res.redirect('/404');
 
         // Guardamos o nome na "request" para usar mais à frente na criação do HTML
         req.nomeProfessor = user.nome;
@@ -109,7 +109,7 @@ module.exports = (supabase) => {
     <div id="includedContent"></div>
 
     <div class="auth-container resource-detail-container">
-        <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
+        <a href="resources" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
         
         <div class="resource-header">
             <div class="resource-header-icon resource-header-icon-${cor}">
@@ -143,7 +143,7 @@ module.exports = (supabase) => {
         <div class="resource-cta-box">
             <h3>Teste os seus conhecimentos!</h3>
             <p>Faça o quiz desta categoria e ganhe pontos táticos</p>
-            <a href="quizzes.html" class="resource-cta-link">Ir para os Quizzes</a>
+            <a href="quizzes" class="resource-cta-link">Ir para os Quizzes</a>
         </div>
     </div>
     <script>lucide.createIcons();</script>

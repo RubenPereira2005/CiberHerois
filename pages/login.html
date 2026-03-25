@@ -123,7 +123,7 @@
                 <div class="form-group" id="passwordGroup">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label class="form-label">Password</label>
-                        <a href="forgot-password.html" class="link-highlight"
+                        <a href="forgot-password" class="link-highlight"
                             style="font-size: 0.8rem;">Esqueceu-se?</a>
                     </div>
                     <div class="password-input-wrapper">
@@ -183,12 +183,12 @@
                     </div>
 
                     <p class="login-link" style="margin-bottom: 15px;">
-                        Novo recruta? <a href="register.html" class="link-highlight">Criar conta</a>
+                        Novo recruta? <a href="register" class="link-highlight">Criar conta</a>
                     </p>
 
                     <p class="back-link">
                         <i data-lucide="arrow-left"></i>
-                        <a href="index.html" class="link-highlight">Voltar à página inicial</a>
+                        <a href="index" class="link-highlight">Voltar à página inicial</a>
                     </p>
                 </div>
             </form>
@@ -350,7 +350,7 @@
 
                 if (response.ok) {
                     sessionStorage.setItem('showLoginToast', 'true');
-                    window.location.href = 'quizzes.html'; // Redirecionamento direto
+                    window.location.href = 'quizzes'; // Redirecionamento direto
                 } else {
                     showToast(data.error || 'Código inválido.', 'error');
                     // Limpar as caixas em caso de erro
@@ -434,7 +434,7 @@
                             transitionToMFA(data.email);
                         } else if (data.step === 'done') {
                             sessionStorage.setItem('showLoginToast', 'true');
-                            window.location.href = 'quizzes.html'; // Redirecionamento direto
+                            window.location.href = 'quizzes'; // Redirecionamento direto
                         }
                     } else {
                         showToast(data.error || 'Erro no login.', 'error');
@@ -482,14 +482,14 @@
                         transitionToMFA(data.email);
                     } else if (data.step === 'done') {
                         sessionStorage.setItem('showLoginToast', 'true');
-                        window.location.href = 'quizzes.html'; // Redirecionamento direto
+                        window.location.href = 'quizzes'; // Redirecionamento direto
                     }
                 } else {
                     // NOVO: Se o servidor disser que a conta não existe, redireciona para o registo
                     showToast(data.error || "Falha na autenticação Google", "error");
                     if (data.redirectToRegister) {
                         setTimeout(() => {
-                            window.location.href = 'register.html';
+                            window.location.href = 'register';
                         }, 2500); // Dá tempo para a pessoa ler o balão de erro e depois muda a página
                     }
                 }

@@ -9,7 +9,7 @@ module.exports = (supabase) => {
     // MIDDLEWARE DE SEGURANÇA: Apenas ADMIN
     // ==========================================
     const verificarAdmin = async (req, res, next) => {
-        if (!req.session.userId) return res.redirect('/404.html');
+        if (!req.session.userId) return res.redirect('/404');
 
         const { data: user, error } = await supabase
             .from('utilizador')
@@ -17,7 +17,7 @@ module.exports = (supabase) => {
             .eq('id_utilizador', req.session.userId)
             .single();
 
-        if (error || !user || user.role !== 'admin') return res.redirect('/404.html');
+        if (error || !user || user.role !== 'admin') return res.redirect('/404');
         next();
     };
 
@@ -42,7 +42,7 @@ module.exports = (supabase) => {
         </div>
         <div id="includedContent"></div>
         <div class="auth-container resource-detail-container">
-            <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
+            <a href="resources" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
             <div class="resource-header">
                 <div class="resource-header-icon resource-header-icon-${cor_card}">
                     <i data-lucide="${icone_card}" class="icon-32"></i>
@@ -56,8 +56,8 @@ module.exports = (supabase) => {
                 ${htmlSeccoes}
             </div>
             <div class="resource-buttons">
-                <button class="resource-btn resource-btn-secondary" onclick="window.location.href='/api/pdf/download/${url_conteudo.replace('.html', '')}'">
-                    <i data-lucide="download" class="icon-20"></i> Descarregar PDF
+                <button class="resource-btn resource-btn-secondary" onclick="window.location.href='/api/pdf/download/${url_conteudo}'">
+                        <i data-lucide="download" class="icon-20"></i> Descarregar PDF
                 </button>
             </div>
         </div>
@@ -67,7 +67,7 @@ module.exports = (supabase) => {
     // ==========================================
     // RECURSOS
     // ==========================================
-    
+
     router.get('/resources', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').order('id_material', { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
@@ -82,9 +82,9 @@ module.exports = (supabase) => {
 
     router.post('/resources', async (req, res) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
-        const id_professor = req.session.userId || 1; 
+        const id_professor = req.session.userId || 1;
 
-        let nomeFicheiro = url_conteudo.replace('.html', '') + '.html';
+        let nomeFicheiro = url_conteudo + '.html';
         let caminhoFicheiro = path.join(__dirname, '../pages', nomeFicheiro);
 
         let htmlSeccoes = '';
@@ -100,7 +100,7 @@ module.exports = (supabase) => {
 
         const htmlTemplate = gerarHtmlTemplate(titulo, cor_card, icone_card, tipo, htmlSeccoes, nomeFicheiro);
 
-        try { fs.writeFileSync(caminhoFicheiro, htmlTemplate, 'utf8'); } 
+        try { fs.writeFileSync(caminhoFicheiro, htmlTemplate, 'utf8'); }
         catch (fsError) { return res.status(500).json({ error: "Erro ao criar ficheiro HTML." }); }
 
         const seccoesStr = JSON.stringify(seccoes);
@@ -118,7 +118,7 @@ module.exports = (supabase) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
         const id = req.params.id;
 
-        let nomeFicheiro = url_conteudo.replace('.html', '') + '.html';
+        let nomeFicheiro = url_conteudo + '.html';
         let caminhoFicheiro = path.join(__dirname, '../pages', nomeFicheiro);
 
         let htmlSeccoes = '';
@@ -134,7 +134,7 @@ module.exports = (supabase) => {
 
         const htmlTemplate = gerarHtmlTemplate(titulo, cor_card, icone_card, tipo, htmlSeccoes, nomeFicheiro);
         const seccoesStr = JSON.stringify(seccoes);
-        const tipoMinusculo = tipo.toLowerCase(); 
+        const tipoMinusculo = tipo.toLowerCase();
 
         try {
             fs.writeFileSync(caminhoFicheiro, htmlTemplate, 'utf8');
@@ -151,7 +151,7 @@ module.exports = (supabase) => {
         const { data, error: selectErr } = await supabase.from('materialpedagogico').select('url_conteudo').eq('id_material', req.params.id).single();
         if (!selectErr && data) {
             const ficheiro = path.join(__dirname, '../pages', data.url_conteudo);
-            if (fs.existsSync(ficheiro)) fs.unlinkSync(ficheiro); 
+            if (fs.existsSync(ficheiro)) fs.unlinkSync(ficheiro);
         }
         const { error } = await supabase.from('materialpedagogico').delete().eq('id_material', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
@@ -161,7 +161,7 @@ module.exports = (supabase) => {
     // ==========================================
     // QUIZZES: Lógica de Mudança Dinâmica
     // ==========================================
-    
+
     router.get('/quizzes', async (req, res) => {
         const { data, error } = await supabase
             .from('pergunta')
@@ -169,7 +169,7 @@ module.exports = (supabase) => {
             .order('id_pergunta', { ascending: false });
 
         if (error) return res.status(500).json({ error: error.message });
-        
+
         const formatado = data.map(p => ({
             id_pergunta: p.id_pergunta,
             categoria: p.atividade.categoria,
@@ -196,15 +196,15 @@ module.exports = (supabase) => {
 
         if (oErr) return res.status(500).json({ error: oErr.message });
 
-        res.json({ 
+        res.json({
             pergunta: {
                 id_pergunta: pData.id_pergunta,
                 texto_pergunta: pData.texto_pergunta,
                 id_atividade: pData.atividade.id_atividade,
                 categoria: pData.atividade.categoria,
                 dificuldade: pData.atividade.dificuldade
-            }, 
-            opcoes: oData 
+            },
+            opcoes: oData
         });
     });
 
@@ -217,10 +217,10 @@ module.exports = (supabase) => {
             .eq('tipo', 'quiz')
             .limit(1)
             .maybeSingle();
-            
+
         let id_atividade;
         let pontos_pergunta = 10; // Fallback
-        
+
         if (ativ) {
             id_atividade = ativ.id_atividade;
             // Procurar uma pergunta desta atividade para descobrir o valor exato dos pontos nela!
@@ -229,37 +229,37 @@ module.exports = (supabase) => {
                 .eq('id_atividade', id_atividade)
                 .limit(1)
                 .maybeSingle();
-                
+
             if (perg && perg.pontos_pergunta) {
                 pontos_pergunta = perg.pontos_pergunta; // Copia o valor da BD
             } else if (ativ.pontos) {
                 // Se não houver perguntas, divide os pontos globais por 5 (como configuraste na DB)
                 pontos_pergunta = Math.round(ativ.pontos / 5);
             } else {
-                if(dificuldade === 'medio') pontos_pergunta = 20;
-                if(dificuldade === 'dificil') pontos_pergunta = 30;
+                if (dificuldade === 'medio') pontos_pergunta = 20;
+                if (dificuldade === 'dificil') pontos_pergunta = 30;
             }
         } else {
             // Se a Atividade ainda não existir, cria-a com as tuas regras
             let pontosAtiv = 50;
-            if(dificuldade === 'medio') { pontosAtiv = 100; pontos_pergunta = 20; }
-            else if(dificuldade === 'dificil') { pontosAtiv = 150; pontos_pergunta = 30; }
+            if (dificuldade === 'medio') { pontosAtiv = 100; pontos_pergunta = 20; }
+            else if (dificuldade === 'dificil') { pontosAtiv = 150; pontos_pergunta = 30; }
             else { pontosAtiv = 50; pontos_pergunta = 10; }
-            
+
             const { data: newAtiv, error } = await supabase.from('atividade').insert([{
-                titulo: `Quiz de ${categoria} (${dificuldade})`, 
-                tipo: 'quiz', 
-                categoria: categoria.trim().toLowerCase(), 
-                descricao: 'Gerado via Admin', 
+                titulo: `Quiz de ${categoria} (${dificuldade})`,
+                tipo: 'quiz',
+                categoria: categoria.trim().toLowerCase(),
+                descricao: 'Gerado via Admin',
                 dificuldade: dificuldade.trim().toLowerCase(),
                 pontos: pontosAtiv,
                 id_professor
             }]).select('id_atividade').single();
-            
+
             if (error) throw error;
             id_atividade = newAtiv.id_atividade;
         }
-        
+
         return { id_atividade, pontos_pergunta };
     }
 
@@ -273,7 +273,7 @@ module.exports = (supabase) => {
 
             // Insere Pergunta
             const { data: perg, error: pergErr } = await supabase.from('pergunta').insert([{
-                id_atividade: id_atividade, 
+                id_atividade: id_atividade,
                 texto_pergunta,
                 pontos_pergunta: pontos_pergunta // Envia a pontuação para a DB!
             }]).select('id_pergunta').single();
@@ -295,17 +295,17 @@ module.exports = (supabase) => {
     router.put('/quizzes/:id', async (req, res) => {
         const { texto_pergunta, categoria, dificuldade, opcoes, corretaIndex } = req.body;
         const id_professor = req.session.userId || 1;
-        
+
         try {
             // Obter dados dinâmicos
             const { id_atividade, pontos_pergunta } = await obterAtividadeEPontos(categoria, dificuldade, id_professor);
 
             // MOVE a pergunta e ATUALIZA a pontuação, deixando o resto quieto
             const { error: pergErr } = await supabase.from('pergunta')
-                .update({ 
-                    texto_pergunta, 
-                    id_atividade: id_atividade, 
-                    pontos_pergunta: pontos_pergunta 
+                .update({
+                    texto_pergunta,
+                    id_atividade: id_atividade,
+                    pontos_pergunta: pontos_pergunta
                 }).eq('id_pergunta', req.params.id);
             if (pergErr) throw pergErr;
 
@@ -410,16 +410,16 @@ module.exports = (supabase) => {
             // Vai buscar tudo à tabela atividade
             const { data, error } = await supabase.from('atividade').select('categoria, dificuldade').eq('tipo', 'quiz');
             if (error) throw error;
-            
+
             // Remove os duplicados automaticamente (cria arrays únicos)
             const categorias = [...new Set(data.map(item => item.categoria))].filter(Boolean).sort();
             const dificuldades = [...new Set(data.map(item => item.dificuldade))].filter(Boolean);
-            
+
             res.json({ categorias, dificuldades });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     });
-    
+
     return router;
 };

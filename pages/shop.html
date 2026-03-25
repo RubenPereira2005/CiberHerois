@@ -76,7 +76,7 @@
                 // 1. Vai buscar os dados do utilizador (para saber o saldo)
                 const userRes = await fetch('/api/me');
                 if (!userRes.ok) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'index';
                     return;
                 }
                 const userData = await userRes.json();

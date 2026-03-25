@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="profile-header-right">
-                    <a href="settings.html" class="settings-btn">
+                    <a href="settings" class="settings-btn">
                         <i data-lucide="settings" class="settings-icon"></i>
                         <span>Definições</span>
                     </a>
@@ -128,7 +128,7 @@
                             <i data-lucide="calendar" class="profile-card-icon"></i>
                             Atividade Recente
                         </h2>
-                        <a href="historico.html" id="btn-ver-historico" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                        <a href="historico" id="btn-ver-historico" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                             Ver Tudo <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                         </a>
                     </div>
@@ -309,8 +309,8 @@
             try {
                 const response = await fetch(endpointUrl);
 
-                if (response.status === 401) { window.location.href = 'index.html'; return; }
-                if (response.status === 404) { window.location.href = '404.html'; return; }
+                if (response.status === 401) { window.location.href = 'index'; return; }
+                if (response.status === 404) { window.location.href = '404'; return; }
 
                 const data = await response.json();
 
@@ -370,13 +370,13 @@
                             document.querySelector('.profile-activity').parentElement.style.display = 'none';
                         } else {
                             const btnVerHistorico = document.getElementById('btn-ver-historico');
-                            if (btnVerHistorico) btnVerHistorico.href = 'historico.html?id=' + publicUserId;
+                            if (btnVerHistorico) btnVerHistorico.href = 'historico?id=' + publicUserId;
                         }
                     } else {
                         // Perfil Próprio
                         if (emailElement) emailElement.textContent = data.email;
                         const btnVerHistorico = document.getElementById('btn-ver-historico');
-                        if (btnVerHistorico) btnVerHistorico.href = 'historico.html';
+                        if (btnVerHistorico) btnVerHistorico.href = 'historico';
                     }
 
                     // --- ATUALIZAR PATENTE E CARTÕES (Resumo) ---
@@ -400,7 +400,7 @@
                                     <div style="color: #ef4444; margin-bottom: 10px;"><i data-lucide="database" style="width: 36px; height: 36px;"></i></div>
                                     <h3 style="color: #ef4444; margin-bottom: 5px; font-size: 1.2rem;">Base de Operações</h3>
                                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Acesso total à academia.</p>
-                                    <a href="gestao.html" class="btn btn-primary" style="background-color: #ef4444; border-color: #ef4444; width: 100%;">Gerir Plataforma</a>
+                                    <a href="gestao" class="btn btn-primary" style="background-color: #ef4444; border-color: #ef4444; width: 100%;">Gerir Plataforma</a>
                                 </div>
                             `;
                         }
@@ -431,7 +431,7 @@
                         } else {
                             esquadraoContent.innerHTML = `
                                 ${turmasHTML}
-                                <a href="professor.html" class="btn btn-primary" style="background-color: #10b981; border-color: #10b981; width: 100%;">Monitorizar Alunos</a>
+                                <a href="professor" class="btn btn-primary" style="background-color: #10b981; border-color: #10b981; width: 100%;">Monitorizar Alunos</a>
                             `;
                         }
                     } else {

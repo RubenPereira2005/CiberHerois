@@ -23,7 +23,7 @@
     <div id="includedContent"></div>
 
     <div class="auth-container resource-detail-container" id="conteudo-recurso" style="display: none;">
-        <a href="resources.html" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos
+        <a href="resources" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos
             Recursos</a>
 
         <div class="resource-header">
@@ -57,7 +57,7 @@
         <div class="resource-cta-box">
             <h3>Teste os seus conhecimentos!</h3>
             <p>Faça o quiz desta categoria e ganhe pontos táticos</p>
-            <a href="quizzes.html" class="resource-cta-link">Ir para os Quizzes</a>
+            <a href="quizzes" class="resource-cta-link">Ir para os Quizzes</a>
         </div>
     </div>
 
@@ -66,7 +66,7 @@
         <h2>Recurso não encontrado</h2>
         <p style="color: var(--text-secondary); margin-bottom: 20px;">O ficheiro que procuras não existe ou foi
             removido.</p>
-        <a href="recursos.html" class="btn btn-primary">Voltar à Academia</a>
+        <a href="recursos" class="btn btn-primary">Voltar à Academia</a>
     </div>
 
     <div id="download-toast" class="toast-container">
@@ -162,7 +162,7 @@
                 lucide.createIcons();
 
                 // 7. Configurar o botão de Download PDF
-                const urlName = r.url_conteudo ? r.url_conteudo.replace('.html', '') : r.id_material;
+                const urlName = r.url_conteudo ? r.url_conteudo.replace('', '') : r.id_material;
                 const btnDownload = document.getElementById('btn-download-pdf');
                 
                 btnDownload.onclick = function() {

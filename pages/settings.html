@@ -52,7 +52,7 @@
     <div class="auth-container">
 
         <div class="settings-header">
-            <a href="profile.html" class="back-link-simple">
+            <a href="profile" class="back-link-simple">
                 <i data-lucide="arrow-left"></i> Voltar ao Perfil
             </a>
             <h1 class="page-title">Definições da Conta</h1>
@@ -518,7 +518,7 @@
                     if (confirmado) {
                         try {
                             const response = await fetch('/api/delete', { method: 'DELETE' });
-                            if (response.ok) window.location.href = "index.html";
+                            if (response.ok) window.location.href = "index";
                             else alert("Erro ao apagar conta.");
                         } catch (e) { alert("Erro ao processar pedido."); }
                     }
