@@ -223,7 +223,7 @@ body.site-body {
   stroke-width: 1.5;
 }
 
-/* Main / quizzes content - Deprecated: use auth-container instead */
+/* Main / quizzes page */
 
 .page-title {
   font-size: 36px;
@@ -1886,6 +1886,7 @@ body.site-body {
   gap: 24px;
 }
 
+/* Novo Contentor Seguro para a Sanduíche de Imagens */
 .profile-avatar-container {
   position: relative;
   display: inline-block;
@@ -1902,6 +1903,7 @@ body.site-body {
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+  /* Corta os cantos quadrados das imagens de upload */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1913,21 +1915,23 @@ body.site-body {
   object-fit: cover;
 }
 
-/* Moldura (Fica por cima e ligeiramente maior) */
+/* A MOLDURA (Fica por cima e ligeiramente maior) */
 .profile-border {
   position: absolute;
-  top: -25%;  /* Puxa para cima para centrar */
-  left: -25%; /* Puxa para a esquerda para centrar (Tem de se dividir os % a mais pela metade ex:140 - 40/2)*/ 
+  top: -25%;
+  left: -25%;
+  /* Puxa para a esquerda para centrar (Tem de se dividir os % a mais pela metade ex:140 - 40/2)*/
   width: 150%;
   height: 150%;
-  pointer-events: none; 
+  pointer-events: none;
   z-index: 5;
 }
 
 /* Botão do Lápis */
 .edit-avatar-btn {
   position: absolute;
-  bottom: -4px; /* Ajustado ligeiramente para não sobrepor muito a moldura */
+  bottom: -4px;
+  /* Ajustado ligeiramente para não sobrepor muito a moldura */
   right: -4px;
   background: #3b82f6;
   color: white;
@@ -1942,6 +1946,7 @@ body.site-body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s;
   z-index: 10;
+  /* Tem de ser o mais alto para estar por cima da moldura! */
 }
 
 .edit-avatar-btn:hover {
@@ -3644,44 +3649,46 @@ body.site-body {
 
 /* Botão de limpar (X) */
 .search-clear-btn {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    z-index: 10;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 10;
 }
 
 .search-clear-btn:hover {
-    color: #ef4444; /* Fica vermelho ao passar o rato */
-    background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  /* Fica vermelho ao passar o rato */
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .search-clear-btn.hidden {
-    display: none;
+  display: none;
 }
 
 /* Destaque (Highlight) das letras pesquisadas */
 .search-highlight {
-    font-weight: 800;
-    color: #3b82f6; /* Azul CiberHeróis */
-    text-decoration: underline;
-    text-decoration-color: rgba(59, 130, 246, 0.3);
+  font-weight: 800;
+  color: #3b82f6;
+  /* Azul CiberHeróis */
+  text-decoration: underline;
+  text-decoration-color: rgba(59, 130, 246, 0.3);
 }
 
 /* Seleção ativa através das setas do teclado */
 .search-result-item.active-search-item {
-    background: #f1f5f9;
-    border-left: 3px solid #3b82f6;
+  background: #f1f5f9;
+  border-left: 3px solid #3b82f6;
 }
 
 
@@ -3754,4 +3761,148 @@ body.site-body {
 .role-admin {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
+}
+
+
+/* --- Quizzes page --- */
+/* Estrelas de Conclusão nos Cartões */
+.card-stars {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.star-icon {
+  width: 18px;
+  height: 18px;
+  color: #cbd5e1;
+  fill: transparent;
+  transition: all 0.3s;
+}
+
+.star-icon.earned {
+  color: #facc15;
+  fill: #facc15;
+  filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.4));
+}
+
+/* Estilos dos cartões de dificuldade no Modal */
+.diff-card {
+  border-radius: 12px;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+.diff-card:not(.locked):hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .diff-card {
+  background: #1e293b;
+}
+
+.diff-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 6px;
+}
+
+/* Cores das Dificuldades */
+.diff-easy {
+  border-color: #10b981;
+}
+
+.diff-easy::before {
+  background-color: #10b981;
+}
+
+.diff-easy h3 {
+  color: #10b981;
+}
+
+.diff-medium {
+  border-color: #3b82f6;
+}
+
+.diff-medium::before {
+  background-color: #3b82f6;
+}
+
+.diff-medium h3 {
+  color: #3b82f6;
+}
+
+.diff-hard {
+  border-color: #ef4444;
+}
+
+.diff-hard::before {
+  background-color: #ef4444;
+}
+
+.diff-hard h3 {
+  color: #ef4444;
+}
+
+/* O ESTADO BLOQUEADO (CADEADO) */
+.diff-card.locked {
+  opacity: 0.6;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+  border-color: #cbd5e1;
+}
+
+.diff-card.locked::before {
+  background-color: #cbd5e1;
+}
+
+.diff-card.locked h3 {
+  color: #64748b;
+}
+
+.diff-card.locked .diff-reward-box {
+  display: none;
+}
+
+.locked-msg {
+  display: none;
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.diff-card.locked .locked-msg {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.diff-reward-box {
+  text-align: right;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+@keyframes spin-fast {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-icon {
+  animation: spin-fast 1s linear infinite;
 }

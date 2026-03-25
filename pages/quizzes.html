@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,107 @@
     <link rel="icon" type="image/x-icon" href="img/favicon.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="popup_modal.css">
     <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
+    
+    <style>
+        /* Estrelas de Conclusão nos Cartões */
+        .card-stars {
+            display: flex;
+            gap: 4px;
+            margin-top: 10px;
+        }
+        .star-icon {
+            width: 18px;
+            height: 18px;
+            color: #cbd5e1;
+            fill: transparent;
+            transition: all 0.3s;
+        }
+        .star-icon.earned {
+            color: #facc15;
+            fill: #facc15;
+            filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.4));
+        }
+
+        /* Estilos dos cartões de dificuldade no Modal */
+        .diff-card {
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        
+        .diff-card:not(.locked):hover {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .diff-card { background: #1e293b; }
+
+        .diff-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0;
+            height: 100%; width: 6px;
+        }
+
+        /* Cores das Dificuldades */
+        .diff-easy { border-color: #10b981; }
+        .diff-easy::before { background-color: #10b981; }
+        .diff-easy h3 { color: #10b981; }
+
+        .diff-medium { border-color: #3b82f6; }
+        .diff-medium::before { background-color: #3b82f6; }
+        .diff-medium h3 { color: #3b82f6; }
+
+        .diff-hard { border-color: #ef4444; }
+        .diff-hard::before { background-color: #ef4444; }
+        .diff-hard h3 { color: #ef4444; }
+
+        /* O ESTADO BLOQUEADO (CADEADO) */
+        .diff-card.locked {
+            opacity: 0.6;
+            filter: grayscale(100%);
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+        }
+        .diff-card.locked::before { background-color: #cbd5e1; }
+        .diff-card.locked h3 { color: #64748b; }
+        .diff-card.locked .diff-reward-box { display: none; }
+        
+        .locked-msg {
+            display: none;
+            color: #ef4444;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+        .diff-card.locked .locked-msg { display: flex; align-items: center; gap: 4px; }
+
+        .diff-reward-box {
+            text-align: right;
+            background: rgba(0,0,0,0.03);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+        body.dark-mode .diff-reward-box { background: rgba(255,255,255,0.05); }
+
+        @keyframes spin-fast { 100% { transform: rotate(360deg); } }
+        .spin-icon { animation: spin-fast 1s linear infinite; }
+    </style>
 </head>
+
 <body class="site-body">
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
@@ -23,10 +120,10 @@
     <div class="auth-container quizzes-main">
         <div class="mb-12">
             <h1 class="page-title">Explora o teu conhecimento</h1>
-            <p class="page-lead">Completa quizzes, ganha pontos e medalhas enquanto aprendes sobre cibersegurança</p>
+            <p class="page-lead">Completa quizzes, ganha estrelas de perfeição e desbloqueia os desafios de Elite!</p>
         </div>
 
-        <div id="mfaMissionBanner" class="mfa-banner"  style="display: none;">
+        <div id="mfaMissionBanner" class="mfa-banner" style="display: none;">
             <div class="mfa-banner-icon">
                 <i data-lucide="shield-alert"></i>
             </div>
@@ -35,15 +132,15 @@
                 <p class="mfa-banner-desc">A tua base de operações ainda não tem a Autenticação de 2 Passos (MFA) ativa. Protege a tua conta contra ciberataques e desbloqueia recompensas exclusivas.</p>
                 <div class="mfa-banner-rewards">
                     <span class="reward-pill"><i data-lucide="star" class="icon-xs"></i> +50 Pontos XP</span>
-                    <span class="reward-pill"><i data-lucide="coins" class="icon-xs"  style="color: #1061bd;"></i> +10 Moedas</span>
-                    <span class="reward-pill"><i data-lucide="shield-check" class="icon-xs"  style="color: #10b981;"></i> Medalha: Guardião</span>
+                    <span class="reward-pill"><i data-lucide="coins" class="icon-xs" style="color: #1061bd;"></i> +10 Moedas</span>
+                    <span class="reward-pill"><i data-lucide="shield-check" class="icon-xs" style="color: #10b981;"></i> Medalha: Guardião</span>
                 </div>
             </div>
             <div class="mfa-banner-actions">
-                <a href="settings.html#security" class="btn btn-primary" id="btn-activate-mfa-banner"  style="background-color: #f59e0b; color: #fff; border: none;">Ativar MFA</a>
+                <a href="settings.html#security" class="btn btn-primary" id="btn-activate-mfa-banner" style="background-color: #f59e0b; color: #fff; border: none;">Ativar MFA</a>
             </div>
             <button id="closeMfaBanner" class="btn-close-banner" title="Ignorar por agora">
-                <i data-lucide="x"  style="width: 18px; height: 18px;"></i>
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
             </button>
         </div>
 
@@ -56,11 +153,16 @@
                         <div class="card-content">
                             <h3 class="card-title">HTTPS e Protocolos</h3>
                             <p class="card-desc">Aprende sobre comunicação segura na web</p>
+                            <div class="card-stars">
+                                <i data-lucide="star" id="star-https-facil" class="star-icon" title="Fácil Concluído"></i>
+                                <i data-lucide="star" id="star-https-medio" class="star-icon" title="Médio Concluído"></i>
+                                <i data-lucide="star" id="star-https-dificil" class="star-icon" title="Difícil Concluído"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <span class="card-meta" id="count-https">A carregar...</span>
-                        <a href="quiz.html?cat=https" class="btn btn-primary btn-sm">Começar</a>
+                        <button onclick="abrirModalDificuldade('https', 'HTTPS e Protocolos')" class="btn btn-primary btn-sm">Começar</button>
                     </div>
                 </div>
             </div>
@@ -73,11 +175,16 @@
                         <div class="card-content">
                             <h3 class="card-title">Gestão de Passwords</h3>
                             <p class="card-desc">Boas práticas para passwords fortes</p>
+                            <div class="card-stars">
+                                <i data-lucide="star" id="star-passwords-facil" class="star-icon"></i>
+                                <i data-lucide="star" id="star-passwords-medio" class="star-icon"></i>
+                                <i data-lucide="star" id="star-passwords-dificil" class="star-icon"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <span class="card-meta" id="count-passwords">A carregar...</span>
-                        <a href="quiz.html?cat=passwords" class="btn btn-primary btn-sm">Começar</a>
+                        <button onclick="abrirModalDificuldade('passwords', 'Gestão de Passwords')" class="btn btn-primary btn-sm">Começar</button>
                     </div>
                 </div>
             </div>
@@ -90,11 +197,16 @@
                         <div class="card-content">
                             <h3 class="card-title">Phishing</h3>
                             <p class="card-desc">Evita ataques de engenharia social</p>
+                            <div class="card-stars">
+                                <i data-lucide="star" id="star-phishing-facil" class="star-icon"></i>
+                                <i data-lucide="star" id="star-phishing-medio" class="star-icon"></i>
+                                <i data-lucide="star" id="star-phishing-dificil" class="star-icon"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <span class="card-meta" id="count-phishing">A carregar...</span>
-                        <a href="quiz.html?cat=phishing" class="btn btn-primary btn-sm">Começar</a>
+                        <button onclick="abrirModalDificuldade('phishing', 'Phishing')" class="btn btn-primary btn-sm">Começar</button>
                     </div>
                 </div>
             </div>
@@ -107,11 +219,16 @@
                         <div class="card-content">
                             <h3 class="card-title">Segurança de Rede</h3>
                             <p class="card-desc">Protege a tua rede e conexões Wi-Fi</p>
+                            <div class="card-stars">
+                                <i data-lucide="star" id="star-network-facil" class="star-icon"></i>
+                                <i data-lucide="star" id="star-network-medio" class="star-icon"></i>
+                                <i data-lucide="star" id="star-network-dificil" class="star-icon"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <span class="card-meta" id="count-network">A carregar...</span>
-                        <a href="quiz.html?cat=network" class="btn btn-primary btn-sm">Começar</a>
+                        <button onclick="abrirModalDificuldade('network', 'Segurança de Rede')" class="btn btn-primary btn-sm">Começar</button>
                     </div>
                 </div>
             </div>
@@ -124,11 +241,16 @@
                         <div class="card-content">
                             <h3 class="card-title">Proteção de Dados</h3>
                             <p class="card-desc">Mantém os teus dados seguros e privados</p>
+                            <div class="card-stars">
+                                <i data-lucide="star" id="star-data-facil" class="star-icon"></i>
+                                <i data-lucide="star" id="star-data-medio" class="star-icon"></i>
+                                <i data-lucide="star" id="star-data-dificil" class="star-icon"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <span class="card-meta" id="count-data">A carregar...</span>
-                        <a href="quiz.html?cat=data" class="btn btn-primary btn-sm">Começar</a>
+                        <button onclick="abrirModalDificuldade('data', 'Proteção de Dados')" class="btn btn-primary btn-sm">Começar</button>
                     </div>
                 </div>
             </div>
@@ -141,11 +263,16 @@
                         <div class="card-content">
                             <h3 class="card-title">Malware e Vírus</h3>
                             <p class="card-desc">Defende-te contra software malicioso</p>
+                            <div class="card-stars">
+                                <i data-lucide="star" id="star-malware-facil" class="star-icon"></i>
+                                <i data-lucide="star" id="star-malware-medio" class="star-icon"></i>
+                                <i data-lucide="star" id="star-malware-dificil" class="star-icon"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <span class="card-meta" id="count-malware">A carregar...</span>
-                        <a href="quiz.html?cat=malware" class="btn btn-primary btn-sm">Começar</a>
+                        <button onclick="abrirModalDificuldade('malware', 'Malware e Vírus')" class="btn btn-primary btn-sm">Começar</button>
                     </div>
                 </div>
             </div>
@@ -167,8 +294,8 @@
                 </div>
             </div>
         </div>
-
-        <div class="suggestion-section">
+        
+        <div class="suggestion-section" style="margin-top: 40px;">
             <h2 class="suggestion-section-title">Tem sugestões de recursos?</h2>
             <p class="suggestion-section-description">Ajude-nos a melhorar a nossa biblioteca de recursos educativos</p>
             <button class="suggestion-section-btn">Enviar Sugestão</button>
@@ -184,11 +311,87 @@
 
     </div>
 
+    <div id="modal-dificuldade" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2>Selecione o Nível de Risco</h2>
+                <button class="close-modal-btn" onclick="fecharModalDificuldade()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 20px; text-align: center; font-size: 1.05rem;">
+                Preparado para o módulo <strong id="modal-cat-name" style="color: var(--text-color);">---</strong>?<br>Escolha o seu nível de desafio:
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                
+                <div class="diff-card diff-easy" onclick="iniciarQuiz('facil')">
+                    <div>
+                        <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="shield-check" style="width: 22px;"></i> Principiante
+                        </h3>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">Questões fundamentais. Ideal para treinar.</p>
+                    </div>
+                    <div class="diff-reward-box">
+                        <div style="font-weight: 700; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                            <span id="xp-facil"><i data-lucide="loader" class="spin-icon" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div style="font-weight: 700; color: #10b981; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                            <span id="coins-facil">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diff-card diff-medium" id="card-medio" onclick="iniciarQuiz('medio')">
+                    <div>
+                        <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="shield-alert" style="width: 22px;"></i> Agente Operacional
+                        </h3>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">O desafio padrão. Cenários mais técnicos.</p>
+                        <div class="locked-msg"><i data-lucide="lock" style="width: 14px;"></i> Passa o nível Principiante com 100% para desbloquear.</div>
+                    </div>
+                    <div class="diff-reward-box">
+                        <div style="font-weight: 700; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                            <span id="xp-medio"><i data-lucide="loader" class="spin-icon" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div style="font-weight: 700; color: #3b82f6; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                            <span id="coins-medio">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diff-card diff-hard" id="card-dificil" onclick="iniciarQuiz('dificil')">
+                    <div>
+                        <h3 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="shield-ban" style="width: 22px;"></i> Especialista Elite
+                        </h3>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">Para verdadeiros Hackers. O erro é fatal.</p>
+                        <div class="locked-msg"><i data-lucide="lock" style="width: 14px;"></i> Passa o nível Operacional com 100% para desbloquear.</div>
+                    </div>
+                    <div class="diff-reward-box">
+                        <div style="font-weight: 700; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                            <span id="xp-dificil"><i data-lucide="loader" class="spin-icon" style="width: 16px; height: 16px;"></i></span>
+                        </div>
+                        <div style="font-weight: 700; color: #ef4444; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
+                            <span id="coins-dificil">...</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
     <script>
         lucide.createIcons();
 
+        let quizCategoriaSelecionada = '';
+        let userQuizProgress = {}; 
+
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Mostrar o Toast de Login se existir
+            // 1. Mostrar o Toast de Login
             const toast = document.getElementById('toast-container');
             const shouldShow = sessionStorage.getItem('showLoginToast');
 
@@ -203,15 +406,17 @@
                 }, 3500);
             }
 
-            // 2. Carregar informações
+            // 2. Carregar informações base
             loadQuizSummary();
+            loadQuizProgress();
             checkMFAStatus();
         });
 
-        // --- LÓGICA DO BANNER MFA ---
+        // ==========================================
+        // LÓGICA DO BANNER MFA (CORRIGIDA)
+        // ==========================================
         async function checkMFAStatus() {
             try {
-                // Chama a rota que vai devolver o perfil do utilizador logado
                 const response = await fetch('/api/me');
                 if (!response.ok) throw new Error('Falha ao obter perfil');
                 
@@ -221,22 +426,58 @@
                 const closeMfaBtn = document.getElementById('closeMfaBanner');
                 const bannerDismissed = sessionStorage.getItem('mfaBannerDismissed');
 
-                // Se o mfa_ativo for false E o utilizador não tiver fechado o banner nesta sessão
+                // Só mostra o banner se o MFA estiver DESLIGADO e o utilizador não tiver fechado a caixa na sessão
                 if (userData.mfa_ativo === false && bannerDismissed !== 'true') {
                     mfaBanner.style.display = 'flex';
+
+                    // A MAGIA ESTÁ AQUI: Se a base de dados disser que já recebeu a recompensa, altera as cores!
+                    if (userData.mfa_recompensa_recebida === true) {
+                        
+                        // Muda estilo do banner para "Aviso Crítico"
+                        mfaBanner.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                        mfaBanner.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                        
+                        const iconDiv = document.querySelector('.mfa-banner-icon');
+                        if (iconDiv) {
+                            iconDiv.style.backgroundColor = '#ef4444';
+                            iconDiv.style.color = 'white';
+                        }
+
+                        // Altera o Título e Texto (remove menções a prémios)
+                        document.querySelector('.mfa-banner-title').innerHTML = '<span style="color: #ef4444;">Aviso: A tua conta está vulnerável!</span>';
+                        document.querySelector('.mfa-banner-desc').textContent = 'Desativaste a Autenticação de 2 Passos (MFA). Recomendamos que a reatives nas definições para manteres o teu progresso seguro contra ataques ciber-criminosos.';
+                        
+                        // Esconde as recompensas
+                        const rewardsBox = document.querySelector('.mfa-banner-rewards');
+                        if (rewardsBox) rewardsBox.style.display = 'none';
+
+                        // Altera a cor e texto do botão
+                        const btnActivate = document.getElementById('btn-activate-mfa-banner');
+                        if (btnActivate) {
+                            btnActivate.textContent = 'Reativar Proteção';
+                            btnActivate.style.backgroundColor = '#ef4444';
+                        }
+                    }
                 }
 
-                // Lógica do botão de fechar (X)
+                // O que acontece ao clicar no "X" para fechar o banner
                 closeMfaBtn.addEventListener('click', () => {
                     mfaBanner.style.display = 'none';
                     sessionStorage.setItem('mfaBannerDismissed', 'true');
                 });
                 
-                // Quando o utilizador clicar em "Ativar MFA", guardamos uma flag para destacar a secção de MFA nas definições
+                // O QUE ACONTECE AO CLICAR EM "ATIVAR MFA" (Aqui estava o BUG)
                 const btnActivateMfaBanner = document.getElementById('btn-activate-mfa-banner');
                 if (btnActivateMfaBanner) {
-                    btnActivateMfaBanner.addEventListener('click', () => {
+                    btnActivateMfaBanner.addEventListener('click', (e) => {
+                        // 1. Pára o clique para a página não saltar imediatamente
+                        e.preventDefault(); 
+                        
+                        // 2. Guarda na memória que veio da missão
                         sessionStorage.setItem('highlightMFA', 'true');
+                        
+                        // 3. Salta manualmente para as definições de segurança!
+                        window.location.href = btnActivateMfaBanner.href;
                     });
                 }
             } catch (error) {
@@ -244,14 +485,119 @@
             }
         }
 
-        // --- LÓGICA DA CONTAGEM DOS QUIZZES ---
+        // ==========================================
+        // CARREGAR AS ESTRELAS DE PROGRESSO DO JOGADOR
+        // ==========================================
+        async function loadQuizProgress() {
+            try {
+                const res = await fetch('/api/quiz/user-progress/all');
+                if (res.ok) {
+                    userQuizProgress = await res.json();
+                    
+                    Object.keys(userQuizProgress).forEach(cat => {
+                        const stats = userQuizProgress[cat];
+                        if (stats.facil) document.getElementById(`star-${cat}-facil`)?.classList.add('earned');
+                        if (stats.medio) document.getElementById(`star-${cat}-medio`)?.classList.add('earned');
+                        if (stats.dificil) document.getElementById(`star-${cat}-dificil`)?.classList.add('earned');
+                    });
+                }
+            } catch (e) { console.error("Erro a carregar progresso", e); }
+        }
+
+        // ==========================================
+        // FUNÇÕES DO MODAL E CADEADOS
+        // ==========================================
+        window.abrirModalDificuldade = async function(categoriaId, categoriaNome) {
+            quizCategoriaSelecionada = categoriaId;
+            document.getElementById('modal-cat-name').textContent = categoriaNome;
+            
+            const prog = userQuizProgress[categoriaId] || { facil: false, medio: false, dificil: false };
+            
+            const cardMedio = document.getElementById('card-medio');
+            const cardDificil = document.getElementById('card-dificil');
+
+            if (!prog.facil) {
+                cardMedio.classList.add('locked');
+                cardDificil.classList.add('locked');
+            } else {
+                cardMedio.classList.remove('locked');
+                if (!prog.medio) {
+                    cardDificil.classList.add('locked');
+                } else {
+                    cardDificil.classList.remove('locked');
+                }
+            }
+
+            const resetUI = (diff) => {
+                document.getElementById(`xp-${diff}`).innerHTML = '<i data-lucide="loader" class="spin-icon" style="width: 16px; height: 16px;"></i>';
+                document.getElementById(`coins-${diff}`).innerHTML = '...';
+            };
+            resetUI('facil'); resetUI('medio'); resetUI('dificil');
+            lucide.createIcons();
+
+            document.getElementById('modal-dificuldade').classList.add('active');
+
+            try {
+                const res = await fetch(`/api/quiz/info/${categoriaId}`);
+                if (res.ok) {
+                    const stats = await res.json();
+                    const atualizarUI = (diff, corIcon) => {
+                        if (stats[diff] && stats[diff].max_xp > 0) {
+                            document.getElementById(`xp-${diff}`).innerHTML = `Máx +${stats[diff].max_xp} <i data-lucide="star" style="width: 14px; height: 14px; color: #facc15;"></i>`;
+                            document.getElementById(`coins-${diff}`).innerHTML = `Máx +${stats[diff].max_coins} CC <i data-lucide="circle-dollar-sign" style="width: 14px; height: 14px; color: ${corIcon};"></i>`;
+                        } else {
+                            document.getElementById(`xp-${diff}`).innerHTML = `<span style="font-size: 0.9rem; opacity: 0.7;">Em Breve</span>`;
+                            document.getElementById(`coins-${diff}`).innerHTML = `-`;
+                        }
+                    };
+
+                    atualizarUI('facil', '#10b981');
+                    atualizarUI('medio', '#3b82f6');
+                    atualizarUI('dificil', '#ef4444');
+                    lucide.createIcons();
+                }
+            } catch (e) {
+                console.error("Erro ao ler estatísticas:", e);
+            }
+        };
+
+        window.fecharModalDificuldade = function() {
+            document.getElementById('modal-dificuldade').classList.remove('active');
+            quizCategoriaSelecionada = '';
+        };
+
+        window.iniciarQuiz = function(dificuldade) {
+            if (!quizCategoriaSelecionada) return;
+            
+            const prog = userQuizProgress[quizCategoriaSelecionada] || { facil: false, medio: false, dificil: false };
+            
+            if (dificuldade === 'medio' && !prog.facil) {
+                alert("🔒 Tens de acertar todas as perguntas no modo Principiante (5/5) para desbloquear o modo Operacional!");
+                return;
+            }
+            if (dificuldade === 'dificil' && !prog.medio) {
+                alert("🔒 Tens de acertar todas as perguntas no modo Operacional (5/5) para desbloquear a Elite!");
+                return;
+            }
+
+            const xpText = document.getElementById(`xp-${dificuldade}`).textContent;
+            if (xpText.includes('Em Breve') || xpText.includes('Erro')) {
+                alert("Ainda não temos desafios suficientes para este nível. Volta mais tarde!");
+                return;
+            }
+            
+            window.location.href = `quiz.html?cat=${quizCategoriaSelecionada}&diff=${dificuldade}`;
+        };
+
+        // ==========================================
+        // CONTAGEM DOS QUIZZES
+        // ==========================================
         async function loadQuizSummary() {
             try {
                 const response = await fetch('/api/quiz/summary/all');
                 if (!response.ok) throw new Error('Falha ao obter dados');
                 
                 const data = await response.json(); 
-                
                 data.forEach(item => {
                     const spanElement = document.getElementById(`count-${item.categoria}`);
                     if (spanElement) {
@@ -269,10 +615,6 @@
 
             } catch (error) {
                 console.error("Erro ao carregar resumo dos quizzes:", error);
-                const allSpans = document.querySelectorAll('.card-meta');
-                allSpans.forEach(span => {
-                    if (span.textContent === 'A carregar...') span.textContent = 'Erro ao carregar';
-                });
             }
         }
     </script>

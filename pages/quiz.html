@@ -12,6 +12,11 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="global-init.js"></script>
     <script src="theme.js"></script>
+    <style>
+        /* Animação para o botão da IA */
+        @keyframes spin-fast { 100% { transform: rotate(360deg); } }
+        .spin-icon { animation: spin-fast 1s linear infinite; }
+    </style>
 </head>
 
 <body class="quiz-page-body">
@@ -29,7 +34,7 @@
         <div class="quiz-play-header">
             <div class="quiz-play-stats">
                 <span id="question-counter">A carregar questões...</span>
-                <span id="score-counter">Pontuação: 0</span>
+                <span id="score-counter">XP Acumulado: 0</span>
             </div>
             <div class="quiz-progress-track">
                 <div id="progress-bar" class="quiz-progress-fill" style="width: 0%;"></div>
@@ -42,7 +47,17 @@
             <div id="options-container" class="quiz-options-container">
             </div>
 
-            <button id="next-btn" onclick="nextQuestion()" class="btn btn-primary quiz-next-btn quiz-hidden">
+            <div id="ai-mentor-box" class="quiz-hidden" style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; border-radius: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <i data-lucide="bot" style="color: #3b82f6;"></i>
+                    <h3 style="margin: 0; color: #3b82f6; font-size: 1rem;">Ciber-Mentor IA</h3>
+                </div>
+                <button id="ask-ai-btn" class="btn btn-secondary btn-sm" onclick="pedirDicaIA()" style="display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Pedir Análise à IA
+                </button>
+                <p id="ai-response-text" style="margin-top: 10px; font-size: 0.95rem; line-height: 1.5; color: var(--text-color); display: none;"></p>
+            </div>
+            <button id="next-btn" onclick="nextQuestion()" class="btn btn-primary quiz-next-btn quiz-hidden" style="margin-top: 15px;">
                 Próxima Questão
             </button>
         </div>
@@ -65,7 +80,7 @@
 
             <div class="quiz-results-actions">
                 <button onclick="window.location.href='quizzes.html'" class="btn btn-primary">
-                    Voltar ao quizzes
+                    Voltar aos quizzes
                 </button>
                 <button onclick="window.location.href='profile.html'" class="btn btn-secondary">
                     Ver Perfil
@@ -75,9 +90,12 @@
     </div>
 
     <script>
-        // SETUP DO JOGO
+        // ==========================================
+        // SETUP DO JOGO & LEITURA DO URL
+        // ==========================================
         const urlParams = new URLSearchParams(window.location.search);
         const category = urlParams.get('cat') || 'https';
+        const difficulty = urlParams.get('diff') || 'medio'; 
 
         let questions = [];
         let currentQIndex = 0;
@@ -85,7 +103,11 @@
         let totalPontosGanhos = 0;
         let answered = false;
 
-        // Função para baralhar apenas as opções de resposta
+        // Variáveis para guardar o contexto para a IA
+        let ultimaPerguntaTexto = "";
+        let ultimaRespostaErradaTexto = "";
+
+        // Função para baralhar as opções de resposta
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -94,16 +116,13 @@
             return array;
         }
 
-        // Função que comunica com a API para obter as questões
         async function loadQuizData() {
             try {
-                const response = await fetch(`/api/quiz/${category}`);
-
+                const response = await fetch(`/api/quiz/${category}?diff=${difficulty}`);
                 if (!response.ok) throw new Error('Erro na resposta da API');
 
                 questions = await response.json();
 
-                // Baralhar apenas as opções
                 questions.forEach(q => {
                     if (q.options) {
                         q.options = shuffleArray(q.options);
@@ -111,10 +130,9 @@
                 });
 
                 renderQuestion();
-
             } catch (error) {
                 console.error("Erro:", error);
-                document.getElementById('question-text').textContent = "Erro ao carregar o quiz da Base de Dados.";
+                document.getElementById('question-text').textContent = "Não existem perguntas para esta dificuldade ainda!";
                 document.getElementById('question-counter').textContent = "Erro";
             }
         }
@@ -122,16 +140,16 @@
         function renderQuestion() {
             if (questions.length === 0) return;
 
+            // Esconde a caixa da IA ao desenhar uma nova pergunta
+            document.getElementById('ai-mentor-box').classList.add('quiz-hidden');
+
             const q = questions[currentQIndex];
 
-            // Mostrar em que nível de dificuldade estamos
-            let diffText = q.dificuldade === 'facil' ? '🟢 Fácil' : q.dificuldade === 'medio' ? '🟡 Médio' : '🔴 Difícil';
-
+            let diffText = difficulty === 'facil' ? '🟢 Fácil' : difficulty === 'medio' ? '🟡 Médio' : '🔴 Difícil';
             document.getElementById('question-counter').textContent = `Questão ${currentQIndex + 1} de ${questions.length} | ${diffText}`;
-            document.getElementById('score-counter').textContent = `XP Acumulado: ${totalPontosGanhos}`; // Atualizado para mostrar XP
+            document.getElementById('score-counter').textContent = `XP Acumulado: ${totalPontosGanhos}`;
             document.getElementById('progress-bar').style.width = `${((currentQIndex + 1) / questions.length) * 100}%`;
             document.getElementById('question-text').textContent = q.question;
-
             document.getElementById('next-btn').classList.add('quiz-hidden');
 
             const optionsContainer = document.getElementById('options-container');
@@ -157,41 +175,84 @@
             answered = true;
 
             const isCorrect = (selectedId == correctId);
+            const q = questions[currentQIndex];
+
+            // Guarda a pergunta para a IA
+            ultimaPerguntaTexto = q.question;
+
             if (isCorrect) {
                 score++;
-
-                // === LÓGICA DE PONTOS POR DIFICULDADE ===
-                const dificuldade = questions[currentQIndex].dificuldade;
-                if (dificuldade === 'facil') {
-                    totalPontosGanhos += 10;
-                } else if (dificuldade === 'medio') {
-                    totalPontosGanhos += 20;
-                } else if (dificuldade === 'dificil') {
-                    totalPontosGanhos += 30;
-                } else {
-                    totalPontosGanhos += 10; // Valor por defeito
-                }
+                const pontosDaPergunta = q.pontos || 10;
+                totalPontosGanhos += pontosDaPergunta; 
             }
 
             const buttons = document.getElementById('options-container').children;
             for (let b of buttons) {
                 b.disabled = true;
-
+                
                 if (b.dataset.isCorrect === "true") {
                     b.classList.add('correct');
                 }
-
+                
                 if (b === btn && !isCorrect) {
                     b.classList.add('wrong');
+                    // Tira o "A) " da frente para a IA ter o texto limpo
+                    ultimaRespostaErradaTexto = b.textContent.substring(3).trim();
+                    
+                    // Mostra o botão para pedir ajuda à IA!
+                    document.getElementById('ai-mentor-box').classList.remove('quiz-hidden');
+                    document.getElementById('ask-ai-btn').style.display = 'flex';
+                    // Reset do botão se ele já tiver sido usado numa pergunta anterior
+                    document.getElementById('ask-ai-btn').innerHTML = '<i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> Pedir Análise à IA';
+                    document.getElementById('ask-ai-btn').disabled = false;
+                    document.getElementById('ai-response-text').style.display = 'none';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 }
             }
 
-            // Atualiza o contador de XP imediatamente no ecrã para dar feedback ao utilizador
             document.getElementById('score-counter').textContent = `XP Acumulado: ${totalPontosGanhos}`;
 
             const nextBtn = document.getElementById('next-btn');
             nextBtn.textContent = currentQIndex < questions.length - 1 ? 'Próxima Questão' : 'Ver Resultados';
             nextBtn.classList.remove('quiz-hidden');
+        }
+
+        // --- FUNÇÃO QUE CHAMA A INTELIGÊNCIA ARTIFICIAL ---
+        async function pedirDicaIA() {
+            const btnAI = document.getElementById('ask-ai-btn');
+            const respostaTxt = document.getElementById('ai-response-text');
+            
+            // Estado de "A pensar..."
+            btnAI.innerHTML = '<i data-lucide="loader" class="spin-icon" style="width:16px; height:16px;"></i> A analisar resposta...';
+            btnAI.disabled = true;
+            lucide.createIcons();
+
+            try {
+                const response = await fetch('/api/quiz/hint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pergunta: ultimaPerguntaTexto,
+                        respostaErrada: ultimaRespostaErradaTexto
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Esconde o botão e mostra o texto gerado
+                btnAI.style.display = 'none'; 
+                respostaTxt.style.display = 'block'; 
+                
+                if (response.ok) {
+                    respostaTxt.innerHTML = `<strong>Dica do Mentor:</strong> ${data.hint}`;
+                } else {
+                    respostaTxt.innerHTML = `<em>${data.error}</em>`;
+                }
+            } catch (error) {
+                btnAI.style.display = 'none';
+                respostaTxt.style.display = 'block';
+                respostaTxt.innerHTML = `<em>Erro de ligação ao quartel-general da IA. Tenta mais tarde.</em>`;
+            }
         }
 
         function nextQuestion() {
@@ -211,31 +272,26 @@
 
             const iconContainer = document.getElementById('result-icon');
             if (percentage === 100) {
-                iconContainer.innerHTML = '<i data-lucide="trophy"  style="width: 80px; height: 80px; color: #eab308; stroke-width: 1.5;"></i>';
+                iconContainer.innerHTML = '<i data-lucide="trophy" style="width: 80px; height: 80px; color: #eab308; stroke-width: 1.5;"></i>';
                 document.getElementById('perfect-score-msg').classList.remove('quiz-hidden');
             } else if (percentage >= 70) {
-                iconContainer.innerHTML = '<i data-lucide="award"  style="width: 80px; height: 80px; color: #3b82f6; stroke-width: 1.5;"></i>';
+                iconContainer.innerHTML = '<i data-lucide="award" style="width: 80px; height: 80px; color: #3b82f6; stroke-width: 1.5;"></i>';
             } else {
-                iconContainer.innerHTML = '<i data-lucide="x-circle"  style="width: 80px; height: 80px; color: #9ca3af; stroke-width: 1.5;"></i>';
+                iconContainer.innerHTML = '<i data-lucide="x-circle" style="width: 80px; height: 80px; color: #9ca3af; stroke-width: 1.5;"></i>';
             }
 
             document.getElementById('result-text').textContent = `Acertou ${score} de ${questions.length} questões`;
             document.getElementById('result-points').textContent = `A calcular recompensas...`;
 
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            // --- ENVIAR XP PARA A DB E RECEBER MOEDAS ---
             try {
                 const response = await fetch('/api/quiz/save-score', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         categoria: category,
-                        pontos: totalPontosGanhos, // Usa os pontos calculados pela dificuldade
+                        dificuldade: difficulty,
                         respostas_corretas: score,
                         total_perguntas: questions.length
                     })
@@ -243,21 +299,16 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("Sucesso:", data.message);
-
-                    // Mostra o XP e as CiberCoins geradas no backend!
                     if (data.moedas_ganhas && data.moedas_ganhas > 0) {
-                        document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong> e <strong>${data.moedas_ganhas} CiberCoins</strong>! 🪙`;
+                        document.getElementById('result-points').innerHTML = `Ganhou <strong>${data.pontos_ganhos} XP</strong> e <strong>${data.moedas_ganhas} CiberCoins</strong>! 🪙`;
                     } else {
-                        document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>!`;
+                        document.getElementById('result-points').innerHTML = `Ganhou <strong>${data.pontos_ganhos} XP</strong>!`;
                     }
                 } else {
-                    console.error("Falha ao guardar a pontuação no servidor.");
-                    document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>! <br><small>(Modo Offline/Erro de Servidor)</small>`;
+                    document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>! <br><small>(Erro ao guardar no Servidor)</small>`;
                 }
             } catch (erro) {
-                console.error("Erro de rede ao tentar guardar a pontuação:", erro);
-                document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>! <br><small>(Modo Offline/Erro de Rede)</small>`;
+                document.getElementById('result-points').innerHTML = `Ganhou <strong>${totalPontosGanhos} XP</strong>! <br><small>(Modo Offline/Sem Rede)</small>`;
             }
         }
 
@@ -276,11 +327,10 @@
             }
         }
 
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         loadQuizData();
     </script>
 </body>
+
 </html>

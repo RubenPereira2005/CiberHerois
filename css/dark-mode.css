@@ -886,3 +886,8 @@ body.dark-mode .user-card {
 body.dark-mode .user-card-name {
     color: #f1f5f9;
 }
+
+
+body.dark-mode .diff-reward-box {
+  background: rgba(255, 255, 255, 0.05);
+}
