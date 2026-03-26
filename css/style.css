@@ -15,7 +15,6 @@ body {
   margin: 0;
   scrollbar-width: thin;
   scrollbar-color: #94a3b8 transparent;
-  /* Cinza ardósia e fundo transparente */
 }
 
 body.site-body {
@@ -394,7 +393,6 @@ body.site-body {
   background: #1d4ed8;
 }
 
-
 /* Index Navbar */
 .navbar {
   background: #2563eb;
@@ -428,18 +426,6 @@ body.site-body {
   gap: 12px;
 }
 
-/* Footer */
-.site-footer {
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
-  padding: 32px 0;
-  margin-top: 80px;
-}
-
-.footer-inner {
-  text-align: center;
-}
-
 /* Main / Index Section */
 .main-content {
   padding: 64px 0;
@@ -452,7 +438,6 @@ body.site-body {
   align-items: center;
   margin-bottom: 80px;
 }
-
 
 .highlight {
   color: #2563eb;
@@ -484,25 +469,6 @@ body.site-body {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-block;
-  text-decoration: none;
-  border-radius: 10px;
-  padding: 12px 32px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: #2563eb;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #1d4ed8;
 }
 
 .btn-secondary {
@@ -663,42 +629,6 @@ body.site-body {
   background: #f3f4f6;
 }
 
-.card-icon.color-pink {
-  background: #ec4899;
-}
-
-.card-title {
-  font-weight: 700;
-  margin: 0 0 6px;
-  color: #0f172a;
-}
-
-.card-desc {
-  margin: 0;
-  color: #4b5563;
-  font-size: 14px;
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.card-meta {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.btn-sm {
-  padding: 8px 14px;
-  font-size: 14px;
-  border-radius: 8px;
-}
-
-
-
 /* ========== Footer ========== */
 .site-footer {
   background: #fff;
@@ -753,6 +683,7 @@ body.site-body {
   justify-content: center;
   padding: 16px;
   margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 .login-wrapper {
@@ -796,6 +727,7 @@ body.site-body {
 }
 
 .form-group {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -876,6 +808,28 @@ body.site-body {
   font-size: 14px;
   text-align: center;
   margin: 0;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.back-link svg {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.back-link:hover svg {
+  color: #2563eb;
 }
 
 .link-highlight {
@@ -991,22 +945,18 @@ body.site-body {
   border-left: 4px solid #10b981;
 }
 
-/* Variação Azul */
 .resource-section.border-blue {
   border-left-color: #3b82f6 !important;
 }
 
-/* Variação Vermelha */
 .resource-section.border-red {
   border-left-color: #ef4444 !important;
 }
 
-/* Variação Amarela */
 .resource-section.border-yellow {
   border-left-color: #eab308 !important;
 }
 
-/* Variação Roxa*/
 .resource-section.border-purple {
   border-left-color: #a855f7 !important;
 }
@@ -1063,7 +1013,7 @@ body.site-body {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* Sequential Quiz */
@@ -1475,10 +1425,6 @@ body.site-body {
   margin-top: 10px;
 }
 
-.hidden {
-  display: none !important;
-}
-
 .practice-btn {
   margin: 10px 0;
   padding: 10px 20px;
@@ -1501,12 +1447,6 @@ body.site-body {
 }
 
 /* ====== Resources Page ====== */
-
-/* Resources Navbar - Deprecated: use auth-navbar-* instead */
-
-/* Resources Container */
-
-/* Resources Container - use auth-container instead */
 
 .resources-header {
   margin-bottom: 48px;
@@ -1878,6 +1818,7 @@ body.site-body {
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 24px;
+  gap: 20px;
 }
 
 .profile-header-left {
@@ -1903,7 +1844,6 @@ body.site-body {
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  /* Corta os cantos quadrados das imagens de upload */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1920,7 +1860,6 @@ body.site-body {
   position: absolute;
   top: -25%;
   left: -25%;
-  /* Puxa para a esquerda para centrar (Tem de se dividir os % a mais pela metade ex:140 - 40/2)*/
   width: 150%;
   height: 150%;
   pointer-events: none;
@@ -1931,7 +1870,6 @@ body.site-body {
 .edit-avatar-btn {
   position: absolute;
   bottom: -4px;
-  /* Ajustado ligeiramente para não sobrepor muito a moldura */
   right: -4px;
   background: #3b82f6;
   color: white;
@@ -1946,7 +1884,6 @@ body.site-body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s;
   z-index: 10;
-  /* Tem de ser o mais alto para estar por cima da moldura! */
 }
 
 .edit-avatar-btn:hover {
@@ -1957,12 +1894,14 @@ body.site-body {
   font-size: 28px;
   margin: 0 0 8px;
   font-weight: 700;
+  color: #fff;
 }
 
 .profile-header-email {
   opacity: 0.8;
   margin: 0 0 16px;
   font-size: 14px;
+  color: #fff;
 }
 
 .profile-header-badges {
@@ -1976,6 +1915,7 @@ body.site-body {
   padding: 12px 16px;
   border-radius: 10px;
   backdrop-filter: blur(10px);
+  color: #fff;
 }
 
 .profile-header-badge-content {
@@ -1996,6 +1936,7 @@ body.site-body {
 
 .profile-progress {
   margin-top: 24px;
+  color: #fff;
 }
 
 .profile-progress-label {
@@ -2245,64 +2186,39 @@ body.site-body {
   font-weight: 600;
 }
 
-/* === Posicionamento no Cabeçalho === */
-/* Garante que o conteúdo fica separado: Esquerda (Info) <-> Direita (Botão) */
-.profile-header-content {
-  display: flex;
-  justify-content: space-between;
-  /* [cite: 146] já existe, mas reforçamos */
-  align-items: flex-start;
-  gap: 20px;
-}
-
 /* === Estilo do Botão de Definições === */
 .settings-btn {
   display: inline-flex;
-  /* Para alinhar ícone e texto */
   align-items: center;
   gap: 8px;
-
-  /* Estilo "Glass" (Vidro) igual aos teus badges  */
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-
-  /* Texto e Cores */
   color: #fff;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
-
-  /* Tamanho */
   padding: 10px 16px;
   border-radius: 8px;
-
-  /* Animação */
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
-/* Efeito ao passar o rato (Hover) */
 .settings-btn:hover {
   background: rgba(255, 255, 255, 0.35);
-  /* Fica mais branco/brilhante */
   transform: translateY(-2px);
-  /* Sobe ligeiramente */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Tamanho do ícone dentro do botão */
 .settings-icon {
   width: 18px;
   height: 18px;
   stroke-width: 2px;
 }
 
-/* === Responsividade (Telemóvel) === */
 @media (max-width: 640px) {
   .profile-header-content {
     flex-direction: column;
-    /* Empilha um em cima do outro */
     align-items: center;
     text-align: center;
   }
@@ -2314,196 +2230,9 @@ body.site-body {
 
   .settings-btn {
     width: 100%;
-    /* Botão ocupa a largura toda no telemóvel */
     justify-content: center;
   }
 }
-
-/* ========== Focus states ========== */
-.icon-btn:focus {
-  outline: 2px solid rgba(37, 99, 235, 0.2);
-  outline-offset: 2px;
-}
-
-.btn:focus {
-  outline: 2px solid rgba(37, 99, 235, 0.2);
-  outline-offset: 2px;
-}
-
-/* ========== Login Page ========== */
-.login-page {
-  background: #f3f4f6;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-.login-wrapper {
-  width: 100%;
-  max-width: 420px;
-}
-
-.login-box {
-  background: #fff;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 10px 25px rgba(2, 6, 23, 0.06);
-}
-
-.login-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.login-title {
-  color: #111827;
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.login-subtitle {
-  color: #111827;
-  font-size: 18px;
-  margin-bottom: 24px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.form-group {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-label {
-  color: #4b5563;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.form-input {
-  width: 100%;
-  background: #fff;
-  color: #111827;
-  border: 1px solid #d1d5db;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-input:focus {
-  border-color: #2563eb;
-  outline: none;
-  box-shadow: 0 0 0 1px #2563eb;
-}
-
-.password-input-wrapper {
-  position: relative;
-}
-
-.password-toggle-btn {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
-}
-
-.password-toggle-btn:hover {
-  color: #374151;
-}
-
-.icon-eye {
-  width: 20px;
-  height: 20px;
-}
-
-.login-btn {
-  width: 100%;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-.login-btn:hover {
-  background: #1d4ed8;
-}
-
-.login-link {
-  color: #4b5563;
-  font-size: 14px;
-  text-align: center;
-  margin: 0;
-}
-
-.back-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  /* Espaço entre a seta e o texto */
-  margin-top: 4px;
-  /* Espaço acima (separar do criar conta) */
-  margin-bottom: 0;
-  font-size: 14px;
-  color: #4b5563;
-}
-
-/* Tamanho e cor do ícone da seta */
-.back-link svg {
-  width: 16px;
-  height: 16px;
-  color: #6b7280;
-  transition: color 0.2s;
-}
-
-/* Pequeno efeito: quando passas o rato na linha, a seta também fica azul */
-.back-link:hover svg {
-  color: #2563eb;
-}
-
-.link-highlight {
-  color: #2563eb;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.link-highlight:hover {
-  color: #1d4ed8;
-}
-
-
-/* Password Validation List */
 
 /* Password Requirements (Flutuante) */
 #passwordRequirements {
@@ -2517,7 +2246,6 @@ body.site-body {
   width: 270px;
 }
 
-/* Nova animação que garante que fica centrada no eixo Y (-50%) */
 @keyframes slideOutRight {
   0% {
     opacity: 0;
@@ -2546,7 +2274,6 @@ body.site-body {
   #passwordRequirements {
     position: absolute;
     top: 50%;
-    /* Centra verticalmente com o input */
     left: calc(100% + 15px);
     animation: slideOutRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
   }
@@ -2592,7 +2319,6 @@ body.site-body {
   transition: all 0.2s;
 }
 
-/* Círculo vazio antes de validar */
 .requirement-item::before {
   content: "○";
   font-weight: bold;
@@ -2606,21 +2332,17 @@ body.site-body {
   text-decoration: none;
 }
 
-/* Ícone de "Visto"*/
 .requirement-item.valid::before {
   content: "✓";
   opacity: 1;
 }
 
-/*RISCO APLICADO AO SPAN */
 .requirement-item.valid span {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
   opacity: 0.5;
-  /* Só o texto fica transparente [cite: 150] */
   display: inline-block;
 }
-
 
 /* Custom Toast Notification */
 .toast-container {
@@ -2634,7 +2356,6 @@ body.site-body {
   flex-direction: column;
   overflow: hidden;
   transform: translateX(150%);
-  /* Começa mais fora do ecrã */
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 9999;
   min-width: 280px;
@@ -2678,11 +2399,9 @@ body.site-body {
   bottom: 0;
   height: 100%;
   width: 0;
-  /* BASE ZERO: Resolve o problema de encher outra vez */
   background: #2563eb;
 }
 
-/* A animação agora dita que começa nos 100% e termina em 0% */
 .toast-container.active .toast-progress::before {
   animation: toast-progress-anim 3s linear forwards;
 }
@@ -2697,31 +2416,24 @@ body.site-body {
   }
 }
 
-/* Variações do Toast */
 .toast-container.error .toast-icon {
   color: #ef4444;
-  /* Vermelho para erros [cite: 32] */
 }
 
 .toast-container.error .toast-progress::before {
   background: #ef4444;
-  /* Barra de progresso vermelha [cite: 117] */
 }
 
 .toast-container.success .toast-icon {
   color: #16a34a;
-  /* Verde para sucesso [cite: 32] */
 }
 
-
 /* ====== Forgot Password & Toast Notification ====== */
-
 .forgot-password-link {
   display: block;
   text-align: right;
   font-size: 12px;
   margin-top: -8px;
-  /* Ajuste para aproximar do campo de password */
   color: #2563eb;
   text-decoration: none;
   font-weight: 500;
@@ -2733,13 +2445,11 @@ body.site-body {
   text-decoration: underline;
 }
 
-/* Toast Popup */
 .toast-notification {
   position: fixed;
   top: 24px;
   right: 24px;
   background: #1e40af;
-  /* Azul escuro igual ao badge do navbar */
   color: white;
   padding: 16px 24px;
   border-radius: 8px;
@@ -2762,15 +2472,10 @@ body.site-body {
   width: 20px;
   height: 20px;
   stroke: #fcd34d;
-  /* Amarelo para destaque */
 }
 
 
 /* ========== PÁGINA DE DEFINIÇÕES (SETTINGS) ========== */
-
-/* ============================================================
-   PÁGINA DE DEFINIÇÕES (SETTINGS) - LAYOUT E COMPONENTES
-   ============================================================ */
 
 .settings-layout {
   display: flex;
@@ -2779,7 +2484,6 @@ body.site-body {
   align-items: flex-start;
 }
 
-/* --- Sidebar e Navegação --- */
 .settings-sidebar {
   width: 280px;
   min-width: 240px;
@@ -2797,15 +2501,12 @@ body.site-body {
   gap: 4px;
 }
 
-/* Divisória Crítica na Sidebar */
 .settings-sidebar .sidebar-section.danger {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 2px solid #cbd5e1;
-  /* Cinza mais visível */
 }
 
-/* Tabs (Links) */
 .settings-tab {
   display: flex;
   align-items: center;
@@ -2841,7 +2542,6 @@ body.site-body {
   background: #eff6ff;
 }
 
-/* Indicador lateral animado */
 .settings-tab::after {
   content: "";
   position: absolute;
@@ -2859,7 +2559,6 @@ body.site-body {
   transform: scaleY(1);
 }
 
-/* --- Aba de Perigo (Destaque) --- */
 .settings-tab[data-tab="danger"]:hover {
   background: #fff5f5;
   color: #ef4444;
@@ -2874,7 +2573,6 @@ body.site-body {
   background: #dc2626 !important;
 }
 
-/* --- Painel de Conteúdo --- */
 .settings-content {
   flex: 1;
   background: #ffffff;
@@ -2897,7 +2595,6 @@ body.site-body {
   transform: translateY(0);
 }
 
-/* Cabeçalhos dos Cartões Internos */
 .settings-card-header {
   display: flex;
   align-items: center;
@@ -2928,7 +2625,6 @@ body.site-body {
   color: #ef4444;
 }
 
-/* --- Formulários e Campos Bloqueados --- */
 .settings-content .form-group {
   margin-bottom: 24px;
 }
@@ -2960,7 +2656,6 @@ body.site-body {
   pointer-events: none;
 }
 
-/* --- Botões e Links de Navegação --- */
 .back-link-simple {
   display: inline-flex;
   align-items: center;
@@ -2997,7 +2692,6 @@ body.site-body {
   color: #ffffff;
 }
 
-/* --- Responsividade --- */
 @media (max-width: 768px) {
   .settings-layout {
     flex-direction: column;
@@ -3027,7 +2721,6 @@ body.site-body {
   }
 }
 
-
 /* ====== Quiz Play Page ====== */
 .quiz-page-body {
   background-color: #1a2844;
@@ -3038,7 +2731,6 @@ body.site-body {
   margin: 0;
 }
 
-/* Fundo Estrelado */
 .stars-container {
   position: absolute;
   inset: 0;
@@ -3065,7 +2757,6 @@ body.site-body {
   }
 }
 
-/* Contentor e Layout do Quiz */
 .quiz-play-container {
   position: relative;
   z-index: 10;
@@ -3083,7 +2774,6 @@ body.site-body {
   align-items: center;
   justify-content: space-between;
   color: #dbeafe;
-  /* text-blue-100 */
   margin-bottom: 16px;
   font-weight: 500;
 }
@@ -3091,20 +2781,17 @@ body.site-body {
 .quiz-progress-track {
   width: 100%;
   background-color: #1e3a8a;
-  /* bg-blue-900 */
   border-radius: 9999px;
   height: 8px;
 }
 
 .quiz-progress-fill {
   background-color: #60a5fa;
-  /* bg-blue-400 */
   height: 8px;
   border-radius: 9999px;
   transition: width 0.3s ease;
 }
 
-/* Cartão da Pergunta (Glassmorphism) */
 .quiz-question-box {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
@@ -3123,7 +2810,6 @@ body.site-body {
   color: #ffffff;
 }
 
-/* Botões de Opção */
 .quiz-options-container {
   display: flex;
   flex-direction: column;
@@ -3153,10 +2839,8 @@ body.site-body {
   width: 32px;
   font-weight: bold;
   color: #93c5fd;
-  /* text-blue-300 */
 }
 
-/* Estados de Resposta (Injetados via JS) */
 .quiz-option-btn.correct {
   background-color: #22c55e !important;
   border-color: #4ade80 !important;
@@ -3167,7 +2851,6 @@ body.site-body {
   border-color: #f87171 !important;
 }
 
-/* Ecrã de Resultados */
 .quiz-results-overlay {
   position: absolute;
   inset: 0;
@@ -3239,12 +2922,10 @@ body.site-body {
   gap: 12px;
 }
 
-/* Classe utilitária global para esconder elementos */
 .quiz-hidden {
   display: none !important;
 }
 
-/* Ajustes Extra para o Botão Principal do Quiz */
 .quiz-next-btn {
   width: 100%;
   padding: 14px;
@@ -3259,7 +2940,6 @@ body.site-body {
   background: linear-gradient(to right, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
   border: 1px solid rgba(245, 158, 11, 0.3);
   border-left: 4px solid #f59e0b;
-  /* Laranja/Amarelo de aviso */
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 30px;
@@ -3360,7 +3040,6 @@ body.site-body {
   }
 }
 
-
 /* Leaderboard */
 .ranking-list {
   display: flex;
@@ -3437,7 +3116,6 @@ body.site-body {
   color: var(--primary-color);
 }
 
-/* Cores do Top 3 */
 .top-1 .ranking-pos {
   color: #eab308;
   font-size: 1.5rem;
@@ -3453,22 +3131,14 @@ body.site-body {
   font-size: 1.3rem;
 }
 
-/* Efeitos de Hover Avançados para o Top 3 */
-
-/* 1º Lugar - Efeito Dourado (Ouro) */
 .ranking-item.top-1:hover {
   border-color: #eab308;
-  /* Borda dourada */
-  /* Cria uma sombra interior e exterior para dar um efeito de brilho/néon */
   box-shadow: 0 0 15px rgba(234, 179, 8, 0.4), inset 0 0 10px rgba(234, 179, 8, 0.1);
   transform: translateY(-4px) scale(1.02);
-  /* Levanta e cresce um pouco mais que os outros */
   z-index: 10;
-  /* Garante que a sombra não fica escondida pelos outros elementos */
   background: linear-gradient(to right, rgba(234, 179, 8, 0.05), var(--bg-color));
 }
 
-/* 2º Lugar - Efeito Prateado (Prata) */
 .ranking-item.top-2:hover {
   border-color: #94a3b8;
   box-shadow: 0 0 12px rgba(148, 163, 184, 0.4), inset 0 0 8px rgba(148, 163, 184, 0.1);
@@ -3477,7 +3147,6 @@ body.site-body {
   background: linear-gradient(to right, rgba(148, 163, 184, 0.05), var(--bg-color));
 }
 
-/* 3º Lugar - Efeito Bronzeado (Bronze) */
 .ranking-item.top-3:hover {
   border-color: #d97706;
   box-shadow: 0 0 10px rgba(217, 119, 6, 0.4), inset 0 0 6px rgba(217, 119, 6, 0.1);
@@ -3486,12 +3155,8 @@ body.site-body {
   background: linear-gradient(to right, rgba(217, 119, 6, 0.05), var(--bg-color));
 }
 
-/* Opcional: Animação suave para as cores e sombras do brilho */
 .ranking-item {
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    box-shadow 0.3s ease,
-    border-color 0.3s ease,
-    background 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
 /* =========================================
@@ -3506,7 +3171,6 @@ body.site-body {
   transition: background-color 0.3s ease;
 }
 
-/* Fundo fica ligeiramente visível quando o rato está em cima ou a escrever */
 .auth-navbar-search-container:hover,
 .auth-navbar-search-container:focus-within {
   background: rgba(255, 255, 255, 0.15);
@@ -3528,7 +3192,6 @@ body.site-body {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* A Mágica do Hover: Expande o input */
 .auth-navbar-search-container:hover .auth-search-input,
 .auth-navbar-search-container:focus-within .auth-search-input {
   width: 220px;
@@ -3608,7 +3271,6 @@ body.site-body {
   font-size: 14px;
 }
 
-/* Mensagens de estado da pesquisa */
 .search-message {
   padding: 16px;
   text-align: center;
@@ -3620,7 +3282,6 @@ body.site-body {
   color: #ef4444;
 }
 
-/* Rodapé do Dropdown (Ver todos) */
 .search-dropdown-footer {
   display: flex;
   justify-content: center;
@@ -3629,9 +3290,7 @@ body.site-body {
   font-size: 13px;
   font-weight: 600;
   color: #3b82f6;
-  /* Azul primário */
   background: #f8fafc;
-  /* Fundo muito clarinho para destacar o rodapé */
   text-decoration: none;
   border-top: 1px solid #e2e8f0;
   transition: all 0.2s ease;
@@ -3639,13 +3298,8 @@ body.site-body {
 
 .search-dropdown-footer:hover {
   background: #eff6ff;
-  /* Azul clarinho no hover */
   color: #2563eb;
 }
-
-/* =========================================
-   MELHORIAS DE PESQUISA (UX)
-   ========================================= */
 
 /* Botão de limpar (X) */
 .search-clear-btn {
@@ -3668,7 +3322,6 @@ body.site-body {
 
 .search-clear-btn:hover {
   color: #ef4444;
-  /* Fica vermelho ao passar o rato */
   background: rgba(239, 68, 68, 0.1);
 }
 
@@ -3676,21 +3329,17 @@ body.site-body {
   display: none;
 }
 
-/* Destaque (Highlight) das letras pesquisadas */
 .search-highlight {
   font-weight: 800;
   color: #3b82f6;
-  /* Azul CiberHeróis */
   text-decoration: underline;
   text-decoration-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Seleção ativa através das setas do teclado */
 .search-result-item.active-search-item {
   background: #f1f5f9;
   border-left: 3px solid #3b82f6;
 }
-
 
 /* --- Search page --- */
 .search-page-header {
@@ -3699,7 +3348,6 @@ body.site-body {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Grelha de cartões de utilizadores */
 .users-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -3763,9 +3411,7 @@ body.site-body {
   color: #ef4444;
 }
 
-
 /* --- Quizzes page --- */
-/* Estrelas de Conclusão nos Cartões */
 .card-stars {
   display: flex;
   gap: 4px;
@@ -3786,7 +3432,6 @@ body.site-body {
   filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.4));
 }
 
-/* Estilos dos cartões de dificuldade no Modal */
 .diff-card {
   border-radius: 12px;
   padding: 15px 20px;
@@ -3819,7 +3464,6 @@ body.dark-mode .diff-card {
   width: 6px;
 }
 
-/* Cores das Dificuldades */
 .diff-easy {
   border-color: #10b981;
 }
@@ -3856,7 +3500,6 @@ body.dark-mode .diff-card {
   color: #ef4444;
 }
 
-/* O ESTADO BLOQUEADO (CADEADO) */
 .diff-card.locked {
   opacity: 0.6;
   filter: grayscale(100%);
@@ -3905,4 +3548,60 @@ body.dark-mode .diff-card {
 
 .spin-icon {
   animation: spin-fast 1s linear infinite;
+}
+
+/* =========================================
+   MINI-QUIZ DOS RECURSOS (FEEDBACK E CORES)
+   ========================================= */
+
+/* Animações de loading */
+.spin-animation {
+  animation: loader-rotate 2s linear infinite;
+}
+
+@keyframes loader-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body .quiz-option-seq.correct,
+body.dark-mode .quiz-option-seq.correct {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+body .quiz-option-seq.incorrect,
+body.dark-mode .quiz-option-seq.incorrect {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+/* Caixas de Feedback do Ciber-Mentor */
+.feedback-box {
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.feedback-correct {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.feedback-incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }

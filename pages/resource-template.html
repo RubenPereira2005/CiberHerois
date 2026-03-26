@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
-    <script src="global-init.js"></script>
+    <script src="global-init.js"></script>        
 </head>
 
 <body class="site-body">
@@ -39,14 +39,13 @@
             <div class="resource-meta">
                 <span id="rh-tempo">📚 -- min de leitura</span>
                 <span>•</span>
-                <span id="rh-autor">✍️ Autor</span>
+                <span id="rh-autor">✍️ Equipa CiberHeróis</span>
                 <span>•</span>
                 <span id="rh-data">📅 Data</span>
             </div>
         </div>
 
-        <div class="resource-content" id="rh-seccoes">
-        </div>
+        <div class="resource-content" id="rh-seccoes"></div>
 
         <div class="resource-buttons">
             <button class="resource-btn resource-btn-secondary" id="btn-download-pdf">
@@ -54,9 +53,9 @@
             </button>
         </div>
 
-        <div class="resource-cta-box">
-            <h3>Teste os seus conhecimentos!</h3>
-            <p>Faça o quiz desta categoria e ganhe pontos táticos</p>
+        <div class="resource-cta-box" id="caixa-quiz-oficial">
+            <h3>Preparado para o teste final?</h3>
+            <p>Joga o quiz oficial desta categoria para subires no ranking e ganhares estrelas!</p>
             <a href="quizzes" class="resource-cta-link">Ir para os Quizzes</a>
         </div>
     </div>
@@ -66,7 +65,7 @@
         <h2>Recurso não encontrado</h2>
         <p style="color: var(--text-secondary); margin-bottom: 20px;">O ficheiro que procuras não existe ou foi
             removido.</p>
-        <a href="recursos" class="btn btn-primary">Voltar à Academia</a>
+        <a href="resources" class="btn btn-primary">Voltar à Academia</a>
     </div>
 
     <div id="download-toast" class="toast-container">
@@ -77,55 +76,44 @@
         <div class="toast-progress"></div>
     </div>
 
-    <style>
-        .spin-animation { animation: loader-rotate 2s linear infinite; }
-        @keyframes loader-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .toast-container.active { transform: translateX(0) !important; opacity: 1 !important; visibility: visible !important; }
-    </style>
-
     <script>
         lucide.createIcons();
 
+        // Variáveis globais para o Mini-Quiz
+        let miniQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizCategoriaParaSalvar = '';
+        let corDinamica = 'blue';
+
         async function carregarRecursoDetalhe() {
-            // 1. Apanhar o ID que está no URL (ex: ?id=5)
             const urlParams = new URLSearchParams(window.location.search);
             const recursoId = urlParams.get('id');
 
-            if (!recursoId) {
-                document.getElementById('erro-recurso').style.display = 'block';
-                return;
-            }
+            if (!recursoId) { document.getElementById('erro-recurso').style.display = 'block'; return; }
 
             try {
-                // 2. Ir buscar os dados à BD
-                // NOTA: Certifica-te que tens uma rota pública/alunos no backend que permita ler um recurso pelo ID!
-                // Ex: /api/public/resources/:id
                 const response = await fetch(`/api/gestao/resources/${recursoId}`);
                 if (!response.ok) throw new Error('Recurso não encontrado');
-
                 const r = await response.json();
 
-                // 3. Preencher o Cabeçalho
+                // Cabeçalho
                 document.title = `${r.titulo} - CiberHeróis`;
                 document.getElementById('rh-titulo').textContent = r.titulo;
                 document.getElementById('rh-desc').textContent = r.descricao;
-                document.getElementById('rh-tipo').textContent = r.tipo ? r.tipo.charAt(0).toUpperCase() + r.tipo.slice(1) : 'Documento';
 
-                const cor = r.cor_card || 'blue';
-                const containerIcon = document.getElementById('rh-icon-container');
-                containerIcon.className = `resource-header-icon resource-header-icon-${cor}`;
+                let tipoFormatado = r.tipo ? r.tipo.replace(/-/g, ' ') : 'Documento';
+                tipoFormatado = tipoFormatado.split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+                document.getElementById('rh-tipo').textContent = tipoFormatado;
 
+                corDinamica = r.cor_card || 'blue';
+                document.getElementById('rh-icon-container').className = `resource-header-icon resource-header-icon-${corDinamica}`;
                 document.getElementById('rh-icon').setAttribute('data-lucide', r.icone_card || 'shield');
-
-                // 4. Preencher Autor e Data
-                // Podes passar o nome do autor na query da BD, ou usar um default
-                document.getElementById('rh-autor').textContent = `✍️ Equipa CiberHeróis`;
                 document.getElementById('rh-data').textContent = `📅 ${new Date(r.data_criacao || Date.now()).toLocaleDateString('pt-PT')}`;
 
-                // 5. Montar as Secções e calcular o tempo
+                // Secções
                 let seccoes = [];
                 try { seccoes = typeof r.seccoes === 'string' ? JSON.parse(r.seccoes) : r.seccoes; } catch (e) { }
-
                 let htmlSeccoes = '';
                 let textoCompleto = (r.titulo || '') + " " + (r.descricao || '') + " ";
 
@@ -133,50 +121,225 @@
                     seccoes.forEach(sec => {
                         const icone = sec.icone || 'info';
                         const texto = sec.texto ? String(sec.texto) : '';
+                        const tipo = sec.tipo || 'normal';
                         textoCompleto += sec.titulo + " " + texto + " ";
 
-                        htmlSeccoes += `
-                        <div class="resource-section">
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <i data-lucide="${icone}" class="icon-24" style="color: var(--primary-color); margin-top: 4px;"></i>
-                                <div>
-                                    <h2>${sec.titulo}</h2>
-                                    <p>${texto.replace(/\\n/g, '<br>')}</p>
-                                </div>
-                            </div>
-                        </div>`;
+                        if (tipo === 'praticas') {
+                            htmlSeccoes += `<div class="resource-best-practices"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}" class="icon-24"></i>${sec.titulo}</h3>${texto}</div>`;
+                        } else if (tipo === 'aviso') {
+                            htmlSeccoes += `<div class="resource-warnings"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}" class="icon-24"></i>${sec.titulo}</h3>${texto}</div>`;
+                        } else {
+                            htmlSeccoes += `<div class="resource-section border-${corDinamica}"><div style="display: flex; align-items: flex-start; gap: 12px;"><i data-lucide="${icone}" class="icon-24 icon-${corDinamica}" style="margin-top: 4px;"></i><div><h2>${sec.titulo}</h2><p>${texto.replace(/\\n/g, '<br>')}</p></div></div></div>`;
+                        }
                     });
                 }
 
                 document.getElementById('rh-seccoes').innerHTML = htmlSeccoes;
 
-                // 6. Calcular Tempo
+                // Tempo
                 const wpm = 225;
-                const totalPalavras = textoCompleto.trim().split(/\\s+/).filter(w => w.length > 0).length;
-                let min = Math.ceil(totalPalavras / wpm);
-                if (min < 1) min = 1;
+                let min = Math.max(1, Math.ceil(textoCompleto.trim().split(/\s+/).length / wpm));
                 document.getElementById('rh-tempo').textContent = `📚 ${min} min de leitura`;
 
-                // Mostrar Conteúdo e atualizar Ícones
                 document.getElementById('conteudo-recurso').style.display = 'block';
                 lucide.createIcons();
 
-                // 7. Configurar o botão de Download PDF
+                // Download PDF
                 const urlName = r.url_conteudo ? r.url_conteudo.replace('', '') : r.id_material;
-                const btnDownload = document.getElementById('btn-download-pdf');
-                
-                btnDownload.onclick = function() {
+                document.getElementById('btn-download-pdf').onclick = function () {
                     const toast = document.getElementById('download-toast');
-                    if (toast) {
-                        toast.classList.add('active');
-                        lucide.createIcons(); // Garante que o ícone roda
-                        setTimeout(() => { toast.classList.remove('active'); }, 3500);
-                    }
+                    if (toast) { toast.classList.add('active'); setTimeout(() => toast.classList.remove('active'), 3500); }
                     window.location.href = `/api/pdf/download/${urlName}`;
                 };
+
+                // 👉 SE FOR GUIA INTERATIVO, CARREGA O QUIZ DA BASE DE DADOS!
+                if (r.tipo === 'guia-interativo' || r.tipo === 'guia interativo') {
+                    // Deduz a categoria pelo URL (ex: resource-phishing -> guia-phishing)
+                    const baseCat = r.url_conteudo ? r.url_conteudo.replace('resource-', '') : 'phishing';
+                    quizCategoriaParaSalvar = `guia-${baseCat}`;
+                    iniciarMiniQuiz(quizCategoriaParaSalvar);
+                }
+
+            } catch (error) { document.getElementById('erro-recurso').style.display = 'block'; }
+        }
+
+        // ==========================================
+        // LÓGICA DO MINI QUIZ (CONECTADO À BD)
+        // ==========================================
+        async function iniciarMiniQuiz(categoriaQuiz) {
+            try {
+                // Vai buscar as perguntas à BD! (Usa a tua rota de quizzes)
+                const res = await fetch(`/api/quiz/${categoriaQuiz}?diff=facil`);
+                if (!res.ok) return; // Se não houver quiz, não mostra nada
+
+                miniQuestions = await res.json();
+                if (miniQuestions.length === 0) return;
+
+                // Injeta o HTML do Quiz no fim da página
+                const quizHtml = `
+                    <div class="resource-section border-${corDinamica}" id="sequential-quiz" style="margin-top: 30px;">
+                        <h2><i data-lucide="gamepad-2" class="icon-24 icon-${corDinamica}"></i> Teste os seus conhecimentos</h2>
+                        <div id="quiz-container">
+                            <div id="question-display" style="margin-bottom: 15px;"></div>
+                            <div id="options-display"></div>
+                            <div id="quiz-feedback"></div>
+                            
+                            <!-- Botão limpinho, o style.css trata dele! -->
+                            <button id="next-btn" class="hidden">Próxima Pergunta</button>
+                        </div>
+                    </div>`;
+
+                document.getElementById('rh-seccoes').insertAdjacentHTML('beforeend', quizHtml);
+                lucide.createIcons();
+
+                document.getElementById('next-btn').addEventListener('click', nextQuestion);
+                loadQuestion();
+
+            } catch (e) { console.error("Erro ao carregar mini-quiz:", e); }
+        }
+
+        function loadQuestion() {
+            const q = miniQuestions[currentQuestionIndex];
+            document.getElementById('question-display').innerHTML = `<h3>${currentQuestionIndex + 1}. ${q.question}</h3>`;
+
+            const optionsHtml = q.options.map(opt =>
+                `<button class="quiz-option-seq" data-id="${opt.id}">${opt.text}</button>`
+            ).join('');
+
+            const optionsContainer = document.getElementById('options-display');
+            optionsContainer.innerHTML = optionsHtml;
+
+            // Adiciona evento de clique a cada opção
+            const botoes = optionsContainer.querySelectorAll('.quiz-option-seq');
+            botoes.forEach(btn => {
+                btn.addEventListener('click', () => handleOptionClick(btn, q));
+            });
+
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('quiz-feedback').innerHTML = '';
+        }
+
+        async function handleOptionClick(clickedBtn, questionData) {
+            // Bloqueia cliques adicionais para o aluno não fazer batota
+            const allBtns = document.querySelectorAll('.quiz-option-seq');
+            allBtns.forEach(b => {
+                b.style.pointerEvents = 'none';
+            });
+
+            const selectedId = clickedBtn.getAttribute('data-id');
+            const isCorrect = (selectedId == questionData.correctAnswer);
+            const feedbackBox = document.getElementById('quiz-feedback');
+
+            if (isCorrect) {
+                // É só adicionar a classe! O CSS com !important trata do resto.
+                clickedBtn.classList.add('correct');
                 
-            } catch (error) {
-                document.getElementById('erro-recurso').style.display = 'block';
+                score++;
+                feedbackBox.innerHTML = `<div class="feedback-box feedback-correct"><i data-lucide="check-circle"></i> Excelente! Resposta correta.</div>`;
+                lucide.createIcons();
+                document.getElementById('next-btn').classList.remove('hidden');
+            } else {
+                // Adiciona o vermelho na que ele clicou
+                clickedBtn.classList.add('incorrect');
+
+                // Procura qual era a verdadeira correta e mete verde nela!
+                allBtns.forEach(b => {
+                    if(b.getAttribute('data-id') == questionData.correctAnswer) {
+                        b.classList.add('correct');
+                    }
+                });
+
+                // Mostra que errou e adiciona o BOTÃO DA IA
+                feedbackBox.innerHTML = `
+                    <div class="feedback-box feedback-incorrect" style="flex-direction: column; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="x-circle"></i> Incorreto. A resposta certa está destacada a verde.
+                        </div>
+                        
+                        <button id="btn-pedir-dica" style="margin-top: 12px; padding: 6px 12px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; font-family: inherit; transition: 0.2s;">
+                            <i data-lucide="bot" style="width: 18px; height: 18px;"></i> Pedir dica ao Ciber-Mentor
+                        </button>
+                        
+                        <div id="ia-hint-container" style="margin-top: 10px; font-weight: normal; width: 100%;"></div>
+                    </div>
+                `;
+                lucide.createIcons();
+                document.getElementById('next-btn').classList.remove('hidden');
+
+                // Lógica da IA
+                document.getElementById('btn-pedir-dica').addEventListener('click', async function() {
+                    this.style.display = 'none';
+                    const hintContainer = document.getElementById('ia-hint-container');
+                    
+                    hintContainer.innerHTML = `<div style="display: flex; align-items: center; gap: 8px;"><i data-lucide="loader" class="spin-animation"></i> A pedir dica ao mentor...</div>`;
+                    lucide.createIcons();
+
+                    try {
+                        const iaRes = await fetch('/api/quiz/hint', {
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pergunta: questionData.question, respostaErrada: clickedBtn.textContent })
+                        });
+                        const iaData = await iaRes.json();
+                        
+                        hintContainer.innerHTML = `
+                            <div style="padding-top: 10px; border-top: 1px solid rgba(239, 68, 68, 0.3); margin-top: 5px;">
+                                <strong>Dica do Mentor:</strong> ${iaData.hint || "Pensa bem no conceito por trás desta pergunta."}
+                            </div>
+                        `;
+                    } catch (e) {
+                        hintContainer.innerHTML = `<div><i data-lucide="alert-triangle"></i> O Ciber-Mentor está offline de momento.</div>`;
+                        lucide.createIcons();
+                    }
+                });
+            }
+        }
+
+        async function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < miniQuestions.length) {
+                loadQuestion();
+            } else {
+                finalizarQuiz();
+            }
+        }
+
+        async function finalizarQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i data-lucide="award" style="width: 64px; height: 64px; color: var(--color-${corDinamica}); margin-bottom: 15px;"></i>
+                    <h3>🎉 Guia Concluído!</h3>
+                    <p style="font-size: 1.1rem; margin: 10px 0;">Acertaste <strong>${score}</strong> de ${miniQuestions.length} perguntas.</p>
+                    <p id="saving-score-msg" style="color: var(--text-secondary);"><i data-lucide="loader" class="spin-animation" style="width:16px;"></i> A guardar os teus pontos...</p>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // GUARDA OS PONTOS NA BASE DE DADOS!
+            try {
+                const res = await fetch('/api/quiz/save-score', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        categoria: quizCategoriaParaSalvar,
+                        dificuldade: 'facil',
+                        respostas_corretas: score,
+                        total_perguntas: miniQuestions.length
+                    })
+                });
+
+                const result = await res.json();
+                const msgBox = document.getElementById('saving-score-msg');
+
+                if (res.ok && score > 0) {
+                    msgBox.innerHTML = `<span style="color: #10b981; font-weight: bold;">+${result.pontos_ganhos} XP</span> &nbsp;|&nbsp; <span style="color: #3b82f6; font-weight: bold;">+${result.moedas_ganhas} Moedas</span> guardados!`;
+                } else if (score === 0) {
+                    msgBox.innerHTML = "Não ganhaste pontos desta vez. Tenta o Quiz Oficial!";
+                } else {
+                    msgBox.innerHTML = "Pontos calculados (joga os Quizzes oficiais para ganhar estrelas).";
+                }
+            } catch (e) {
+                document.getElementById('saving-score-msg').innerHTML = "Modo de treino concluído.";
             }
         }
 

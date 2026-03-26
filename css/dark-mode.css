@@ -888,6 +888,20 @@ body.dark-mode .user-card-name {
 }
 
 
+
+/* --- Quizzes page --- */
 body.dark-mode .diff-reward-box {
-  background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .quiz-option-seq.correct {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+body.dark-mode .quiz-option-seq.incorrect {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
 }
