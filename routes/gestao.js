@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 
 module.exports = (supabase) => {
 
@@ -21,48 +19,6 @@ module.exports = (supabase) => {
         next();
     };
 
-    const gerarHtmlTemplate = (titulo, cor_card, icone_card, tipo, htmlSeccoes, url_conteudo) => `<!DOCTYPE html>
-    <html lang="pt">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${titulo} - CiberHeróis</title>
-        <link rel="icon" type="image/x-icon" href="img/favicon.svg">
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="dark-mode.css">
-        <link rel="stylesheet" href="preloader.css">
-        <script src="https://unpkg.com/lucide@latest"></script>
-        <script src="theme.js"></script>
-        <script src="global-init.js"></script>
-    </head>
-    <body class="site-body">
-        <div id="global-loader">
-            <div class="loader-logo">Ciber<span>Heróis</span></div>
-            <div class="loader-spinner"></div>
-        </div>
-        <div id="includedContent"></div>
-        <div class="auth-container resource-detail-container">
-            <a href="resources" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
-            <div class="resource-header">
-                <div class="resource-header-icon resource-header-icon-${cor_card}">
-                    <i data-lucide="${icone_card}" class="icon-32"></i>
-                </div>
-                <div>
-                    <p class="resource-category">${tipo}</p>
-                    <h1 class="resource-title">${titulo}</h1>
-                </div>
-            </div>
-            <div class="resource-content">
-                ${htmlSeccoes}
-            </div>
-            <div class="resource-buttons">
-                <button class="resource-btn resource-btn-secondary" onclick="window.location.href='/api/pdf/download/${url_conteudo}'">
-                        <i data-lucide="download" class="icon-20"></i> Descarregar PDF
-                </button>
-            </div>
-        </div>
-    </body>
-    </html>`;
 
     // ==========================================
     // RECURSOS
@@ -84,30 +40,11 @@ module.exports = (supabase) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
         const id_professor = req.session.userId || 1;
 
-        let nomeFicheiro = url_conteudo + '.html';
-        let caminhoFicheiro = path.join(__dirname, '../pages', nomeFicheiro);
-
-        let htmlSeccoes = '';
-        seccoes.forEach(sec => {
-            htmlSeccoes += `
-            <div class="resource-section border-${cor_card}">
-                <div class="resource-section-content">
-                    <i data-lucide="${sec.icone}" class="icon-24 icon-${cor_card}"></i>
-                    <div><h2>${sec.titulo}</h2><p>${sec.texto}</p></div>
-                </div>
-            </div>`;
-        });
-
-        const htmlTemplate = gerarHtmlTemplate(titulo, cor_card, icone_card, tipo, htmlSeccoes, nomeFicheiro);
-
-        try { fs.writeFileSync(caminhoFicheiro, htmlTemplate, 'utf8'); }
-        catch (fsError) { return res.status(500).json({ error: "Erro ao criar ficheiro HTML." }); }
-
         const seccoesStr = JSON.stringify(seccoes);
         const tipoMinusculo = tipo.toLowerCase();
 
         const { error } = await supabase.from('materialpedagogico').insert([{
-            titulo, descricao, tipo: tipoMinusculo, cor_card, icone_card, url_conteudo: nomeFicheiro, id_professor, seccoes: seccoesStr
+            titulo, descricao, tipo: tipoMinusculo, cor_card, icone_card, url_conteudo, id_professor, seccoes: seccoesStr
         }]);
 
         if (error) return res.status(500).json({ error: error.message });
@@ -118,41 +55,20 @@ module.exports = (supabase) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
         const id = req.params.id;
 
-        let nomeFicheiro = url_conteudo + '.html';
-        let caminhoFicheiro = path.join(__dirname, '../pages', nomeFicheiro);
-
-        let htmlSeccoes = '';
-        seccoes.forEach(sec => {
-            htmlSeccoes += `
-            <div class="resource-section border-${cor_card}">
-                <div class="resource-section-content">
-                    <i data-lucide="${sec.icone}" class="icon-24 icon-${cor_card}"></i>
-                    <div><h2>${sec.titulo}</h2><p>${sec.texto}</p></div>
-                </div>
-            </div>`;
-        });
-
-        const htmlTemplate = gerarHtmlTemplate(titulo, cor_card, icone_card, tipo, htmlSeccoes, nomeFicheiro);
         const seccoesStr = JSON.stringify(seccoes);
         const tipoMinusculo = tipo.toLowerCase();
 
         try {
-            fs.writeFileSync(caminhoFicheiro, htmlTemplate, 'utf8');
             const { error } = await supabase.from('materialpedagogico').update({
-                titulo, descricao, tipo: tipoMinusculo, cor_card, icone_card, url_conteudo: nomeFicheiro, seccoes: seccoesStr
+                titulo, descricao, tipo: tipoMinusculo, cor_card, icone_card, url_conteudo, seccoes: seccoesStr
             }).eq('id_material', id);
 
             if (error) return res.status(500).json({ error: error.message });
             res.json({ message: 'Recurso atualizado!' });
-        } catch (err) { res.status(500).json({ error: "Erro ao atualizar ficheiro HTML." }); }
+        } catch (err) { res.status(500).json({ error: "Erro ao atualizar recurso." }); }
     });
 
     router.delete('/resources/:id', async (req, res) => {
-        const { data, error: selectErr } = await supabase.from('materialpedagogico').select('url_conteudo').eq('id_material', req.params.id).single();
-        if (!selectErr && data) {
-            const ficheiro = path.join(__dirname, '../pages', data.url_conteudo);
-            if (fs.existsSync(ficheiro)) fs.unlinkSync(ficheiro);
-        }
         const { error } = await supabase.from('materialpedagogico').delete().eq('id_material', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Apagado!' });

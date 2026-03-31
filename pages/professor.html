@@ -12,6 +12,40 @@
     <link rel="stylesheet" href="preloader.css">
     <link rel="stylesheet" href="popup_modal.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        /* Estilos PREMIUM de arrastar e soltar (SortableJS fallback) */
+        @keyframes cardFlutter {
+            0%, 100% { rotate: 1.2deg; }
+            50% { rotate: 0.8deg; }
+        }
+        .seccao-dragged {
+            rotate: 1.2deg;
+            scale: 1.02;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
+            opacity: 0.85 !important;
+            background-color: var(--bg-secondary, #ffffff) !important;
+            z-index: 999999 !important;
+            cursor: grabbing !important;
+            animation: cardFlutter 0.8s infinite ease-in-out; /* Tremor muito subtil e lento */
+        }
+        body.dark-mode .seccao-dragged {
+            background-color: #1e293b !important; /* fundo apropriado escuro */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
+        }
+        .seccao-placeholder {
+            opacity: 0.2 !important;
+            background: var(--bg-secondary) !important;
+            border: 2px dashed #8b5cf6 !important;
+            transform: scale(0.98);
+        }
+        .drag-handle {
+            cursor: grab;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+    </style>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
 </head>
@@ -41,7 +75,8 @@
     <div class="auth-container resources-container">
         <div class="gestao-header">
             <h1 class="resources-title">Painel de Controlo do Professor</h1>
-            <p style="color: var(--text-secondary); margin-top: 5px;">Gere os teus esquadrões, recursos e treinos táticos.</p>
+            <p style="color: var(--text-secondary); margin-top: 5px;">Gere os teus esquadrões, recursos e treinos
+                táticos.</p>
         </div>
 
         <div class="gestao-tabs">
@@ -103,15 +138,23 @@
                 </button>
                 <div class="filter-container" style="display: flex; gap: 15px; align-items: flex-end;">
                     <div>
-                        <label for="search-quiz" style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Pesquisar Pergunta:</label>
+                        <label for="search-quiz"
+                            style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Pesquisar
+                            Pergunta:</label>
                         <div style="position: relative;">
-                            <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-secondary);"></i>
-                            <input type="text" id="search-quiz" class="form-input" placeholder="Ex: Ransomware..." oninput="resetPaginationQuizzes()" style="padding-left: 30px; height: 36px; min-width: 250px;">
+                            <i data-lucide="search"
+                                style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-secondary);"></i>
+                            <input type="text" id="search-quiz" class="form-input" placeholder="Ex: Ransomware..."
+                                oninput="resetPaginationQuizzes()"
+                                style="padding-left: 30px; height: 36px; min-width: 250px;">
                         </div>
                     </div>
                     <div>
-                        <label for="filter-categoria" style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Filtrar Categoria:</label>
-                        <select id="filter-categoria" class="filter-select" onchange="resetPaginationQuizzes()" style="height: 36px;">
+                        <label for="filter-categoria"
+                            style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Filtrar
+                            Categoria:</label>
+                        <select id="filter-categoria" class="filter-select" onchange="resetPaginationQuizzes()"
+                            style="height: 36px;">
                             <option value="todas">Todas</option>
                         </select>
                     </div>
@@ -135,9 +178,11 @@
                     <tbody id="quizzes-tbody"></tbody>
                 </table>
                 <div class="pagination-container">
-                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaQuizzes(-1)" id="btn-prev-quiz"><i data-lucide="chevron-left"></i> Anterior</button>
+                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaQuizzes(-1)" id="btn-prev-quiz"><i
+                            data-lucide="chevron-left"></i> Anterior</button>
                     <span id="page-info-quiz" class="page-info">Pág 1 de 1</span>
-                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaQuizzes(1)" id="btn-next-quiz">Próxima <i data-lucide="chevron-right"></i></button>
+                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaQuizzes(1)" id="btn-next-quiz">Próxima
+                        <i data-lucide="chevron-right"></i></button>
                 </div>
             </div>
         </div>
@@ -148,20 +193,24 @@
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
                 <h2 id="titulo-modal-turma">Criar Nova Turma</h2>
-                <button type="button" class="close-modal-btn" onclick="closeModal('modal-turma')"><i data-lucide="x"></i></button>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-turma')"><i
+                        data-lucide="x"></i></button>
             </div>
             <form id="form-turma" onsubmit="salvarTurma(event)">
                 <div class="form-group">
                     <label>Nome da Turma (Ex: 10º A)</label>
-                    <input type="text" id="turma-nome" class="form-input" required placeholder="Escreve o nome da turma">
+                    <input type="text" id="turma-nome" class="form-input" required
+                        placeholder="Escreve o nome da turma">
                 </div>
                 <div class="form-group">
                     <label>Ano Letivo (Ex: 2023/2024)</label>
                     <input type="text" id="turma-ano" class="form-input" required placeholder="Escreve o ano letivo">
                 </div>
                 <div class="modal-actions" style="margin-top: 20px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-turma')">Cancelar</button>
-                    <button type="submit" id="btn-submit-turma" class="btn btn-primary" style="background-color: #10b981;">Guardar Turma</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-turma')">Cancelar</button>
+                    <button type="submit" id="btn-submit-turma" class="btn btn-primary"
+                        style="background-color: #10b981;">Guardar Turma</button>
                 </div>
             </form>
         </div>
@@ -171,7 +220,8 @@
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
                 <h2>Editar o Meu Esquadrão</h2>
-                <button type="button" class="close-modal-btn" onclick="closeModal('modal-editar-turma')"><i data-lucide="x"></i></button>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-editar-turma')"><i
+                        data-lucide="x"></i></button>
             </div>
             <form id="form-editar-turma" onsubmit="salvarEdicaoTurma(event)">
                 <input type="hidden" id="edit-turma-id">
@@ -184,8 +234,10 @@
                     <input type="text" id="edit-turma-ano" class="form-input" required>
                 </div>
                 <div class="modal-actions" style="margin-top: 20px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-editar-turma')">Cancelar</button>
-                    <button type="submit" id="btn-submit-edit-turma" class="btn btn-primary" style="background-color: #10b981;">Guardar</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-editar-turma')">Cancelar</button>
+                    <button type="submit" id="btn-submit-edit-turma" class="btn btn-primary"
+                        style="background-color: #10b981;">Guardar</button>
                 </div>
             </form>
         </div>
@@ -211,7 +263,8 @@
                     </thead>
                     <tbody id="alunos-tbody"></tbody>
                 </table>
-                <p id="msg-sem-alunos" style="text-align: center; color: var(--text-secondary); display: none; margin-top: 20px; font-style: italic;">
+                <p id="msg-sem-alunos"
+                    style="text-align: center; color: var(--text-secondary); display: none; margin-top: 20px; font-style: italic;">
                     Não existem alunos neste esquadrão.</p>
             </div>
         </div>
@@ -232,35 +285,54 @@
                             <label>Tipo (Categoria)</label>
                             <select id="rec-cat" class="form-input" required>
                                 <option value="documento">Documento</option>
-                                <option value="guia">Guia Prático</option>
+                                <option value="guia">Guia</option>
+                                <option value="guia-interativo">Guia Interativo</option>
                                 <option value="video">Vídeo</option>
                                 <option value="outro">Outro</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group"><label>Descrição Curta</label><input type="text" id="rec-desc" required></div>
-                    <label style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Cor do Tema:</label>
+                    <div class="form-group"><label>Descrição Curta</label><input type="text" id="rec-desc" required>
+                    </div>
+                    <label style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Cor do
+                        Tema:</label>
                     <div class="color-selector" id="color-picker">
-                        <div class="color-circle active" data-color="green" onclick="selectColor('green')" style="background: #10b981;"></div>
-                        <div class="color-circle" data-color="blue" onclick="selectColor('blue')" style="background: #3b82f6;"></div>
-                        <div class="color-circle" data-color="red" onclick="selectColor('red')" style="background: #ef4444;"></div>
-                        <div class="color-circle" data-color="purple" onclick="selectColor('purple')" style="background: #a855f7;"></div>
-                        <div class="color-circle" data-color="yellow" onclick="selectColor('yellow')" style="background: #eab308;"></div>
-                        <div class="color-circle" data-color="orange" onclick="selectColor('orange')" style="background: #f97316;"></div>
+                        <div class="color-circle active" data-color="green" onclick="selectColor('green')"
+                            style="background: #10b981;"></div>
+                        <div class="color-circle" data-color="blue" onclick="selectColor('blue')"
+                            style="background: #3b82f6;"></div>
+                        <div class="color-circle" data-color="red" onclick="selectColor('red')"
+                            style="background: #ef4444;"></div>
+                        <div class="color-circle" data-color="purple" onclick="selectColor('purple')"
+                            style="background: #a855f7;"></div>
+                        <div class="color-circle" data-color="yellow" onclick="selectColor('yellow')"
+                            style="background: #eab308;"></div>
+                        <div class="color-circle" data-color="orange" onclick="selectColor('orange')"
+                            style="background: #f97316;"></div>
                     </div>
                     <input type="hidden" id="rec-cor" value="green">
                     <div class="gestao-flex-row">
                         <div class="form-group" style="flex: 2;">
-                            <label style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Escolha um Ícone:</label>
+                            <label
+                                style="color: #64748b; margin-bottom: 10px; display: block; font-weight: bold;">Escolha
+                                um Ícone:</label>
                             <div class="icon-selector" id="icon-picker">
-                                <div class="icon-box active" data-icon="shield" onclick="selectIcon('shield')" title="Escudo / Segurança"><i data-lucide="shield"></i></div>
-                                <div class="icon-box" data-icon="book-open" onclick="selectIcon('book-open')" title="Livro / Estudo"><i data-lucide="book-open"></i></div>
-                                <div class="icon-box" data-icon="lock" onclick="selectIcon('lock')" title="Cadeado / Encriptação"><i data-lucide="lock"></i></div>
-                                <div class="icon-box" data-icon="key" onclick="selectIcon('key')" title="Chave / Password"><i data-lucide="key"></i></div>
-                                <div class="icon-box" data-icon="alert-triangle" onclick="selectIcon('alert-triangle')" title="Aviso / Perigo"><i data-lucide="alert-triangle"></i></div>
-                                <div class="icon-box" data-icon="file-text" onclick="selectIcon('file-text')" title="Documento / Ficheiro"><i data-lucide="file-text"></i></div>
-                                <div class="icon-box" data-icon="monitor" onclick="selectIcon('monitor')" title="Computador / Sistema"><i data-lucide="monitor"></i></div>
-                                <div class="icon-box" data-icon="video" onclick="selectIcon('video')" title="Vídeo"><i data-lucide="video"></i></div>
+                                <div class="icon-box active" data-icon="shield" onclick="selectIcon('shield')"
+                                    title="Escudo / Segurança"><i data-lucide="shield"></i></div>
+                                <div class="icon-box" data-icon="book-open" onclick="selectIcon('book-open')"
+                                    title="Livro / Estudo"><i data-lucide="book-open"></i></div>
+                                <div class="icon-box" data-icon="lock" onclick="selectIcon('lock')"
+                                    title="Cadeado / Encriptação"><i data-lucide="lock"></i></div>
+                                <div class="icon-box" data-icon="key" onclick="selectIcon('key')"
+                                    title="Chave / Password"><i data-lucide="key"></i></div>
+                                <div class="icon-box" data-icon="alert-triangle" onclick="selectIcon('alert-triangle')"
+                                    title="Aviso / Perigo"><i data-lucide="alert-triangle"></i></div>
+                                <div class="icon-box" data-icon="file-text" onclick="selectIcon('file-text')"
+                                    title="Documento / Ficheiro"><i data-lucide="file-text"></i></div>
+                                <div class="icon-box" data-icon="monitor" onclick="selectIcon('monitor')"
+                                    title="Computador / Sistema"><i data-lucide="monitor"></i></div>
+                                <div class="icon-box" data-icon="video" onclick="selectIcon('video')" title="Vídeo"><i
+                                        data-lucide="video"></i></div>
                             </div>
                             <input type="hidden" id="rec-icone" value="shield">
                         </div>
@@ -269,13 +341,26 @@
                 <div class="gestao-panel-section">
                     <h3 class="gestao-panel-title green">2. Conteúdo da Página HTML</h3>
                     <div id="seccoes-container"></div>
-                    <div style="text-align: center;">
-                        <button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Adicionar Outro Retângulo</button>
+                    <div
+                        style="text-align: center; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Secção
+                            Normal</button>
+                        <button type="button" class="btn" id="btn-add-praticas"
+                            onclick="adicionarSeccao('check-circle', 'Melhores Práticas', '', 'praticas')"
+                            style="background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid #10b981;"><i
+                                data-lucide="check-circle" style="width:16px;height:16px;"></i> + Boas Práticas</button>
+                        <button type="button" class="btn" id="btn-add-aviso"
+                            onclick="adicionarSeccao('alert-triangle', 'Pontos de Atenção', '', 'aviso')"
+                            style="background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid #f59e0b;"><i
+                                data-lucide="alert-triangle" style="width:16px;height:16px;"></i> + Pontos de
+                            Atenção</button>
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-recurso')">Cancelar</button>
-                    <button type="submit" id="btn-submit-recurso" class="btn btn-primary" style="background-color: #10b981;">Gravar e Gerar HTML</button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-recurso')">Cancelar</button>
+                    <button type="submit" id="btn-submit-recurso" class="btn btn-primary"
+                        style="background-color: #10b981;">Gravar e Gerar HTML</button>
                 </div>
             </form>
         </div>
@@ -285,42 +370,47 @@
         <div class="modal-content">
             <h2 id="titulo-modal-quiz">Adicionar Pergunta à BD</h2>
             <form id="form-quiz" onsubmit="salvarPergunta(event)">
-                
+
                 <div class="form-group">
                     <label>Categoria</label>
                     <select id="quiz-cat" class="form-input" required>
                         <option value="" disabled selected>A carregar da Base de Dados...</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Dificuldade</label>
                     <select id="quiz-diff" class="form-input" required>
                         <option value="" disabled selected>A carregar da Base de Dados...</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>A Pergunta</label>
                     <textarea id="quiz-texto" class="form-input" rows="2" required></textarea>
-                    
+
                     <div style="text-align: right; margin-top: 8px;">
-                        <button type="button" id="btn-ia-opcoes" class="btn btn-sm" onclick="gerarOpcoesIA()" style="background-color: #8b5cf6; border-color: #8b5cf6; color: white; font-size: 0.8rem; padding: 4px 10px;">
+                        <button type="button" id="btn-ia-opcoes" class="btn btn-sm" onclick="gerarOpcoesIA()"
+                            style="background-color: #8b5cf6; border-color: #8b5cf6; color: white; font-size: 0.8rem; padding: 4px 10px;">
                             <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Gerar Opções (IA)
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Opções de Resposta (Marque a certa)</label>
-                    <div class="radio-group"><input type="radio" name="correta" id="radio0" value="0" required> <input type="text" id="op0" class="form-input" placeholder="Opção 1" required></div>
-                    <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input type="text" id="op1" class="form-input" placeholder="Opção 2" required></div>
-                    <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input type="text" id="op2" class="form-input" placeholder="Opção 3" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio0" value="0" required> <input
+                            type="text" id="op0" class="form-input" placeholder="Opção 1" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio1" value="1"> <input
+                            type="text" id="op1" class="form-input" placeholder="Opção 2" required></div>
+                    <div class="radio-group"><input type="radio" name="correta" id="radio2" value="2"> <input
+                            type="text" id="op2" class="form-input" placeholder="Opção 3" required></div>
                 </div>
-                
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quiz')">Cancelar</button>
-                    <button type="submit" id="btn-submit-quiz" class="btn btn-primary" style="background-color: #10b981;">Guardar Pergunta</button>
+                    <button type="submit" id="btn-submit-quiz" class="btn btn-primary"
+                        style="background-color: #10b981;">Guardar Pergunta</button>
                 </div>
             </form>
         </div>
@@ -335,7 +425,8 @@
             <p id="texto-confirmacao" style="margin: 20px 0; color: var(--text-color);">Tem a certeza?</p>
             <div class="modal-actions" style="justify-content: center; gap: 15px;">
                 <button type="button" class="btn btn-secondary" id="btn-cancelar-confirmacao">Cancelar</button>
-                <button type="button" class="btn" id="btn-aceitar-confirmacao" style="background-color: #ef4444; color: white; border-color: #ef4444;">Confirmar Ação</button>
+                <button type="button" class="btn" id="btn-aceitar-confirmacao"
+                    style="background-color: #ef4444; color: white; border-color: #ef4444;">Confirmar Ação</button>
             </div>
         </div>
     </div>
@@ -348,7 +439,8 @@
             <h2>Sucesso!</h2>
             <p id="texto-sucesso" style="margin: 20px 0; color: var(--text-color); font-size: 1.1rem;"></p>
             <div class="modal-actions" style="justify-content: center;">
-                <button type="button" class="btn btn-primary" onclick="closeModal('modal-sucesso')" style="background-color: #10b981; border-color: #10b981;">Ok</button>
+                <button type="button" class="btn btn-primary" onclick="closeModal('modal-sucesso')"
+                    style="background-color: #10b981; border-color: #10b981;">Ok</button>
             </div>
         </div>
     </div>
@@ -378,13 +470,13 @@
 
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        
+
         function selectColor(color) {
             document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
             document.querySelector(`.color-circle[data-color="${color}"]`).classList.add('active');
             document.getElementById('rec-cor').value = color;
         }
-        
+
         function selectIcon(iconName) {
             document.querySelectorAll('.icon-box').forEach(b => b.classList.remove('active'));
             document.querySelector(`.icon-box[data-icon="${iconName}"]`).classList.add('active');
@@ -423,17 +515,17 @@
                 const baseUrl = window.location.pathname.includes('gestao') ? '/api/gestao' : '/api/professor';
                 const res = await fetch(`${baseUrl}/opcoes-quiz`);
                 const data = await res.json();
-                
+
                 const catSelect = document.getElementById('quiz-cat');
                 const diffSelect = document.getElementById('quiz-diff');
-                
+
                 // Preencher Categorias
                 catSelect.innerHTML = '<option value="" disabled selected>-- Escolhe uma Categoria --</option>';
                 data.categorias.forEach(cat => {
                     const nomeStr = cat.charAt(0).toUpperCase() + cat.slice(1);
                     catSelect.innerHTML += `<option value="${cat}">${nomeStr}</option>`;
                 });
-                
+
                 // Preencher Dificuldades
                 diffSelect.innerHTML = '<option value="" disabled selected>-- Escolhe a Dificuldade --</option>';
                 const pesos = { 'facil': 1, 'medio': 2, 'dificil': 3 };
@@ -580,9 +672,28 @@
             lucide.createIcons();
         }
 
-        function adicionarSeccao(icone = 'info', titulo = '', texto = '') {
+        function adicionarSeccao(icone = 'info', titulo = '', texto = '', tipo = 'normal') {
             const container = document.getElementById('seccoes-container');
 
+            // Bloquear duplicados de secções especiais
+            if (tipo === 'praticas' && container.querySelector('.seccao-item[data-tipo="praticas"]')) return;
+            if (tipo === 'aviso' && container.querySelector('.seccao-item[data-tipo="aviso"]')) return;
+
+            // Para tipos especiais, extrair os itens da lista HTML se estiver a editar
+            let listaItens = [];
+            if ((tipo === 'praticas' || tipo === 'aviso') && texto) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = texto;
+                tempDiv.querySelectorAll('li').forEach(li => listaItens.push(li.textContent.trim()));
+            }
+
+            const isEspecial = tipo === 'praticas' || tipo === 'aviso';
+            const corBorda = tipo === 'praticas' ? '#10b981' : tipo === 'aviso' ? '#f59e0b' : 'transparent';
+            const corFundo = tipo === 'praticas' ? 'rgba(16,185,129,0.06)' : tipo === 'aviso' ? 'rgba(245,158,11,0.06)' : 'transparent';
+            const labelTipo = tipo === 'praticas' ? '✅ Boas Práticas' : tipo === 'aviso' ? '⚠️ Pontos de Atenção' : '';
+            const borderStyle = isEspecial ? `border-left: 3px solid ${corBorda};` : '';
+
+            // Para secções normais, usar o select de ícones
             const opcoes = [
                 { val: 'info', nome: 'Informação (ℹ️)' },
                 { val: 'alert-triangle', nome: 'Atenção / Perigo (⚠️)' },
@@ -593,32 +704,135 @@
                 { val: 'help-circle', nome: 'Dúvida / Pergunta (❓)' }
             ];
 
+            let itensHTML = '';
+            if (isEspecial) {
+                if (listaItens.length > 0) {
+                    listaItens.forEach((item, i) => {
+                        itensHTML += `<div class="lista-item-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <input type="text" class="sec-list-item form-input" value="${item.replace(/"/g, '&quot;')}" placeholder="Item da lista..." style="flex: 1;">
+                            <button type="button" class="btn-danger" onclick="this.parentElement.remove()" style="padding: 4px 8px; border-radius: 6px; font-size: 14px;" title="Remover item"><i data-lucide="x" style="width:14px;height:14px;"></i></button>
+                        </div>`;
+                    });
+                } else {
+                    itensHTML = `<div class="lista-item-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <input type="text" class="sec-list-item form-input" placeholder="Item da lista..." style="flex: 1;">
+                        <button type="button" class="btn-danger" onclick="this.parentElement.remove()" style="padding: 4px 8px; border-radius: 6px; font-size: 14px;" title="Remover item"><i data-lucide="x" style="width:14px;height:14px;"></i></button>
+                    </div>`;
+                }
+            }
+
             let opcoesHTML = opcoes.map(op => `<option value="${op.val}" ${icone === op.val ? 'selected' : ''}>${op.nome}</option>`).join('');
 
             const html = `
-                <div class="form-group seccao-item">
+                <div class="form-group seccao-item" data-tipo="${tipo}" style="${borderStyle} background: ${corFundo}; border-radius: 8px; padding: 14px; margin-bottom: 12px; position: relative;">
+                    ${isEspecial ? `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 0.8rem; font-weight: 600; color: ${corBorda};">${labelTipo}</span>
+                        <button type="button" class="btn-danger" onclick="this.closest('.seccao-item').remove(); atualizarBotoesEspeciais();" style="padding: 4px 8px; border-radius: 6px;" title="Remover secção"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                    </div>` : `<div class="drag-handle" style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;"><i data-lucide="grip-vertical" style="width:16px;height:16px;color:var(--text-secondary);opacity:0.5;"></i><span style="font-size:0.75rem;color:var(--text-secondary);">Arrastar para reordenar</span></div>`}
                     <div class="gestao-flex-row">
                         <div style="flex: 1;">
                             <label>Ícone da Secção</label>
-                            <select class="sec-icon form-input" required>${opcoesHTML}</select>
+                            ${isEspecial ? `<input type="text" class="sec-icon form-input" value="${icone}" required>` : `<select class="sec-icon form-input" required>${opcoesHTML}</select>`}
                         </div>
                         <div style="flex: 2;">
                             <label>Título da Secção</label>
                             <input type="text" class="sec-title form-input" value="${titulo}" placeholder="Ex: O que é Phishing?" required>
                         </div>
                     </div>
-                    <label>Texto da Secção</label>
-                    <textarea class="sec-text form-input" rows="4" placeholder="Escreve o conteúdo aqui..." required>${texto}</textarea>
+                    ${isEspecial ? `
+                        <label style="margin-top: 8px;">Itens da Lista</label>
+                        <div class="sec-list-container">${itensHTML}</div>
+                        <button type="button" class="btn btn-secondary" onclick="adicionarItemLista(this)" style="margin-top: 6px; font-size: 0.8rem; padding: 4px 10px;">+ Adicionar Item</button>
+                    ` : `
+                        <label>Texto da Secção</label>
+                        <textarea class="sec-text form-input" rows="4" placeholder="Escreve o conteúdo aqui..." required>${texto}</textarea>
+                    `}
                 </div>`;
-            container.insertAdjacentHTML('beforeend', html);
+                
+            if (tipo === 'normal') {
+                const primeiraEspecial = container.querySelector('.seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"]');
+                if (primeiraEspecial) {
+                    primeiraEspecial.insertAdjacentHTML('beforebegin', html);
+                } else {
+                    container.insertAdjacentHTML('beforeend', html);
+                }
+            } else if (tipo === 'praticas') {
+                const aviso = container.querySelector('.seccao-item[data-tipo="aviso"]');
+                if (aviso) {
+                    aviso.insertAdjacentHTML('beforebegin', html);
+                } else {
+                    container.insertAdjacentHTML('beforeend', html);
+                }
+            } else {
+                container.insertAdjacentHTML('beforeend', html);
+            }
+
+            lucide.createIcons();
+            atualizarBotoesEspeciais();
         }
 
+        function atualizarBotoesEspeciais() {
+            const container = document.getElementById('seccoes-container');
+            const btnPraticas = document.getElementById('btn-add-praticas');
+            const btnAviso = document.getElementById('btn-add-aviso');
+            if (btnPraticas) {
+                btnPraticas.disabled = !!container.querySelector('.seccao-item[data-tipo="praticas"]');
+                btnPraticas.style.opacity = btnPraticas.disabled ? '0.4' : '1';
+                btnPraticas.style.cursor = btnPraticas.disabled ? 'not-allowed' : 'pointer';
+            }
+            if (btnAviso) {
+                btnAviso.disabled = !!container.querySelector('.seccao-item[data-tipo="aviso"]');
+                btnAviso.style.opacity = btnAviso.disabled ? '0.4' : '1';
+                btnAviso.style.cursor = btnAviso.disabled ? 'not-allowed' : 'pointer';
+            }
+        }
+
+        function adicionarItemLista(btn) {
+            const listContainer = btn.previousElementSibling;
+            const novoItem = `<div class="lista-item-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <input type="text" class="sec-list-item form-input" placeholder="Item da lista..." style="flex: 1;">
+                <button type="button" class="btn-danger" onclick="this.parentElement.remove()" style="padding: 4px 8px; border-radius: 6px; font-size: 14px;" title="Remover item"><i data-lucide="x" style="width:14px;height:14px;"></i></button>
+            </div>`;
+            listContainer.insertAdjacentHTML('beforeend', novoItem);
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // DRAG & DROP PREMIUM (SortableJS Fallback)
+        // ==========================================
+        let sortableInstance = null;
+        function initSortablePremium() {
+            const container = document.getElementById('seccoes-container');
+            if (sortableInstance) sortableInstance.destroy();
+            sortableInstance = new Sortable(container, {
+                animation: 250, // animação brutal e suave
+                handle: '.drag-handle',
+                filter: '.seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"]', // ignora especiais
+                preventOnFilter: false,
+                direction: 'vertical',
+                forceFallback: true, // força o uso JS custom ghost e abandona D&D nativo
+                fallbackOnBody: true, // EVITA QUE O CARTAO FIQUE PRESO DENTRO DO MODAL/SCROLL!
+                fallbackClass: 'seccao-dragged', // o cartão voador (inclinado)
+                ghostClass: 'seccao-placeholder', // o buraco escuro
+                onMove: function(evt) {
+                    // Funcionalidade Mágica: Impede a barra normal de ser arrastada "para debaixo" ou cruzar as secções fixas
+                    if (evt.related.getAttribute('data-tipo') === 'praticas' || evt.related.getAttribute('data-tipo') === 'aviso') {
+                        return false; // Bate contra uma parede invisível!
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initSortablePremium();
+        });
+
         function prepararNovoRecurso() {
-            editandoRecursoId = null; 
+            editandoRecursoId = null;
             document.getElementById('form-recurso').reset();
-            document.getElementById('seccoes-container').innerHTML = ''; 
+            document.getElementById('seccoes-container').innerHTML = '';
             adicionarSeccao();
-            document.getElementById('titulo-modal-recurso').textContent = 'Criar Novo Recurso'; 
+            document.getElementById('titulo-modal-recurso').textContent = 'Criar Novo Recurso';
             document.getElementById('btn-submit-recurso').textContent = 'Gravar e Gerar HTML';
             openModal('modal-recurso');
         }
@@ -640,19 +854,42 @@
 
             const container = document.getElementById('seccoes-container'); container.innerHTML = '';
             let seccoesGuardadas = []; if (r.seccoes) { try { seccoesGuardadas = JSON.parse(r.seccoes); } catch (e) { } }
-            if (seccoesGuardadas.length > 0) { seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto)); } else { adicionarSeccao(); }
+            if (seccoesGuardadas.length > 0) { seccoesGuardadas.forEach(sec => adicionarSeccao(sec.icone, sec.titulo, sec.texto, sec.tipo || 'normal')); } else { adicionarSeccao(); }
             document.getElementById('titulo-modal-recurso').textContent = 'Editar Recurso #' + id; document.getElementById('btn-submit-recurso').textContent = 'Atualizar Recurso'; openModal('modal-recurso');
         }
 
         async function salvarRecurso(e) {
             e.preventDefault();
             let seccoesArray = [];
-            const icones = document.querySelectorAll('.sec-icon');
-            const titulos = document.querySelectorAll('.sec-title');
-            const textos = document.querySelectorAll('.sec-text');
-            for (let i = 0; i < titulos.length; i++) {
-                seccoesArray.push({ icone: icones[i].value, titulo: titulos[i].value, texto: textos[i].value });
-            }
+            const seccaoItems = document.querySelectorAll('.seccao-item');
+
+            seccaoItems.forEach(item => {
+                const tipo = item.getAttribute('data-tipo') || 'normal';
+                const icone = item.querySelector('.sec-icon').value;
+                const titulo = item.querySelector('.sec-title').value;
+
+                let texto = '';
+                if (tipo === 'praticas' || tipo === 'aviso') {
+                    const listaInputs = item.querySelectorAll('.sec-list-item');
+                    const listaItems = [];
+                    listaInputs.forEach(input => {
+                        if (input.value.trim()) listaItems.push(`<li>${input.value.trim()}</li>`);
+                    });
+                    texto = `<ul class="resource-list">${listaItems.join('')}</ul>`;
+                } else {
+                    texto = item.querySelector('.sec-text').value;
+                }
+
+                const secObj = { icone, titulo, texto };
+                if (tipo !== 'normal') secObj.tipo = tipo;
+                seccoesArray.push(secObj);
+            });
+
+            // Ordenar por ordem rigorosa a pedido: Textos Normais (por ordem visual) -> Práticas -> Avisos Especiais (últimos sempre!)
+            const normais = seccoesArray.filter(s => !s.tipo);
+            const praticas = seccoesArray.filter(s => s.tipo === 'praticas');
+            const avisos = seccoesArray.filter(s => s.tipo === 'aviso');
+            seccoesArray = [...normais, ...praticas, ...avisos];
 
             const tituloInserido = document.getElementById('rec-titulo').value;
             const slug = tituloInserido.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "").trim().replace(/\s+/g, '-');
@@ -800,7 +1037,7 @@
                 paginatedQuizzes.forEach(q => {
                     let badge = q.dificuldade === 'facil' ? '🟢' : q.dificuldade === 'medio' ? '🟡' : '🔴';
                     let catCapitalized = q.categoria.charAt(0).toUpperCase() + q.categoria.slice(1);
-                    
+
                     novoHtmlContent += `
                         <tr>
                             <td><strong>#${q.id_pergunta}</strong></td>
@@ -814,17 +1051,17 @@
                         </tr>`;
                 });
             }
-            
+
             // 5. Injetar na Tabela
             document.getElementById('quizzes-tbody').innerHTML = novoHtmlContent;
             lucide.createIcons();
         }
 
         function prepararNovoQuiz() {
-            editandoQuizId = null; 
+            editandoQuizId = null;
             document.getElementById('form-quiz').reset();
-            document.getElementById('titulo-modal-quiz').textContent = 'Adicionar Pergunta à BD'; 
-            document.getElementById('btn-submit-quiz').textContent = 'Guardar Pergunta'; 
+            document.getElementById('titulo-modal-quiz').textContent = 'Adicionar Pergunta à BD';
+            document.getElementById('btn-submit-quiz').textContent = 'Guardar Pergunta';
             openModal('modal-quiz');
         }
 
@@ -834,29 +1071,29 @@
                 const res = await fetch(`/api/professor/quizzes/${id}`);
                 const data = await res.json();
                 const q = data.pergunta;
-                
+
                 // Preenche de forma inteligente pegando da atividade associada à pergunta se existir
                 const catValue = q.atividade ? q.atividade.categoria : q.categoria;
                 const diffValue = q.atividade ? q.atividade.dificuldade : q.dificuldade;
 
-                document.getElementById('quiz-cat').value = catValue; 
-                document.getElementById('quiz-diff').value = diffValue; 
+                document.getElementById('quiz-cat').value = catValue;
+                document.getElementById('quiz-diff').value = diffValue;
                 document.getElementById('quiz-texto').value = q.texto_pergunta;
-                
+
                 document.querySelectorAll('input[name="correta"]').forEach(r => r.checked = false);
-                
-                data.opcoes.forEach((op, index) => { 
-                    const inputTexto = document.getElementById('op' + index); 
-                    if (inputTexto) { 
-                        inputTexto.value = op.texto_opcao; 
+
+                data.opcoes.forEach((op, index) => {
+                    const inputTexto = document.getElementById('op' + index);
+                    if (inputTexto) {
+                        inputTexto.value = op.texto_opcao;
                         if (op.e_correta === true) {
-                            document.getElementById('radio' + index).checked = true; 
+                            document.getElementById('radio' + index).checked = true;
                         }
-                    } 
+                    }
                 });
-                
-                document.getElementById('titulo-modal-quiz').textContent = 'Editar Pergunta #' + id; 
-                document.getElementById('btn-submit-quiz').textContent = 'Atualizar Pergunta'; 
+
+                document.getElementById('titulo-modal-quiz').textContent = 'Editar Pergunta #' + id;
+                document.getElementById('btn-submit-quiz').textContent = 'Atualizar Pergunta';
                 openModal('modal-quiz');
             } catch (e) {
                 alert("Erro ao tentar carregar a pergunta para edição.");
@@ -867,24 +1104,24 @@
             e.preventDefault();
             let opcoesArray = [document.getElementById('op0').value, document.getElementById('op1').value, document.getElementById('op2').value];
             if (document.getElementById('op3') && document.getElementById('op3').value !== '') opcoesArray.push(document.getElementById('op3').value);
-            
-            const payload = { 
-                texto_pergunta: document.getElementById('quiz-texto').value, 
-                categoria: document.getElementById('quiz-cat').value, 
-                dificuldade: document.getElementById('quiz-diff').value, 
-                opcoes: opcoesArray, 
-                corretaIndex: document.querySelector('input[name="correta"]:checked').value 
+
+            const payload = {
+                texto_pergunta: document.getElementById('quiz-texto').value,
+                categoria: document.getElementById('quiz-cat').value,
+                dificuldade: document.getElementById('quiz-diff').value,
+                opcoes: opcoesArray,
+                corretaIndex: document.querySelector('input[name="correta"]:checked').value
             };
 
             const url = editandoQuizId ? `/api/professor/quizzes/${editandoQuizId}` : '/api/professor/quiz';
             const metodo = editandoQuizId ? 'PUT' : 'POST';
-            
+
             try {
                 const res = await fetch(url, { method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (res.ok) { 
-                    closeModal('modal-quiz'); 
-                    carregarQuizzes(); 
-                    mostrarSucesso(editandoQuizId ? 'Pergunta atualizada com sucesso!' : 'Nova pergunta adicionada!'); 
+                if (res.ok) {
+                    closeModal('modal-quiz');
+                    carregarQuizzes();
+                    mostrarSucesso(editandoQuizId ? 'Pergunta atualizada com sucesso!' : 'Nova pergunta adicionada!');
                 } else {
                     alert("Erro ao gravar pergunta no servidor.");
                 }
@@ -895,10 +1132,10 @@
 
         async function apagarQuiz(id) {
             const confirmado = await confirmarAcao('Tem a certeza? As opções ligadas a esta pergunta também serão apagadas.');
-            if (confirmado) { 
+            if (confirmado) {
                 try {
-                    await fetch(`/api/professor/quizzes/${id}`, { method: 'DELETE' }); 
-                    carregarQuizzes(); 
+                    await fetch(`/api/professor/quizzes/${id}`, { method: 'DELETE' });
+                    carregarQuizzes();
                 } catch (e) {
                     alert("Erro ao tentar apagar pergunta.");
                 }
@@ -911,7 +1148,7 @@
         // ==========================================
         async function gerarOpcoesIA() {
             const perguntaInput = document.getElementById('quiz-texto').value;
-            
+
             if (!perguntaInput || perguntaInput.length < 5) {
                 alert("Por favor, escreve uma pergunta válida na caixa antes de pedires ajuda à IA!");
                 return;
@@ -919,7 +1156,7 @@
 
             const btn = document.getElementById('btn-ia-opcoes');
             const btnOriginalText = btn.innerHTML;
-            
+
             // Dá feedback visual de loading
             btn.innerHTML = '<i data-lucide="loader" class="spin-icon" style="width: 14px; height: 14px;"></i> A pensar...';
             btn.disabled = true;
@@ -928,7 +1165,7 @@
             try {
                 // Adapta a rota consoante estejas na página de admin ou professor
                 const baseUrl = window.location.pathname.includes('gestao') ? '/api/gestao' : '/api/professor';
-                
+
                 const res = await fetch(`${baseUrl}/generate-options`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -942,15 +1179,15 @@
                     document.getElementById('op0').value = data.opcoes[0] || '';
                     document.getElementById('op1').value = data.opcoes[1] || '';
                     document.getElementById('op2').value = data.opcoes[2] || '';
-                    
+
                     // Limpa as seleções antigas e marca o rádio correto
                     document.querySelectorAll('input[name="correta"]').forEach(r => r.checked = false);
-                    
+
                     const radioCerto = document.getElementById(`radio${data.corretaIndex}`);
                     if (radioCerto) radioCerto.checked = true;
-                    
+
                     // Se houver uma 4ª opção visível (op3), limpa-a para evitar confusões
-                    if(document.getElementById('op3')) document.getElementById('op3').value = '';
+                    if (document.getElementById('op3')) document.getElementById('op3').value = '';
 
                 } else {
                     alert(data.error || "Erro desconhecido ao gerar opções.");

@@ -16,139 +16,17 @@ module.exports = (supabase) => {
 
     // Middleware de segurança (AGORA GUARDA O NOME DO PROFESSOR)
     const verificarProfessor = async (req, res, next) => {
-        if (!req.session.userId) return res.redirect('/404');
+        if (!req.session.userId) return res.redirect('/404.html');
 
         // Puxamos o "nome" da base de dados também!
         const { data: user, error } = await supabase.from('utilizador').select('role, nome').eq('id_utilizador', req.session.userId).single();
 
-        if (error || !user || (user.role !== 'professor' && user.role !== 'admin')) return res.redirect('/404');
+        if (error || !user || (user.role !== 'professor' && user.role !== 'admin')) return res.redirect('/404.html');
 
         // Guardamos o nome na "request" para usar mais à frente na criação do HTML
         req.nomeProfessor = user.nome;
 
         next();
-    };
-
-    // ==========================================
-    // RECURSOS DO PROFESSOR (GERAÇÃO DE HTML)
-    // ==========================================
-
-    // Função interna à prova de bala para gerar HTML
-    const gerarHTMLRecurso = (recurso, nomeAutor = 'Professor') => {
-        let seccoesHTML = '';
-        let seccoes = [];
-
-        let textoCompletoParaCalculo = (recurso.titulo || '') + " " + (recurso.descricao || '') + " ";
-
-        try {
-            if (recurso.seccoes) {
-                seccoes = typeof recurso.seccoes === 'string' ? JSON.parse(recurso.seccoes) : recurso.seccoes;
-            }
-        } catch (e) { console.error("Erro ao ler secções:", e); }
-
-        if (Array.isArray(seccoes) && seccoes.length > 0) {
-            seccoes.forEach(sec => {
-                const icone = sec.icone || 'info';
-                const titulo = sec.titulo || 'Secção';
-                const texto = sec.texto ? String(sec.texto) : '';
-
-                textoCompletoParaCalculo += titulo + " " + texto + " ";
-
-                const textoHTML = texto.replace(/\n/g, '<br>');
-
-                seccoesHTML += `
-            <div class="resource-section">
-                <div style="display: flex; align-items: flex-start; gap: 12px;">
-                    <i data-lucide="${icone}" class="icon-24" style="color: var(--primary-color); margin-top: 4px;"></i>
-                    <div>
-                        <h2>${titulo}</h2>
-                        <p>${textoHTML}</p>
-                    </div>
-                </div>
-            </div>`;
-            });
-        }
-
-        // --- CÁLCULO DO TEMPO DE LEITURA ---
-        const wpm = 225;
-        const arrayPalavras = textoCompletoParaCalculo.trim().split(/\s+/).filter(word => word.length > 0);
-        const totalPalavras = arrayPalavras.length;
-
-        let tempoLeituraMinutos = Math.ceil(totalPalavras / wpm);
-        if (tempoLeituraMinutos < 1) tempoLeituraMinutos = 1;
-
-        const tipoBadge = recurso.tipo ? String(recurso.tipo).charAt(0).toUpperCase() + String(recurso.tipo).slice(1) : 'Documento';
-        const cor = recurso.cor_card || 'blue';
-        const iconePrincipal = recurso.icone_card || 'shield';
-        const tituloRecurso = recurso.titulo || 'Recurso de Estudo';
-        const descRecurso = recurso.descricao || '';
-
-        const dataHoje = new Date().toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' });
-        const urlSemHtml = recurso.url_conteudo ? recurso.url_conteudo.replace('.html', '') : '';
-
-        return `<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${tituloRecurso} - CiberHeróis</title>
-    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="dark-mode.css">
-    <link rel="stylesheet" href="preloader.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="theme.js"></script>
-    <script src="global-init.js"></script>
-</head>
-<body class="site-body">
-    <div id="global-loader">
-        <div class="loader-logo">Ciber<span>Heróis</span></div>
-        <div class="loader-spinner"></div>
-    </div>
-
-    <div id="includedContent"></div>
-
-    <div class="auth-container resource-detail-container">
-        <a href="resources" class="resource-back-link"><i data-lucide="arrow-left" class="icon-20"></i> Voltar aos Recursos</a>
-        
-        <div class="resource-header">
-            <div class="resource-header-icon resource-header-icon-${cor}">
-                <i data-lucide="${iconePrincipal}" class="icon-32"></i>
-            </div>
-            <div>
-                <p class="resource-category">${tipoBadge}</p>
-                <h1 class="resource-title">${tituloRecurso}</h1>
-                <p style="color: var(--text-secondary); margin-top: 8px;">${descRecurso}</p>
-            </div>
-
-            <div class="resource-meta">
-                <span>📚 ${tempoLeituraMinutos} min de leitura</span>
-                <span>•</span>
-                <span>✍️ Professor ${nomeAutor}</span>
-                <span>•</span>
-                <span>📅 ${dataHoje}</span>
-            </div>
-        </div>
-
-        <div class="resource-content">
-            ${seccoesHTML}
-        </div>
-
-        <div class="resource-buttons">
-            <button class="resource-btn resource-btn-secondary" onclick="window.print()">
-                <i data-lucide="download" class="icon-20"></i> Guardar PDF
-            </button>
-        </div>
-        
-        <div class="resource-cta-box">
-            <h3>Teste os seus conhecimentos!</h3>
-            <p>Faça o quiz desta categoria e ganhe pontos táticos</p>
-            <a href="quizzes" class="resource-cta-link">Ir para os Quizzes</a>
-        </div>
-    </div>
-    <script>lucide.createIcons();</script>
-</body>
-</html>`;
     };
 
     // ==========================================
