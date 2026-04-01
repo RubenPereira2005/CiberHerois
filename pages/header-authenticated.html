@@ -70,5 +70,63 @@
                 <i data-lucide="log-out" class="auth-navbar-icon"></i>
             </button>
         </div>
+
+        <!-- Mobile: Logout always visible + Hamburger -->
+        <div class="mobile-navbar-actions">
+            <button onclick="window.fazerLogout()" class="auth-navbar-btn auth-navbar-logout" title="Sair">
+                <i data-lucide="log-out" class="auth-navbar-icon"></i>
+            </button>
+            <button class="hamburger-btn" id="hamburger-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+
+        <!-- Collapsible mobile menu -->
+        <div class="mobile-menu" id="mobile-menu">
+            <div class="mobile-menu-inner">
+                <a href="resources" class="mobile-menu-link auth-navbar-link">
+                    <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
+                    Recursos
+                </a>
+                <a href="quizzes" class="mobile-menu-link auth-navbar-link">
+                    <i data-lucide="help-circle" style="width: 18px; height: 18px;"></i>
+                    Quizzes
+                </a>
+
+                <div class="mobile-menu-divider"></div>
+
+                <a href="shop" class="mobile-menu-link">
+                    <i data-lucide="store" style="width: 18px; height: 18px;"></i>
+                    Loja
+                </a>
+                <a href="leaderboard" class="mobile-menu-link">
+                    <i data-lucide="chart-no-axes-column" style="width: 18px; height: 18px;"></i>
+                    Leaderboard
+                </a>
+                <a href="profile" class="mobile-menu-link">
+                    <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+                    Perfil
+                </a>
+                <a href="settings" class="mobile-menu-link">
+                    <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+                    Definições
+                </a>
+
+                <div class="mobile-menu-divider"></div>
+
+                <div class="mobile-menu-badges">
+                    <div class="mobile-badge">
+                        <img src="../img/coin.svg" alt="Moeda" style="width: 18px; height: 18px; object-fit: contain;">
+                        <span id="mobile-coin-balance">-- CC</span>
+                    </div>
+                    <div class="mobile-badge">
+                        <i data-lucide="trophy" style="width: 18px; height: 18px; color: #fcd34d;"></i>
+                        <span id="mobile-level">Nível --</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>

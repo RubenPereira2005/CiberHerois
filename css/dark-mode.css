@@ -17,6 +17,28 @@ body.dark-mode .auth-navbar-badge {
     border-color: #334155 !important;
 }
 
+/* Mobile menu dark mode */
+body.dark-mode .mobile-menu {
+    background: #1e293b !important;
+    box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .mobile-menu-inner {
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .mobile-menu-divider {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .mobile-badge {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .hamburger-line {
+    background: #f1f5f9;
+}
+
 /* Cards e Seções */
 body.dark-mode .quiz-card,
 body.dark-mode .resource-header,
@@ -374,7 +396,7 @@ body.dark-mode .profile-medal-title {
     color: #f1f5f9 !important;
 }
 
-/* --- Profile settings --- */
+/* --- Profile & Settings --- */
 
 /* Se o site tiver a classe .dark-mode ou .site-body.dark */
 body.dark-mode .settings-btn {
@@ -388,6 +410,77 @@ body.dark-mode .settings-btn:hover {
     background-color: rgba(255, 255, 255, 0.2);
     /* Mais visível ao passar o rato */
     border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Settings Layout Dark Mode */
+body.dark-mode .settings-sidebar,
+body.dark-mode .settings-content {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Apenas em ecrãs com menu lateral (Desktop e Tablet) */
+@media (min-width: 641px) {
+    body.dark-mode .settings-sidebar .sidebar-section.danger {
+        border-top-color: #334155 !important;
+    }
+}
+
+/* Telas pequenas (Móvel pílula horizontal) */
+@media (max-width: 640px) {
+    body.dark-mode .settings-sidebar {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    body.dark-mode .settings-sidebar .sidebar-section.danger {
+        border-top: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        border-left: 2px solid #334155 !important;
+    }
+}
+
+body.dark-mode .settings-tab {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .settings-tab:hover {
+    background: #334155 !important;
+    color: #60a5fa !important;
+}
+
+/* Desktop active state (blue line on left) */
+@media (min-width: 769px) {
+    body.dark-mode .settings-tab.active {
+        background: rgba(37, 99, 235, 0.1) !important;
+        color: #60a5fa !important;
+    }
+    
+    body.dark-mode .settings-tab[data-tab="danger"].active {
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #f87171 !important;
+    }
+}
+
+/* Form Styles Override in Settings */
+body.dark-mode .settings-card-header {
+    border-bottom-color: #334155 !important;
+}
+
+body.dark-mode .settings-card-title {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .settings-card-desc {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .input-wrapper-locked .form-input.locked {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #64748b !important;
 }
 
 /* ====== Dark Mode: Index Page Specifics ====== */
@@ -576,10 +669,7 @@ body.dark-mode .settings-content {
     border-color: #334155 !important;
 }
 
-/* Divisórias */
-body.dark-mode .settings-sidebar .sidebar-section.danger {
-    border-top: 1px solid #475569 !important;
-}
+/* Divisões e Bordas Corrigidas Anteriormente */
 
 body.dark-mode .settings-card-header {
     border-bottom-color: #334155 !important;
@@ -892,16 +982,4 @@ body.dark-mode .user-card-name {
 /* --- Quizzes page --- */
 body.dark-mode .diff-reward-box {
     background: rgba(255, 255, 255, 0.05) !important;
-}
-
-body.dark-mode .quiz-option-seq.correct {
-  background: rgba(16, 185, 129, 0.15) !important;
-  border-color: #10b981 !important;
-  color: #10b981 !important;
-}
-
-body.dark-mode .quiz-option-seq.incorrect {
-  background: rgba(239, 68, 68, 0.15) !important;
-  border-color: #ef4444 !important;
-  color: #ef4444 !important;
 }

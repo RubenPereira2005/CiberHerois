@@ -1,3 +1,8 @@
+/**
+ * GLOBAL-INIT.JS - Versão 100% Autónoma
+ * Gere o Loader, Header e o preenchimento automático de dados sem mexer nas páginas.
+ */
+
 // 1. Função global para esconder o loader
 window.esconderLoader = function() {
     const loader = document.getElementById('global-loader');
@@ -15,10 +20,10 @@ window.fazerLogout = async function() {
     try {
         await fetch('/api/logout', { method: 'POST' });
         // Limpa tokens locais se houver (por precaução) e redireciona
-        window.location.href = 'index';
+        window.location.href = 'index.html';
     } catch (e) {
         console.error("Erro ao terminar sessão", e);
-        window.location.href = 'index'; // Redireciona na mesma por segurança
+        window.location.href = 'index.html'; // Redireciona na mesma por segurança
     }
 };
 
@@ -34,8 +39,13 @@ window.atualizarHeaderGlobal = async function() {
 
             if (navPoints) navPoints.textContent = `${stats.pontos || 0} pts`;
             if (navLevel) navLevel.textContent = `Nível ${stats.nivel || 1}`;
-            
             if (navCoins) navCoins.textContent = `${stats.coins || 0} CC`; 
+            
+            // Sync mobile menu badges
+            const mobileCoins = document.getElementById('mobile-coin-balance');
+            const mobileLevel = document.getElementById('mobile-level');
+            if (mobileCoins) mobileCoins.textContent = `${stats.coins || 0} CC`;
+            if (mobileLevel) mobileLevel.textContent = `Nível ${stats.nivel || 1}`;
             
             return stats;
         }
@@ -85,13 +95,13 @@ window.iniciarPesquisa = function() {
                 if (Array.isArray(results) && results.length > 0) {
                     const matchExato = results.find(u => u.nome.trim().toLowerCase() === query.toLowerCase());
                     if (matchExato) {
-                        window.location.href = 'profile?id=' + matchExato.id_utilizador;
+                        window.location.href = 'profile.html?id=' + matchExato.id_utilizador;
                         return; 
                     }
                 }
             } catch (error) { console.error("Erro:", error); }
 
-            window.location.href = 'search?q=' + encodeURIComponent(query);
+            window.location.href = 'search.html?q=' + encodeURIComponent(query);
         }
     };
 
@@ -187,7 +197,7 @@ window.iniciarPesquisa = function() {
                     const nomeComHighlight = user.nome.replace(regexHighlight, "<span class='search-highlight'>$1</span>");
 
                     const item = document.createElement('a');
-                    item.href = 'profile?id=' + user.id_utilizador;
+                    item.href = 'profile.html?id=' + user.id_utilizador;
                     item.className = 'search-result-item';
                     
                     item.innerHTML = `
@@ -202,7 +212,7 @@ window.iniciarPesquisa = function() {
 
                 // Botão de "Ver todos"
                 const moreLink = document.createElement('a');
-                moreLink.href = 'search?q=' + encodeURIComponent(query);
+                moreLink.href = 'search.html?q=' + encodeURIComponent(query);
                 moreLink.className = 'search-result-item search-dropdown-footer'; 
                 moreLink.innerHTML = 'Ver todos os resultados <i data-lucide="arrow-right" style="width: 14px; height: 14px; margin-left: 4px; vertical-align: middle;"></i>';
                 dropdown.appendChild(moreLink);
@@ -223,13 +233,46 @@ window.iniciarPesquisa = function() {
     });
 };
 
+// 4. Função para inicializar o menu hamburger (mobile)
+window.iniciarHamburger = function() {
+    const hamburgerBtn = document.getElementById('hamburger-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (!hamburgerBtn || !mobileMenu) return;
+
+    hamburgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = mobileMenu.classList.toggle('open');
+        hamburgerBtn.classList.toggle('active', isOpen);
+        hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.auth-navbar') && mobileMenu.classList.contains('open')) {
+            mobileMenu.classList.remove('open');
+            hamburgerBtn.classList.remove('active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Close menu when a mobile link is clicked
+    mobileMenu.querySelectorAll('.mobile-menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            hamburgerBtn.classList.remove('active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('includedContent');
-    const isProfilePage = window.location.pathname.includes('profile');
+    const isProfilePage = window.location.pathname.includes('profile.html');
 
     // CENA A: Páginas com Header
     if (container) {
-        fetch('header-authenticated')
+        fetch('header-authenticated.html')
             .then(res => res.text())
             .then(async (html) => {
                 container.innerHTML = html;
@@ -241,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Navbar Link Ativo
-                const current = window.location.pathname.split('/').pop() || 'index';
+                const current = window.location.pathname.split('/').pop() || 'index.html';
                 document.querySelectorAll('.auth-navbar-link').forEach(link => {
                     if (link.getAttribute('href') === current) link.classList.add('auth-navbar-link-active');
                 });
@@ -253,10 +296,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 1.5. Inicia o campo de pesquisa dinâmico
                 window.iniciarPesquisa();
 
+                // 1.6. Inicializa o menu hamburger para mobile
+                window.iniciarHamburger();
+
                 // 2. Se for o PERFIL, o Global-Init encarrega-se de esperar pelos dados da página
                 if (isProfilePage) {
                     try {
-                        // Esperamos um pequeno delay para garantir que os scripts da página profile
+                        // Esperamos um pequeno delay para garantir que os scripts da página profile.html 
                         // iniciaram os seus fetches (atividade recente e estatísticas)
                         await new Promise(resolve => setTimeout(resolve, 600)); 
                         
