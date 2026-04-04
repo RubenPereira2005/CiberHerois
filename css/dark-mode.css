@@ -483,80 +483,136 @@ body.dark-mode .input-wrapper-locked .form-input.locked {
     color: #64748b !important;
 }
 
-/* ====== Dark Mode: Index Page Specifics ====== */
+/* ====== Dark Mode: Index Page (Redesigned) ====== */
 
-/* Secção Hero (Esquerda) */
-body.dark-mode .index-title {
-    color: #ffffff !important;
+/* Body background */
+body.dark-mode.index-body {
+    background: #0b1120;
 }
 
-body.dark-mode .index-subtitle {
-    color: #cbd5e1 !important;
-    /* Slate-300 para suavizar o subtítulo */
+/* Navbar glassmorphism */
+body.dark-mode .index-page-wrapper .navbar {
+    background: rgba(30, 41, 59, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-body.dark-mode .lead {
-    color: #94a3b8 !important;
+/* Hero badge */
+body.dark-mode .hero-badge {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.12), rgba(167, 139, 250, 0.12));
+    color: #93c5fd;
+    border-color: rgba(96, 165, 250, 0.2);
 }
 
-/* Painel de Destaque (Direita) */
-body.dark-mode .index-right {
-    background: linear-gradient(135deg, #1e293b, #0f172a) !important;
-    border: 1px solid #334155 !important;
+/* Hero title & text */
+body.dark-mode .index-hero .index-title {
+    color: #ffffff;
 }
 
-body.dark-mode .panel-title {
-    color: #ffffff !important;
+body.dark-mode .index-hero .index-subtitle {
+    color: #cbd5e1;
 }
 
-body.dark-mode .panel-desc {
-    color: #94a3b8 !important;
+body.dark-mode .index-hero .lead {
+    color: #94a3b8;
 }
 
-body.dark-mode .bubble {
-    background: #2563eb !important;
-    /* Mantém as bolhas azuis mas com brilho no escuro [cite: 49] */
-    opacity: 0.2;
+/* Hero btn secondary */
+body.dark-mode .hero-btn-secondary {
+    background: rgba(96, 165, 250, 0.1);
+    color: #93c5fd;
+    border-color: rgba(96, 165, 250, 0.2);
 }
 
-/* Cartões de Funcionalidades (Features) */
-body.dark-mode .feature-card {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3) !important;
+body.dark-mode .hero-btn-secondary:hover {
+    background: rgba(96, 165, 250, 0.18);
 }
 
-body.dark-mode .feature-title {
-    color: #ffffff !important;
+/* Hero visual card */
+body.dark-mode .hero-visual-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+    border-color: #334155;
 }
 
-body.dark-mode .feature-desc {
-    color: #94a3b8 !important;
+body.dark-mode .hero-orb {
+    opacity: 0.25;
 }
 
-/* Botão Secundário no Hero */
-body.dark-mode .btn-secondary {
-    background-color: #334155 !important;
-    color: #f1f5f9 !important;
+body.dark-mode .hero-visual-title {
+    color: #ffffff;
 }
 
-body.dark-mode .btn-secondary:hover {
-    background-color: #475569 !important;
+body.dark-mode .hero-visual-desc {
+    color: #94a3b8;
 }
 
-/* Footer */
-body.dark-mode .site-footer {
-    background-color: #0f172a !important;
-    border-top: 1px solid #334155 !important;
+/* Stat cards */
+body.dark-mode .stat-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-body.dark-mode .site-footer p {
-    color: #94a3b8 !important;
+body.dark-mode .stat-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
-body.dark-mode .cta-panel {
-    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+body.dark-mode .stat-value {
+    color: #ffffff;
+}
+
+body.dark-mode .stat-label {
+    color: #94a3b8;
+}
+
+/* Section headings */
+body.dark-mode .section-badge {
+    color: #60a5fa;
+}
+
+body.dark-mode .section-title {
+    color: #ffffff;
+}
+
+body.dark-mode .section-desc {
+    color: #94a3b8;
+}
+
+/* Feature cards v2 */
+body.dark-mode .feature-card-v2 {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .feature-card-v2:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .feature-title-v2 {
+    color: #ffffff;
+}
+
+body.dark-mode .feature-desc-v2 {
+    color: #94a3b8;
+}
+
+/* How it works */
+body.dark-mode .step-title {
+    color: #ffffff;
+}
+
+body.dark-mode .step-desc {
+    color: #94a3b8;
+}
+
+/* Index footer */
+body.dark-mode .index-footer {
+    background: #0f172a;
+    border-top-color: #334155;
+}
+
+body.dark-mode .index-footer p {
+    color: #64748b;
 }
 
 

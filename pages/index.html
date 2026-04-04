@@ -15,96 +15,211 @@
     <script src="global-init.js"></script>
 </head>
 
-<body>
+<body class="index-body">
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
         <div class="loader-spinner"></div>
     </div>
 
-    <nav class="navbar">
-        <div class="container navbar-inner">
-            <div class="nav-left">
-                <span class="site-title">CiberHeróis</span>
-            </div>
+    <!-- Mouse-following -->
+    <canvas id="cursor-glow-canvas" aria-hidden="true"></canvas>
 
-            <div class="nav-right">
-                <button class="icon-btn" id="theme-toggle" title="Alternar Modo">
-                    <i data-lucide="sun" class="icon-sm"></i>
-                </button>
+    <div class="index-page-wrapper">
 
-                <button class="icon-btn">
-                    <i data-lucide="search" class="icon-sm"></i>
-                </button>
-
-                <a href="login" class="icon-btn">
-                    <i data-lucide="user" class="icon-sm"></i>
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container main-content">
-        <section class="index-section">
-            <div class="index-left">
-                <p class="highlight">A melhor forma de aprender</p>
-                <h1 class="index-title">CiberHeróis</h1>
-                <h2 class="index-subtitle">Aprenda cibersegurança como um verdadeiro herói</h2>
-                <p class="lead">Aprenda cibersegurança de forma interativa e divertida. Complete quizzes, ganhe medalhas
-                    e torne-se um expert em segurança digital.</p>
-                <div class="cta-group">
-                    <a href="register" class="btn btn-primary">Começar Agora</a>
-                    <a href="login" class="btn btn-secondary">Iniciar Sessão</a>
-                </div>
-            </div>
-
-            <aside class="index-right">
-                <div class="panel-bubbles" aria-hidden="true">
-                    <div class="bubble" style="left: 20%; top: 30%;"></div>
-                    <div class="bubble" style="left: 80%; top: 60%;"></div>
-                    <div class="bubble" style="left: 50%; top: 10%;"></div>
+        <nav class="navbar">
+            <div class="container navbar-inner">
+                <div class="nav-left">
+                    <span class="site-title">CiberHeróis</span>
                 </div>
 
-                <div class="panel-content">
-                    <div class="shield-circle">
-                        <i data-lucide="shield" class="icon-lg"></i>
+                <div class="nav-right">
+                    <button class="icon-btn" id="theme-toggle" title="Alternar Modo">
+                        <i data-lucide="sun" class="icon-sm"></i>
+                    </button>
+
+                    <button class="icon-btn">
+                        <i data-lucide="search" class="icon-sm"></i>
+                    </button>
+
+                    <a href="login" class="icon-btn">
+                        <i data-lucide="user" class="icon-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="index-hero">
+            <div class="container">
+                <div class="index-hero-grid">
+                    <div class="index-hero-left">
+                        <div class="hero-badge">
+                            <i data-lucide="zap"></i>
+                            A melhor forma de aprender
+                        </div>
+
+                        <h1 class="index-title">
+                            <span class="title-accent">CiberHeróis</span>
+                        </h1>
+                        <h2 class="index-subtitle">Aprenda cibersegurança como um verdadeiro herói</h2>
+                        <p class="lead">
+                            Aprenda cibersegurança de forma interativa e divertida. Complete quizzes, ganhe medalhas
+                            e torne-se um expert em segurança digital.
+                        </p>
+
+                        <div class="hero-cta-group">
+                            <a href="register" class="hero-btn-primary" id="hero-cta-register">
+                                <i data-lucide="rocket"></i>
+                                Começar Agora
+                            </a>
+                            <a href="login" class="hero-btn-secondary" id="hero-cta-login">
+                                <i data-lucide="log-in"></i>
+                                Iniciar Sessão
+                            </a>
+                        </div>
                     </div>
-                    <h3 class="panel-title">Proteção Digital</h3>
-                    <p class="panel-desc">Aprenda a proteger-se online</p>
-                </div>
-            </aside>
-        </section>
 
-        <section class="features">
-            <div class="feature-card">
-                <div class="feature-icon blue">
-                    <i data-lucide="book-open" class="icon-sm white"></i>
-                </div>
-                <h3 class="feature-title">Aprendizagem Interativa</h3>
-                <p class="feature-desc">Quizzes dinâmicos sobre temas essenciais de cibersegurança</p>
-            </div>
+                    <div class="index-hero-visual">
+                        <div class="hero-visual-card">
+                            <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+                            <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+                            <div class="hero-orb hero-orb-3" aria-hidden="true"></div>
 
-            <div class="feature-card">
-                <div class="feature-icon purple">
-                    <i data-lucide="trophy" class="icon-sm white"></i>
+                            <div class="hero-shield-container">
+                                <div class="hero-shield-ring">
+                                    <i data-lucide="shield"></i>
+                                </div>
+                                <h3 class="hero-visual-title">Proteção Digital</h3>
+                                <p class="hero-visual-desc">Aprenda a proteger-se online</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="feature-title">Sistema de Gamificação</h3>
-                <p class="feature-desc">Ganhe pontos, suba de nível e conquiste medalhas especiais</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon green">
-                    <i data-lucide="award" class="icon-sm white"></i>
-                </div>
-                <h3 class="feature-title">Progresso Personalizado</h3>
-                <p class="feature-desc">Acompanhe o seu desenvolvimento e áreas de melhoria</p>
             </div>
         </section>
 
-        <section class="cta-section">
-            <div class="cta-panel">
-                <h2 class="cta-title">Pronto para começar?</h2>
-                <p class="cta-text">Junte-se a milhares de utilizadores que já estão a aprender cibersegurança</p>
-                <button onclick="window.location.href='register'" class="btn btn-white">Criar Conta Grátis</button>
+        <section class="index-stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <p class="stat-value" id="stat-users">500+</p>
+                        <p class="stat-label">Utilizadores</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i data-lucide="brain"></i>
+                        </div>
+                        <p class="stat-value" id="stat-quizzes">50+</p>
+                        <p class="stat-label">Quizzes</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        <p class="stat-value" id="stat-completed">10K+</p>
+                        <p class="stat-label">Completados</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i data-lucide="award"></i>
+                        </div>
+                        <p class="stat-value" id="stat-medals">200+</p>
+                        <p class="stat-label">Medalhas</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="index-features">
+            <div class="container">
+                <div class="section-header">
+                    <p class="section-badge">✦ Funcionalidades</p>
+                    <h2 class="section-title">Tudo o que precisas para aprender</h2>
+                    <p class="section-desc">
+                        Uma plataforma completa com ferramentas interativas para dominar a cibersegurança.
+                    </p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card-v2">
+                        <div class="feature-icon-v2 blue">
+                            <i data-lucide="book-open"></i>
+                        </div>
+                        <h3 class="feature-title-v2">Aprendizagem Interativa</h3>
+                        <p class="feature-desc-v2">Quizzes dinâmicos sobre temas essenciais de cibersegurança, com
+                            feedback imediato e explicações detalhadas.</p>
+                    </div>
+
+                    <div class="feature-card-v2">
+                        <div class="feature-icon-v2 purple">
+                            <i data-lucide="trophy"></i>
+                        </div>
+                        <h3 class="feature-title-v2">Sistema de Gamificação</h3>
+                        <p class="feature-desc-v2">Ganhe pontos, suba de nível e conquiste medalhas especiais. Compete
+                            no leaderboard com outros jogadores.</p>
+                    </div>
+
+                    <div class="feature-card-v2">
+                        <div class="feature-icon-v2 green">
+                            <i data-lucide="line-chart"></i>
+                        </div>
+                        <h3 class="feature-title-v2">Progresso Personalizado</h3>
+                        <p class="feature-desc-v2">Acompanhe o seu desenvolvimento e identifique áreas de melhoria com
+                            estatísticas detalhadas do seu perfil.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="index-how">
+            <div class="container">
+                <div class="section-header">
+                    <p class="section-badge">✦ Como Funciona</p>
+                    <h2 class="section-title">Três passos simples</h2>
+                    <p class="section-desc">
+                        Comece a sua jornada de cibersegurança em poucos minutos.
+                    </p>
+                </div>
+
+                <div class="how-steps">
+                    <div class="how-step">
+                        <div class="step-number n1">1</div>
+                        <h3 class="step-title">Cria uma Conta</h3>
+                        <p class="step-desc">Regista-te gratuitamente e personaliza o teu perfil com avatar e moldura.
+                        </p>
+                    </div>
+
+                    <div class="how-step">
+                        <div class="step-number n2">2</div>
+                        <h3 class="step-title">Completa Quizzes</h3>
+                        <p class="step-desc">Testa os teus conhecimentos com quizzes interativos sobre temas atuais.</p>
+                    </div>
+
+                    <div class="how-step">
+                        <div class="step-number n3">3</div>
+                        <h3 class="step-title">Sobe de Nível</h3>
+                        <p class="step-desc">Ganha pontos, desbloqueia medalhas e conquista o topo do leaderboard.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="index-cta">
+            <div class="container">
+                <div class="cta-card">
+                    <h2 class="cta-card-title">Pronto para começar?</h2>
+                    <p class="cta-card-text">Junte-se a milhares de utilizadores que já estão a aprender cibersegurança
+                        de forma divertida e interativa.</p>
+                    <a href="register" class="cta-btn-white" id="cta-register">
+                        <i data-lucide="shield-check"></i>
+                        Criar Conta Grátis
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -126,19 +241,104 @@
             </div>
         </div>
 
-    </main>
+        <footer class="index-footer">
+            <div class="container">
+                <p>© 2025 CiberHeróis. Todos os direitos reservados.</p>
+            </div>
+        </footer>
 
-    <footer class="site-footer">
-        <div class="container footer-inner">
-            <p>© 2025 CiberHeróis. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+    </div>
 
     <script>
         lucide.createIcons();
 
+        // Função Mouse following para o cursor 
+        (function () {
+            const canvas = document.getElementById('cursor-glow-canvas');
+            const ctx = canvas.getContext('2d');
+            let mouseX = -300, mouseY = -300;
+            let targetX = -300, targetY = -300;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            document.addEventListener('mousemove', (e) => {
+                targetX = e.clientX;
+                targetY = e.clientY;
+            });
+
+            function isDark() {
+                return document.body.classList.contains('dark-mode');
+            }
+
+            function draw() {
+                mouseX += (targetX - mouseX) * 0.15;
+                mouseY += (targetY - mouseY) * 0.15;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const dark = isDark();
+
+                const gridSpacing = 32;
+                const glowRadius = 150;
+
+                const startCol = Math.max(0, Math.floor((mouseX - glowRadius) / gridSpacing));
+                const endCol = Math.min(Math.ceil(canvas.width / gridSpacing) + 1, Math.ceil((mouseX + glowRadius) / gridSpacing) + 1);
+                const startRow = Math.max(0, Math.floor((mouseY - glowRadius) / gridSpacing));
+                const endRow = Math.min(Math.ceil(canvas.height / gridSpacing) + 1, Math.ceil((mouseY + glowRadius) / gridSpacing) + 1);
+
+                for (let row = startRow; row < endRow; row++) {
+                    for (let col = startCol; col < endCol; col++) {
+                        const x = col * gridSpacing;
+                        const y = row * gridSpacing;
+                        const dx = x - mouseX;
+                        const dy = y - mouseY;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < glowRadius) {
+                            const intensity = 1 - (dist / glowRadius);
+                            const alpha = intensity * (dark ? 0.28 : 0.18);
+                            const size = 1 + intensity * 1.5;
+
+                            ctx.fillStyle = dark
+                                ? `rgba(96, 165, 250, ${alpha})`
+                                : `rgba(37, 99, 235, ${alpha})`;
+
+                            ctx.beginPath();
+                            ctx.arc(x, y, size, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+
+                const gr = 160;
+                const glowGradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, gr);
+                if (dark) {
+                    glowGradient.addColorStop(0, 'rgba(59, 130, 246, 0.06)');
+                    glowGradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.02)');
+                    glowGradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+                } else {
+                    glowGradient.addColorStop(0, 'rgba(37, 99, 235, 0.045)');
+                    glowGradient.addColorStop(0.5, 'rgba(37, 99, 235, 0.015)');
+                    glowGradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+                }
+
+                ctx.fillStyle = glowGradient;
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, gr, 0, Math.PI * 2);
+                ctx.fill();
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // Notificação de erro de sessão
         document.addEventListener('DOMContentLoaded', () => {
-            // Verificar se a URL tem o aviso de erro
             const urlParams = new URLSearchParams(window.location.search);
             const erro = urlParams.get('erro');
 
@@ -146,26 +346,38 @@
                 const toast = document.getElementById('sessaoToast');
                 const closeBtn = document.getElementById('closeSessaoToast');
 
-                // Limpa a URL imediatamente
                 window.history.replaceState({}, document.title, window.location.pathname);
 
-                // Dá um pequeno atraso de meio segundo antes de mostrar o aviso
                 setTimeout(() => {
                     toast.classList.add('active');
                 }, 500);
 
-                // Fechar ao clicar no X
                 closeBtn.addEventListener('click', () => {
                     toast.classList.remove('active');
                 });
 
-                // Opcional: Fechar automaticamente após 8 segundos
                 setTimeout(() => {
                     if (toast.classList.contains('active')) {
                         toast.classList.remove('active');
                     }
                 }, 8500);
             }
+        });
+
+
+        const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card, .feature-card-v2, .how-step, .cta-card').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
         });
     </script>
 </body>
