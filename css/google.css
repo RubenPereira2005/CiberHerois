@@ -20,6 +20,8 @@
 
 #g_id_signin, #g_id_signup {
     width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 #g_id_signin iframe,
