@@ -1,26 +1,48 @@
-/* --- Efeitos Especiais para o Botão do Google (Corrigido) --- */
+/* --- Botão do Google (Responsivo) --- */
 
 #googleBtnContainer {
     display: flex;
     justify-content: center;
-    margin: 10px auto 15px auto;
-    border-radius: 40px; 
-    width: max-content;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+    margin: 8px auto 10px auto;
+    width: 100%;
+    max-width: 300px;
+    transition: transform 0.25s ease, filter 0.25s ease;
 }
 
 #googleBtnContainer:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4); 
+    transform: translateY(-2px);
+    filter: brightness(1.08);
 }
 
 #googleBtnContainer:active {
     transform: translateY(1px);
-    box-shadow: 0 2px 10px rgba(66, 133, 244, 0.2);
 }
 
 #g_id_signin, #g_id_signup {
-    border-radius: 40px;
-    overflow: hidden;
+    width: 100%;
+}
+
+#g_id_signin iframe,
+#g_id_signup iframe {
+    max-width: 100% !important;
+}
+
+/* --- Divider ("ou entrar/registar com Google") --- */
+.divider-container {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 10px 0 4px 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.divider-text {
+    margin: 0 10px;
+    color: #64748b;
+    font-size: 0.875rem;
 }

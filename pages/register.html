@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,13 +16,29 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="global-init.js"></script>
     <style>
-        .divider-container { display: flex; align-items: center; text-align: center; margin: 20px 0; }
-        .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
-        .divider-text { margin: 0 10px; color: #64748b; font-size: 0.875rem; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Reduce form gap so Google button section isn't too spaced */
+        #registerForm {
+            gap: 8px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body class="login-page">
 
     <div id="global-loader">
@@ -45,7 +62,7 @@
 
             <div id="registerBlock" class="fade-in">
                 <h3 class="login-subtitle">Criar uma conta</h3>
-                
+
                 <form id="registerForm" class="login-form">
                     <div class="form-group">
                         <label class="form-label">Email</label>
@@ -60,17 +77,19 @@
                     <div class="form-group">
                         <label class="form-label">Password</label>
                         <div class="password-input-wrapper">
-                            <input type="password" id="password" required class="form-input" placeholder="••••••••" autocomplete="new-password" />
+                            <input type="password" id="password" required class="form-input" placeholder="••••••••"
+                                autocomplete="new-password" />
                             <button type="button" onclick="toggleVisibility('password')" class="password-toggle-btn">
                                 <i data-lucide="eye" class="icon-eye"></i>
                             </button>
-                            
+
                             <div id="passwordRequirements" class="password-requirements">
                                 <p class="requirements-title">A sua palavra-passe deve conter:</p>
                                 <div class="requirement-item" id="req-length"><span>Pelo menos 8 caracteres</span></div>
                                 <div class="requirement-item" id="req-upper"><span>Uma letra maiúscula</span></div>
                                 <div class="requirement-item" id="req-number"><span>Um número</span></div>
-                                <div class="requirement-item" id="req-symbol"><span>Um símbolo (@, #, $, etc.)</span></div>
+                                <div class="requirement-item" id="req-symbol"><span>Um símbolo (@, #, $, etc.)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -78,8 +97,10 @@
                     <div class="form-group">
                         <label class="form-label">Confirmar Password</label>
                         <div class="password-input-wrapper">
-                            <input type="password" id="confirmPassword" required class="form-input" placeholder="••••••••" />
-                            <button type="button" onclick="toggleVisibility('confirmPassword')" class="password-toggle-btn">
+                            <input type="password" id="confirmPassword" required class="form-input"
+                                placeholder="••••••••" />
+                            <button type="button" onclick="toggleVisibility('confirmPassword')"
+                                class="password-toggle-btn">
                                 <i data-lucide="eye" class="icon-eye"></i>
                             </button>
                         </div>
@@ -93,7 +114,7 @@
                         <span class="divider-line"></span>
                     </div>
 
-                    <div id="googleBtnContainer"  style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <div id="googleBtnContainer">
                         <div id="g_id_signin"></div>
                     </div>
 
@@ -109,25 +130,28 @@
             </div>
 
             <div id="confirmationBlock" class="fade-in" style="display: none; text-align: center; padding: 10px 0;">
-                <div  style="background: rgba(16, 185, 129, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                    <i data-lucide="mail-check"  style="width: 40px; height: 40px; color: #10b981;"></i>
+                <div
+                    style="background: rgba(16, 185, 129, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i data-lucide="mail-check" style="width: 40px; height: 40px; color: #10b981;"></i>
                 </div>
                 <h3 class="login-subtitle">Verifica o teu E-mail</h3>
-                <p  style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.6; font-size: 0.95rem;">
+                <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.6; font-size: 0.95rem;">
                     Enviámos um link de ativação para <br>
-                    <strong id="displayUserEmail"  style="color: var(--text-color);"></strong>.<br><br>
+                    <strong id="displayUserEmail" style="color: var(--text-color);"></strong>.<br><br>
                     Clica no link que recebeste e depois volta aqui para entrares na academia.
                 </p>
 
-                <button type="button" id="btnCheckConfirmation" class="login-btn"  style="margin-bottom: 15px;">
+                <button type="button" id="btnCheckConfirmation" class="login-btn" style="margin-bottom: 15px;">
                     Já confirmei o e-mail
                 </button>
 
-                <p  style="margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary);">
-                    Não recebeste? <button type="button" id="btnResendEmail"  style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: bold; padding: 0;">Reenviar e-mail</button>
+                <p style="margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary);">
+                    Não recebeste? <button type="button" id="btnResendEmail"
+                        style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-weight: bold; padding: 0;">Reenviar
+                        e-mail</button>
                 </p>
-                <p  style="margin-top: 15px;">
-                    <a href="register" class="link-highlight"  style="font-size: 0.85rem;">Usar um e-mail diferente</a>
+                <p style="margin-top: 15px;">
+                    <a href="register" class="link-highlight" style="font-size: 0.85rem;">Usar um e-mail diferente</a>
                 </p>
             </div>
 
@@ -137,9 +161,8 @@
     <script>
         lucide.createIcons();
 
-        // COLOCA AQUI AS TUAS CHAVES DO SUPABASE
-        const supabaseUrl = 'https://TEU-URL.supabase.co';
-        const supabaseKey = 'TUA-CHAVE';
+        const supabaseUrl = 'https://xpmdiqqbgpzdditkbuzz.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwbWRpcXFiZ3B6ZGRpdGtidXp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDY5MzMsImV4cCI6MjA4ODIyMjkzM30.mwWcvrNrnLO_EjgbY9V1Ozdcfs9SBk0S4nWKxagiuUU';
         const db = supabase.createClient(supabaseUrl, supabaseKey);
 
         const passwordInput = document.getElementById('password');
@@ -147,7 +170,7 @@
         const toastContainer = document.getElementById('toast-container');
         const toastMessage = document.getElementById('toast-message-element');
         const toastIcon = document.getElementById('toast-icon-element');
-        
+
         function showToast(mensagem, tipo = 'error') {
             toastMessage.textContent = mensagem;
             toastContainer.className = `toast-container active ${tipo}`;
@@ -207,27 +230,27 @@
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         email: tempEmail,
                         username: document.getElementById('regUsername').value,
-                        password: tempPassword 
+                        password: tempPassword
                     })
                 });
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     // SUCESSO! Esconder o Formulário e Mostrar o Ecrã de Confirmação
                     document.getElementById('registerBlock').style.display = 'none';
                     document.getElementById('confirmationBlock').style.display = 'block';
                     document.getElementById('displayUserEmail').textContent = tempEmail;
                     showToast('Conta criada! Verifica o e-mail.', 'success');
-                } else { 
-                    showToast(data.error || 'Erro no registo.', 'error'); 
+                } else {
+                    showToast(data.error || 'Erro no registo.', 'error');
                     submitBtn.textContent = "Registar Novo Recruta";
                     submitBtn.disabled = false;
                 }
-            } catch (err) { 
-                showToast('Erro de ligação.', 'error'); 
+            } catch (err) {
+                showToast('Erro de ligação.', 'error');
                 submitBtn.textContent = "Registar Novo Recruta";
                 submitBtn.disabled = false;
             }
@@ -246,9 +269,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: tempEmail, password: tempPassword })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     // O e-mail está confirmado e o Node.js criou a sessão!
                     showToast('Identidade verificada! A entrar...', 'success');
@@ -299,12 +322,14 @@
         // --- GOOGLE LOGIN ---
         window.onload = function () {
             google.accounts.id.initialize({
-                client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com", 
+                client_id: "865272573225-lv2lfndmf2cvhsu7v63av77v8lq1au5u.apps.googleusercontent.com",
                 callback: handleGoogleResponse
             });
+            const gBtnEl = document.getElementById("g_id_signin");
+            const gBtnWidth = Math.min(300, gBtnEl.parentElement.offsetWidth - 4);
             google.accounts.id.renderButton(
-                document.getElementById("g_id_signin"),
-                { theme: "filled_black", size: "large", width: "300", text: "signup_with", shape: "pill" }
+                gBtnEl,
+                { theme: "filled_black", size: "large", width: gBtnWidth.toString(), text: "signup_with", shape: "pill" }
             );
         };
 
@@ -314,18 +339,19 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     // Enviamos a action 'register'
-                    body: JSON.stringify({ token: googleData.credential, action: 'register' }) 
+                    body: JSON.stringify({ token: googleData.credential, action: 'register' })
                 });
                 const data = await response.json();
                 if (response.ok) {
                     showToast('Conta Google associada com sucesso!', 'success');
                     sessionStorage.setItem('showLoginToast', 'true');
                     setTimeout(() => { window.location.href = data.role === 'admin' ? 'gestao' : 'quizzes'; }, 1000);
-                } else { 
-                    showToast(data.error || "Erro no Google Login", "error"); 
+                } else {
+                    showToast(data.error || "Erro no Google Login", "error");
                 }
             } catch (err) { showToast("Erro de ligação.", "error"); }
         }
     </script>
 </body>
+
 </html>
