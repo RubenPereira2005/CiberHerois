@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const { verificarEAtribuirMedalhas } = require('./medals');
 
 // --- CONFIGURAÇÃO DO MULTER (Memória em vez de Disco) ---
 const storage = multer.memoryStorage();
@@ -197,10 +198,17 @@ module.exports = (supabase) => {
 
                 if (updateError) throw updateError;
 
-                return res.json({ message: "Missão Concluída! Ganhaste +50 XP e +10 CiberCoins!", recompensa: true });
+                // Verificar a atribuição da medalha também nesta situação!
+                const novasMedalhas = await verificarEAtribuirMedalhas(supabase, req.session.userId);
+
+                return res.json({ 
+                    message: "Missão Concluída! Ganhaste +50 XP e +10 CiberCoins!", 
+                    recompensa: true,
+                    novas_medalhas: novasMedalhas
+                });
             }
 
-            // SE FOR UMA ATIVAÇÃO NORMAL (SEM VIR DO BANNER) OU SE ESTIVER A DESLIGAR
+            // 🔴 SE FOR UMA ATIVAÇÃO NORMAL (SEM VIR DO BANNER) OU SE ESTIVER A DESLIGAR
             const { error: normalUpdateError } = await supabase
                 .from('utilizador')
                 .update({ mfa_ativo: isAtivando })
@@ -208,9 +216,16 @@ module.exports = (supabase) => {
 
             if (normalUpdateError) throw normalUpdateError;
 
+            // Se está a ativar (mesmo sem vir do banner), verifica a medalha
+            let novasMedalhas = [];
+            if (isAtivando) {
+                novasMedalhas = await verificarEAtribuirMedalhas(supabase, req.session.userId);
+            }
+
             res.json({ 
                 message: isAtivando ? "MFA ativado com sucesso." : "MFA desativado. A tua conta está vulnerável!", 
-                recompensa: false 
+                recompensa: false,
+                novas_medalhas: novasMedalhas
             });
 
         } catch (error) {

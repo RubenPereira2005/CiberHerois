@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai'); // Importa a AI do Gemini
+const { verificarEAtribuirMedalhas } = require('./medals');
 
 module.exports = (supabase) => {
 
@@ -189,7 +190,15 @@ module.exports = (supabase) => {
                     coins: (userData.coins || 0) + moedasGanhas
                 }).eq('id_utilizador', req.session.userId);
             }
-            res.json({ message: "Guardado com sucesso!", pontos_ganhos: pontosGanhos, moedas_ganhas: moedasGanhas });
+            // --- VERIFICAR E ATRIBUIR MEDALHAS AUTOMATICAMENTE ---
+            const novasMedalhas = await verificarEAtribuirMedalhas(supabase, req.session.userId);
+
+            res.json({
+                message: "Guardado com sucesso!",
+                pontos_ganhos: pontosGanhos,
+                moedas_ganhas: moedasGanhas,
+                novas_medalhas: novasMedalhas
+            });
         } catch (err) {
             console.error("Erro ao guardar:", err.message);
             res.status(500).json({ error: "Erro interno." });

@@ -29,7 +29,7 @@
                 <div class="profile-header-left">
                     <div class="profile-avatar-container">
                         <div class="profile-avatar">
-                            </div>
+                        </div>
                         <button id="edit-avatar-btn" class="edit-avatar-btn" title="Mudar Avatar">
                             <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
                         </button>
@@ -50,16 +50,20 @@
                                     <span class="profile-header-badge-text" id="profile-points-badge">-- Pontos</span>
                                 </div>
                             </div>
-                            <div class="profile-header-badge" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
+                            <div class="profile-header-badge"
+                                style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="globe" class="profile-header-icon" style="color: #f59e0b;"></i>
-                                    <span class="profile-header-badge-text" id="profile-ranking-badge" style="color: #f59e0b;">Top --</span>
+                                    <span class="profile-header-badge-text" id="profile-ranking-badge"
+                                        style="color: #f59e0b;">Top --</span>
                                 </div>
                             </div>
-                            <div class="profile-header-badge" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
+                            <div class="profile-header-badge"
+                                style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">
                                 <div class="profile-header-badge-content">
                                     <i data-lucide="flame" class="profile-header-icon" style="color: #ef4444;"></i>
-                                    <span class="profile-header-badge-text" id="profile-streak-badge" style="color: #ef4444;">-- Dias</span>
+                                    <span class="profile-header-badge-text" id="profile-streak-badge"
+                                        style="color: #ef4444;">-- Dias</span>
                                 </div>
                             </div>
                         </div>
@@ -123,12 +127,14 @@
                 </div>
 
                 <div class="profile-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h2 class="profile-card-title" style="margin: 0;">
                             <i data-lucide="calendar" class="profile-card-icon"></i>
                             Atividade Recente
                         </h2>
-                        <a href="historico" id="btn-ver-historico" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                        <a href="historico" id="btn-ver-historico"
+                            style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                             Ver Tudo <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                         </a>
                     </div>
@@ -143,39 +149,8 @@
                     Medalhas
                 </h2>
 
-                <div class="profile-medals-list">
-                    <div class="profile-medal profile-medal-unlocked">
-                        <div class="profile-medal-content">
-                            <div class="profile-medal-emoji">🛡️</div>
-                            <div class="profile-medal-text">
-                                <div class="profile-medal-title">Guardião da Web</div>
-                                <div class="profile-medal-desc">Completou o módulo HTTPS com nota máxima.</div>
-                                <div class="profile-medal-date">Conquistada em 25/01/2026</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="profile-medal profile-medal-unlocked">
-                        <div class="profile-medal-content">
-                            <div class="profile-medal-emoji">🦅</div>
-                            <div class="profile-medal-text">
-                                <div class="profile-medal-title">Olho de Águia</div>
-                                <div class="profile-medal-desc">Identificou 10 emails de phishing corretamente.</div>
-                                <div class="profile-medal-date">Conquistada em 24/01/2026</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="profile-medal profile-medal-locked">
-                        <div class="profile-medal-content">
-                            <div class="profile-medal-emoji">🔒</div>
-                            <div class="profile-medal-text">
-                                <div class="profile-medal-title">Mestre das Passwords</div>
-                                <div class="profile-medal-desc">Crie uma password forte no simulador.</div>
-                                <div class="profile-medal-date profile-medal-status">Bloqueada</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="profile-medals-list" id="medals-list">
+                    <p style="color: var(--text-secondary); padding: 10px;">A carregar medalhas...</p>
                 </div>
             </div>
         </div>
@@ -261,11 +236,11 @@
         lucide.createIcons();
 
         // ==========================================
-        // FUNÇÕES GLOBAIS DE ATUALIZAÇÃO VISUAL
+        // FUNÇÕES GLOBAIS DE ATUALIZAÇÃO VISUAL (SEM REFRESH)
         // ==========================================
-        
+
         // 1. Filtros do Modal (Avatares vs Molduras)
-        window.filtrarModalPerfil = function(tipo, btnClicado) {
+        window.filtrarModalPerfil = function (tipo, btnClicado) {
             document.querySelectorAll('.modal-filter-btn').forEach(b => b.classList.remove('active'));
             btnClicado.classList.add('active');
 
@@ -279,15 +254,15 @@
         };
 
         // 2. Atualiza a foto principal do ecrã na hora (A "Sanduíche" Visual)
-        window.atualizarVisualDoAvatar = function(fotoUrl, molduraUrl) {
+        window.atualizarVisualDoAvatar = function (fotoUrl, molduraUrl) {
             const avatarElement = document.querySelector('.profile-avatar');
             if (!avatarElement) return;
-            
+
             let caminhoImagem = fotoUrl || 'default_avatar.png';
             if (!caminhoImagem.startsWith('http')) {
                 caminhoImagem = caminhoImagem.startsWith('upload-') ? `/img/uploads/${caminhoImagem}` : `/img/${caminhoImagem}`;
             }
-            
+
             let molduraHTML = '';
             if (molduraUrl) {
                 molduraHTML = `<img src="/img/${molduraUrl}" class="profile-border" alt="Moldura">`;
@@ -303,7 +278,7 @@
             // 1. Verificar se é Perfil Próprio ou Perfil Público
             const urlParams = new URLSearchParams(window.location.search);
             const publicUserId = urlParams.get('id');
-            const isPublicProfile = !!publicUserId; 
+            const isPublicProfile = !!publicUserId;
             const endpointUrl = isPublicProfile ? '/api/user/' + publicUserId : '/api/me';
 
             try {
@@ -317,7 +292,7 @@
                 if (response.ok) {
                     const nomeElement = document.querySelector('.profile-header-title');
                     const emailElement = document.querySelector('.profile-header-email');
-                    
+
                     if (nomeElement) nomeElement.textContent = data.nome;
 
                     // LÓGICA DE PRIVACIDADE PARA PERFIL PÚBLICO
@@ -328,7 +303,7 @@
                         document.querySelector('.profile-progress').style.display = 'none';
 
                         // Estatísticas
-                        if (!data.showEstatisticas) { 
+                        if (!data.showEstatisticas) {
                             const statsGrid = document.querySelector('.profile-stats-grid');
                             if (statsGrid) statsGrid.closest('.profile-card').style.display = 'none';
                         } else if (data.estatisticas) {
@@ -470,7 +445,7 @@
 
                     // --- RENDERIZAR O AVATAR E MOLDURA ---
                     window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
-                    
+
                     lucide.createIcons();
 
                     // --- SE FOR O PRÓPRIO UTILIZADOR, CARREGA AS FUNCIONALIDADES DE EDIÇÃO ---
@@ -478,6 +453,7 @@
                         inicializarSistemaAvatares(data);
                         carregarAtividadeRecente();
                         carregarEstatisticas();
+                        carregarMedalhas(null); // null = perfil próprio
                     } else {
                         // Se for perfil público, preenche a atividade recente recebida do servidor
                         if (data.showHistorico !== false && data.atividades_recentes) {
@@ -504,6 +480,10 @@
                                 contentor.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Ainda não existem atividades registadas.</p>';
                             }
                         }
+                        // Carregar medalhas do perfil público (se privacidade o permitir)
+                        if (data.showMedalhas !== false) {
+                            carregarMedalhas(publicUserId);
+                        }
                     }
                 }
             } catch (error) { console.error("Erro ao carregar perfil:", error); }
@@ -523,7 +503,7 @@
                 btnOpen.onclick = (e) => {
                     e.preventDefault();
                     modalAvatar.classList.remove('hidden');
-                    carregarGrelhaModal(); 
+                    carregarGrelhaModal();
                 };
             }
             if (overlay) overlay.onclick = () => modalAvatar.classList.add('hidden');
@@ -535,9 +515,9 @@
                     const response = await fetch('/api/shop/itens');
                     if (!response.ok) return;
                     const shopItems = await response.json();
-                    
+
                     const grid = document.getElementById('modal-items-grid');
-                    grid.innerHTML = ''; 
+                    grid.innerHTML = '';
 
                     // Opção "Sem Moldura" 
                     const isNenhumaMoldura = !data.moldura_perfil;
@@ -550,22 +530,22 @@
                     `;
 
                     shopItems.forEach(item => {
-                        const isEquipado = item.tipo === 'avatar' 
-                            ? item.imagem_url === data.foto_perfil 
+                        const isEquipado = item.tipo === 'avatar'
+                            ? item.imagem_url === data.foto_perfil
                             : item.imagem_url === data.moldura_perfil;
 
                         const classeLocked = item.comprado ? '' : 'locked-avatar';
                         const classeExtraImagem = item.tipo === 'moldura' ? 'is-border' : '';
-                        
+
                         let estiloContainer = '';
                         if (isEquipado) {
-                            estiloContainer = item.tipo === 'avatar' 
-                                ? 'border: 3px solid var(--primary-color);' 
+                            estiloContainer = item.tipo === 'avatar'
+                                ? 'border: 3px solid var(--primary-color);'
                                 : 'box-shadow: inset 0 0 0 3px var(--primary-color); background: rgba(59,130,246,0.1); border-radius: 50%;';
                         }
 
                         const cadeadoHtml = item.comprado ? '' : `<i data-lucide="lock" class="avatar-lock-icon" style="width: 32px; height: 32px;"></i>`;
-                        
+
                         // Esconde o preço se for grátis (preco 0) ou se já estiver comprado
                         const pricePillHtml = (item.comprado || item.preco === 0) ? '' : `
                             <div class="avatar-price-pill">
@@ -582,17 +562,17 @@
                         `;
                     });
                     lucide.createIcons();
-                    
+
                     // Força o clique no separador que estiver ativo para filtrar corretamente
                     const btnAtivo = document.querySelector('.modal-filter-btn.active');
-                    if(btnAtivo) btnAtivo.click();
+                    if (btnAtivo) btnAtivo.click();
 
                 } catch (error) { console.error("Erro ao carregar modal:", error); }
 
                 // Injetar Fotos Pessoais (Upload/Google)
                 const personalSection = document.getElementById('personal-avatars-section');
                 if (personalSection) {
-                    personalSection.innerHTML = ''; 
+                    personalSection.innerHTML = '';
                     if (data.foto_upload) {
                         let linkUpload = data.foto_upload.startsWith('http') ? data.foto_upload : `/img/uploads/${data.foto_upload}`;
                         const isEquipado = data.foto_upload === data.foto_perfil ? 'border: 3px solid var(--primary-color);' : '';
@@ -624,7 +604,7 @@
                 if (e.target.closest('.modal-filter-btn')) return;
 
                 const container = e.target.closest('.avatar-option-container');
-                if (!container) return; 
+                if (!container) return;
 
                 const tipoItem = container.getAttribute('data-tipo');
                 const comprado = container.getAttribute('data-comprado') === 'true';
@@ -646,7 +626,7 @@
                         if (res.ok) {
                             if (tipoItem === 'avatar') data.foto_perfil = url;
                             if (tipoItem === 'moldura') data.moldura_perfil = url;
-                            
+
                             window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
                             modalAvatar.classList.add('hidden');
                         }
@@ -665,7 +645,7 @@
                                 body: JSON.stringify({ id_item: idItem })
                             });
                             const resultData = await res.json();
-                            
+
                             if (res.ok) {
                                 data.coins = resultData.novasCoins;
 
@@ -677,7 +657,7 @@
 
                                 if (tipoItem === 'avatar') data.foto_perfil = url;
                                 if (tipoItem === 'moldura') data.moldura_perfil = url;
-                                
+
                                 window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
 
                                 if (typeof window.atualizarHeaderGlobal === 'function') window.atualizarHeaderGlobal();
@@ -706,7 +686,7 @@
                         const response = await fetch('/api/upload-avatar', { method: 'POST', body: formData });
                         const resData = await response.json();
                         if (response.ok) {
-                            data.foto_upload = resData.filename; 
+                            data.foto_upload = resData.filename;
                             data.foto_perfil = resData.filename;
                             window.atualizarVisualDoAvatar(data.foto_perfil, data.moldura_perfil);
                             modalAvatar.classList.add('hidden');
@@ -767,7 +747,7 @@
 
                 document.getElementById('profile-points-badge').textContent = `${stats.pontos || 0} pts`;
                 document.getElementById('profile-level-badge').textContent = `Nível ${stats.nivel}`;
-                
+
                 const badgeRanking = document.getElementById('profile-ranking-badge');
                 if (badgeRanking) badgeRanking.textContent = stats.ranking !== '--' ? `Top #${stats.ranking}` : 'Top --';
 
@@ -779,6 +759,60 @@
                 document.getElementById('profile-progress-bar-fill').style.width = `${stats.progresso_perc}%`;
             } catch (error) {
                 console.error("Erro ao carregar estatísticas:", error);
+            }
+        }
+
+        // ==========================================
+        // SISTEMA DE MEDALHAS DINÂMICO
+        // ==========================================
+        async function carregarMedalhas(publicUserId) {
+            const medalsList = document.getElementById('medals-list');
+            if (!medalsList) return;
+
+            try {
+                // Para perfil próprio usa /api/medals/mine (mostra bloqueadas também)
+                // Para perfil público, a privacidade já foi verificada pelo servidor
+                const url = publicUserId ? `/api/medals/public/${publicUserId}` : '/api/medals/mine';
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    medalsList.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Sem medalhas para mostrar.</p>';
+                    return;
+                }
+
+                const medalhas = await response.json();
+
+                if (!medalhas || medalhas.length === 0) {
+                    medalsList.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Este utilizador ainda não ganhou nenhuma medalha.</p>';
+                    return;
+                }
+
+                medalsList.innerHTML = medalhas.map(m => {
+                    const desbloqueada = m.desbloqueada;
+                    const dataFmt = m.data_conquista
+                        ? 'Conquistada em ' + new Date(m.data_conquista).toLocaleDateString('pt-PT')
+                        : '';
+
+                    return `
+                        <div class="profile-medal ${desbloqueada ? 'profile-medal-unlocked' : 'profile-medal-locked'}">
+                            <div class="profile-medal-content">
+                                <div class="profile-medal-emoji">${desbloqueada ? m.icone : '🔒'}</div>
+                                <div class="profile-medal-text">
+                                    <div class="profile-medal-title">${m.nome}</div>
+                                    <div class="profile-medal-desc">${m.descricao}</div>
+                                    ${desbloqueada
+                            ? `<div class="profile-medal-date">${dataFmt}</div>`
+                            : `<div class="profile-medal-date profile-medal-status">Bloqueada</div>`
+                        }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('Erro ao carregar medalhas:', err);
+                medalsList.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Erro ao carregar medalhas.</p>';
             }
         }
 
