@@ -5,7 +5,7 @@
     justify-content: center;
     margin: 8px auto 10px auto;
     width: 100%;
-    max-width: 300px;
+    overflow: visible;
     transition: transform 0.25s ease, filter 0.25s ease;
 }
 
@@ -18,15 +18,16 @@
     transform: translateY(1px);
 }
 
-#g_id_signin, #g_id_signup {
-    width: 100%;
+#g_id_signin,
+#g_id_signup {
     display: flex;
     justify-content: center;
+    overflow: visible;
 }
 
 #g_id_signin iframe,
 #g_id_signup iframe {
-    max-width: 100% !important;
+    max-width: none !important;
 }
 
 /* --- Divider ("ou entrar/registar com Google") --- */
