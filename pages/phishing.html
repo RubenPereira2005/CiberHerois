@@ -1,293 +1,691 @@
-<!--Ainda sem css e a nao ser usado-->
-
-
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detetor de Phishing - CiberHeróis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="Simulador interativo de phishing. Analise emails e aprenda a identificar tentativas de ataque.">
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+
+    <style>
+        /* ========================================
+           SIMULADOR DE PHISHING — Estilos
+           ======================================== */
+        .phishing-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .phishing-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #3b82f6;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: opacity 0.2s;
+        }
+        .phishing-back-link:hover { opacity: 0.8; }
+
+        /* Header do Jogo */
+        .phishing-header {
+            margin-bottom: 30px;
+        }
+        .phishing-header-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .phishing-header-icon {
+            background: rgba(239, 68, 68, 0.1);
+            padding: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .phishing-header-icon i { color: #ef4444; width: 30px; height: 30px; }
+        .phishing-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+        }
+        .phishing-subtitle {
+            color: #64748b;
+            font-size: 1.05rem;
+            margin: 0 0 15px 0;
+        }
+
+        /* Barra de Progresso */
+        .phishing-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .phishing-progress-label { color: #64748b; }
+        .phishing-score-label { color: #3b82f6; font-weight: 700; }
+        .phishing-progress-track {
+            width: 100%;
+            background: #e2e8f0;
+            border-radius: 50px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .phishing-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            border-radius: 50px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        /* ==========================================
+           CARTÃO DE EMAIL
+           ========================================== */
+        .sim-email-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+        .sim-email-header {
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 18px 24px;
+        }
+        .sim-email-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .sim-email-field:last-child { margin-bottom: 0; }
+        .sim-email-label {
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 65px;
+        }
+        .sim-email-from {
+            font-family: 'Courier New', monospace;
+            background: #e2e8f0;
+            color: #1e293b;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .sim-email-subject {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .sim-email-body {
+            padding: 24px;
+        }
+        .sim-email-body-text {
+            color: #334155;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-family: inherit;
+            margin: 0;
+        }
+
+        /* ==========================================
+           DARK MODE — EMAIL CARD
+           ========================================== */
+        body.dark-mode .sim-email-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .sim-email-header {
+            background: #0f172a !important;
+            border-bottom-color: #334155 !important;
+        }
+        body.dark-mode .sim-email-label {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .sim-email-from {
+            background: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode .sim-email-subject {
+            color: #f1f5f9 !important;
+        }
+        body.dark-mode .sim-email-body-text {
+            color: #cbd5e1 !important;
+        }
+
+        /* DARK MODE — Textos do Header do Jogo */
+        body.dark-mode .phishing-title { color: #ffffff !important; }
+        body.dark-mode .phishing-subtitle { color: #94a3b8 !important; }
+        body.dark-mode .phishing-progress-label { color: #94a3b8 !important; }
+        body.dark-mode .phishing-score-label { color: #60a5fa !important; }
+        body.dark-mode .phishing-progress-track { background: #334155 !important; }
+        body.dark-mode .phishing-back-link { color: #60a5fa !important; }
+
+        /* ==========================================
+           BOTÕES DE DECISÃO
+           ========================================== */
+        .phishing-actions {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 500px) {
+            .phishing-actions { grid-template-columns: 1fr !important; }
+        }
+        .phishing-action-btn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 24px;
+            border: none !important;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #ffffff !important;
+            text-decoration: none;
+        }
+        .phishing-action-btn i { width: 22px; height: 22px; color: #ffffff !important; }
+        .phishing-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .phishing-action-btn:active { transform: translateY(0); }
+        .phishing-action-btn.safe-btn {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+        }
+        .phishing-action-btn.danger-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        }
+
+        .phishing-next-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+        .phishing-next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ==========================================
+           FEEDBACK
+           ========================================== */
+        .phishing-feedback {
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            border: 1px solid;
+            animation: phishing-fadeIn 0.3s ease;
+        }
+        @keyframes phishing-fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .phishing-feedback.correct {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .phishing-feedback.wrong {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        .feedback-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .feedback-title i { width: 22px; height: 22px; }
+        .feedback-message {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+        body.dark-mode .feedback-message { color: #f1f5f9 !important; }
+        .feedback-detail-box {
+            background: rgba(255,255,255,0.5);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        body.dark-mode .feedback-detail-box {
+            background: rgba(0,0,0,0.2) !important;
+        }
+        .feedback-detail-label {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        body.dark-mode .feedback-detail-label { color: #94a3b8 !important; }
+        .feedback-indicator {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+        body.dark-mode .feedback-indicator { color: #cbd5e1 !important; }
+        .feedback-indicator:last-child { margin-bottom: 0; }
+        .feedback-indicator i { width: 16px; height: 16px; margin-top: 3px; flex-shrink: 0; }
+
+        /* ==========================================
+           DICAS
+           ========================================== */
+        .phishing-tips {
+            background: rgba(59, 130, 246, 0.06);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-top: 40px;
+        }
+        .phishing-tips-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .phishing-tips-title i { width: 18px; height: 18px; }
+        .phishing-tips ul {
+            list-style: disc;
+            padding-left: 20px;
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+        body.dark-mode .phishing-tips {
+            background: rgba(59, 130, 246, 0.08) !important;
+            border-color: rgba(59, 130, 246, 0.2) !important;
+        }
+        body.dark-mode .phishing-tips-title { color: #60a5fa !important; }
+        body.dark-mode .phishing-tips ul { color: #94a3b8 !important; }
+
+        /* ==========================================
+           ECRÃ DE RESULTADOS
+           ========================================== */
+        .phishing-results-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .phishing-results-overlay.active { display: flex; }
+        .phishing-results-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            animation: phishing-fadeIn 0.4s ease;
+        }
+        body.dark-mode .phishing-results-card {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+        .phishing-results-icon { margin-bottom: 20px; }
+        .phishing-results-icon i { width: 70px; height: 70px; stroke-width: 1.5; }
+        .phishing-results-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        body.dark-mode .phishing-results-title { color: #ffffff !important; }
+        .phishing-results-text {
+            color: #64748b;
+            font-size: 1.05rem;
+            margin-bottom: 25px;
+        }
+        body.dark-mode .phishing-results-text { color: #94a3b8 !important; }
+        .phishing-results-score-box {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+        .phishing-results-score-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        .phishing-results-score-value {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .phishing-results-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Loading State */
+        .phishing-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        body.dark-mode .phishing-loading { color: #94a3b8 !important; }
+        .phishing-loading i {
+            width: 40px;
+            height: 40px;
+            animation: spin-fast 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin-fast { 100% { transform: rotate(360deg); } }
+
+        /* Esconder */
+        .phishing-hidden { display: none !important; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-900">
 
-    <nav class="bg-blue-600 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <a href="dashboard" class="text-xl font-bold tracking-tight hover:opacity-90 transition-opacity">
-                    CiberHeróis
-                </a>
-                <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-                    <a href="resources" class="hover:text-blue-200 transition-colors opacity-90">Recursos</a>
-                    <a href="dashboard" class="hover:text-blue-200 transition-colors opacity-90">Quizzes</a>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="hidden sm:flex items-center gap-3 bg-blue-700 px-4 py-1.5 rounded-lg border border-blue-500/30 shadow-sm">
-                    <i data-lucide="trophy" class="w-4 h-4 text-yellow-300"></i>
-                    <div class="flex flex-col leading-none">
-                        <span class="text-xs font-bold text-blue-100 uppercase tracking-wide">Nível 2</span>
-                        <span class="text-[10px] text-blue-200">150 pts</span>
-                    </div>
-                </div>
-                <a href="profile" class="p-2 hover:bg-blue-700 rounded-full transition-colors" title="Ver Perfil">
-                    <i data-lucide="user" class="w-5 h-5"></i>
-                </a>
-                <a href="index" class="p-2 hover:bg-blue-700 rounded-full transition-colors text-blue-200 hover:text-white" title="Sair">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </a>
-            </div>
-        </div>
-    </nav>
+<body class="site-body">
 
-    <div id="game-container" class="max-w-4xl mx-auto px-6 py-12">
-        <a href="dashboard" class="flex items-center gap-2 mb-6 text-blue-600 hover:text-blue-700 transition-colors font-medium">
-            <i data-lucide="arrow-left" class="w-5 h-5"></i>
-            Voltar ao Dashboard
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+
+    <!-- ========== ECRÃ DO JOGO ========== -->
+    <div id="game-container" class="phishing-container">
+        <a href="quizzes" class="phishing-back-link">
+            <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+            Voltar aos Quizzes
         </a>
 
-        <div class="mb-8">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="bg-red-100 p-3 rounded-full">
-                    <i data-lucide="mail" class="text-red-600 w-8 h-8"></i>
+        <div class="phishing-header">
+            <div class="phishing-header-top">
+                <div class="phishing-header-icon">
+                    <i data-lucide="mail"></i>
                 </div>
-                <h1 class="text-gray-900 text-3xl font-bold">
-                    Detetor de Phishing
-                </h1>
+                <h1 class="phishing-title">Detetor de Phishing</h1>
             </div>
-            <p class="text-gray-600 mb-4 text-lg">
+            <p class="phishing-subtitle">
                 Analise cada email e identifique se é <strong>Legítimo</strong> ou <strong>Phishing</strong>.
             </p>
 
-            <div class="flex items-center justify-between text-sm font-medium mb-2">
-                <span class="text-gray-600" id="progress-text">Email 1 de 5</span>
-                <span class="text-blue-600 font-bold" id="score-text">Pontuação: 0</span>
+            <div class="phishing-stats">
+                <span class="phishing-progress-label" id="progress-text">A carregar...</span>
+                <span class="phishing-score-label" id="score-text">Pontuação: 0</span>
             </div>
-
-            <div class="w-full bg-gray-200 rounded-full h-3">
-                <div id="progress-bar" class="bg-blue-600 h-3 rounded-full transition-all duration-300 shadow-md" style="width: 20%"></div>
+            <div class="phishing-progress-track">
+                <div id="progress-bar" class="phishing-progress-fill"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-200">
-            <div class="bg-gray-50 border-b border-gray-200 p-5">
-                <div class="mb-3 flex flex-wrap gap-2">
-                    <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider w-16">De:</span>
-                    <span id="email-from" class="text-gray-900 font-mono text-sm bg-gray-200 px-2 py-0.5 rounded">...</span>
+        <!-- Estado de Loading -->
+        <div id="loading-state" class="phishing-loading">
+            <i data-lucide="loader"></i>
+            <p>A carregar emails da base de dados...</p>
+        </div>
+
+        <!-- Email Card -->
+        <div id="email-display" class="phishing-hidden">
+            <div class="sim-email-card">
+                <div class="sim-email-header">
+                    <div class="sim-email-field">
+                        <span class="sim-email-label">De:</span>
+                        <span id="email-from" class="sim-email-from">...</span>
+                    </div>
+                    <div class="sim-email-field">
+                        <span class="sim-email-label">Assunto:</span>
+                        <span id="email-subject" class="sim-email-subject">...</span>
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider w-16">Assunto:</span>
-                    <span id="email-subject" class="text-gray-900 font-medium">...</span>
+                <div class="sim-email-body">
+                    <pre id="email-body" class="sim-email-body-text">...</pre>
                 </div>
             </div>
 
-            <div class="p-8 bg-white">
-                <pre id="email-body" class="text-gray-700 whitespace-pre-wrap font-sans text-base leading-relaxed">...</pre>
+            <!-- Feedback -->
+            <div id="feedback-area" class="phishing-feedback phishing-hidden">
+                <div id="feedback-title" class="feedback-title"></div>
+                <p id="feedback-message" class="feedback-message"></p>
+                <div class="feedback-detail-box">
+                    <p class="feedback-detail-label">Análise Detalhada:</p>
+                    <div id="feedback-list"></div>
+                </div>
             </div>
-        </div>
 
-        <div id="feedback-area" class="hidden border rounded-xl p-6 mb-6 shadow-sm animate-fade-in">
-            <h3 id="feedback-title" class="mb-4 flex items-center gap-2 text-xl font-bold">
-                </h3>
-            <p id="feedback-message" class="text-gray-800 mb-4 font-medium text-lg">
-                </p>
-            <div class="bg-white/50 p-4 rounded-lg">
-                <p class="text-gray-500 mb-3 font-semibold text-xs uppercase tracking-wide">
-                    Análise Detalhada:
-                </p>
-                <ul id="feedback-list" class="space-y-2 text-gray-700">
-                    </ul>
+            <!-- Botões de Ação -->
+            <div id="action-buttons" class="phishing-actions">
+                <button onclick="checkAnswer(false)" class="phishing-action-btn safe-btn" id="btn-legitimate">
+                    <i data-lucide="check-circle"></i>
+                    Email Legítimo
+                </button>
+                <button onclick="checkAnswer(true)" class="phishing-action-btn danger-btn" id="btn-phishing">
+                    <i data-lucide="alert-triangle"></i>
+                    É Phishing!
+                </button>
             </div>
-        </div>
 
-        <div id="action-buttons" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button onclick="checkAnswer(false)" class="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-3 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                <i data-lucide="check-circle" class="w-6 h-6"></i>
-                Email Legítimo
-            </button>
-            <button onclick="checkAnswer(true)" class="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-xl transition-all flex items-center justify-center gap-3 font-bold shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                É Phishing!
+            <!-- Botão Próximo -->
+            <button id="next-button" onclick="nextEmail()" class="phishing-next-btn phishing-hidden">
+                Próximo Email <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
             </button>
         </div>
 
-        <button id="next-button" onclick="nextEmail()" class="hidden w-full bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition-colors font-bold shadow-lg text-lg flex items-center justify-center gap-2">
-            Próximo Email <i data-lucide="arrow-right" class="w-5 h-5"></i>
-        </button>
-
-        <div class="bg-blue-50 rounded-xl p-6 mt-12 border border-blue-100">
-            <h3 class="text-blue-900 mb-3 flex items-center gap-2 font-bold">
-                <i data-lucide="info" class="text-blue-600 w-5 h-5"></i>
+        <!-- Dicas -->
+        <div class="phishing-tips">
+            <div class="phishing-tips-title">
+                <i data-lucide="info"></i>
                 Dicas Rápidas
-            </h3>
-            <ul class="text-blue-800 space-y-2 text-sm list-disc list-inside opacity-90">
-                <li>Verifique sempre o remetente (erros ortográficos são comuns).</li>
-                <li>Desconfie de urgência ("Sua conta será bloqueada em 24h").</li>
-                <li>Nunca clique em links sem verificar o destino real.</li>
+            </div>
+            <ul>
+                <li>Verifique sempre o remetente — erros ortográficos e domínios estranhos são comuns.</li>
+                <li>Desconfie de urgência — "Sua conta será bloqueada em 24h" é um sinal clássico.</li>
+                <li>Nunca clique em links sem verificar o destino real (passe o rato por cima).</li>
+                <li>Empresas legítimas nunca pedem passwords ou dados bancários por email.</li>
             </ul>
         </div>
     </div>
 
-    <div id="results-container" class="hidden min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 text-center max-w-md w-full border border-gray-100 transform transition-all scale-100">
-            <div class="mb-6 flex justify-center animate-bounce">
-                <div class="bg-yellow-100 p-6 rounded-full">
-                    <i data-lucide="trophy" class="w-16 h-16 text-yellow-500"></i>
-                </div>
+    <!-- ========== ECRÃ DE RESULTADOS ========== -->
+    <div id="results-overlay" class="phishing-results-overlay">
+        <div class="phishing-results-card">
+            <div id="result-icon" class="phishing-results-icon"></div>
+            <h2 class="phishing-results-title">Simulação Completa!</h2>
+            <p id="result-text" class="phishing-results-text">Identificou corretamente X de Y emails</p>
+
+            <div class="phishing-results-score-box">
+                <p class="phishing-results-score-label">Recompensa Total</p>
+                <p id="result-score" class="phishing-results-score-value">A calcular...</p>
             </div>
 
-            <h2 class="text-gray-900 text-3xl mb-2 font-bold">
-                Jogo Completo!
-            </h2>
-            <p id="final-score-text" class="text-gray-500 mb-8 text-lg">
-                Identificou corretamente X de Y emails
-            </p>
-
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 mb-8 shadow-inner text-white">
-                <span class="block text-blue-200 text-sm uppercase tracking-wide font-semibold mb-1">Total Ganho</span>
-                <p id="final-points" class="text-4xl font-bold">
-                    0 pts
-                </p>
-            </div>
-
-            <div class="flex flex-col gap-3">
-                <button onclick="location.reload()" class="bg-blue-600 text-white px-6 py-3.5 rounded-xl hover:bg-blue-700 transition-colors font-bold shadow-lg">
+            <div class="phishing-results-actions">
+                <button onclick="location.reload()" class="btn btn-primary">
                     Jogar Novamente
                 </button>
-                <a href="dashboard" class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-6 py-3.5 rounded-xl transition-colors font-medium">
-                    Voltar ao Dashboard
+                <a href="quizzes" class="btn btn-secondary" style="text-align: center;">
+                    Voltar aos Quizzes
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        // Dados dos Emails
-        const emails = [
-            {
-                id: 1,
-                from: 'noreply@paypa1-security.com',
-                subject: 'URGENTE: Verifique a sua conta imediatamente!',
-                body: `Prezado cliente,\n\nDetectamos atividade suspeita na sua conta PayPal. A sua conta será suspensa em 24 horas se não verificar os seus dados imediatamente.\n\nClique aqui para verificar: http://paypa1-verify.com/secure\n\nAtenciosamente,\nEquipe PayPal`,
-                isPhishing: true,
-                indicators: ['Domínio suspeito (paypa1 em vez de paypal)', 'Senso de urgência excessivo', 'Link suspeito', 'Ameaça de suspensão']
-            },
-            {
-                id: 2,
-                from: 'notifications@linkedin.com',
-                subject: 'João Silva visualizou o seu perfil',
-                body: `Olá,\n\nJoão Silva e 3 outras pessoas visualizaram o seu perfil esta semana.\n\nVeja quem está interessado no seu perfil profissional.\n\nVer perfil: https://www.linkedin.com/notifications\n\nCumprimentos,\nEquipa LinkedIn`,
-                isPhishing: false,
-                indicators: ['Domínio oficial do LinkedIn', 'Sem senso de urgência', 'Link para o site oficial', 'Formatação profissional']
-            },
-            {
-                id: 3,
-                from: 'suporte@banco-santander.urgent.tk',
-                subject: 'Confirmação de Transferência de €5.000',
-                body: `Caro Cliente,\n\nFoi realizada uma transferência de €5.000 da sua conta.\n\nSe não reconhece esta operação, clique AQUI IMEDIATAMENTE para cancelar.\n\nTEMPO RESTANTE: 15 minutos\n\nBanco Santander\nDepartamento de Segurança`,
-                isPhishing: true,
-                indicators: ['Domínio suspeito (.tk)', 'Urgência extrema', 'Valor alto para causar pânico', 'Solicitação de ação imediata']
-            },
-            {
-                id: 4,
-                from: 'noreply@amazon.pt',
-                subject: 'A sua encomenda #302-8394712 foi enviada',
-                body: `Olá,\n\nA sua encomenda foi enviada e chegará em 2-3 dias úteis.\n\nDetalhes da encomenda:\n- 1x Livro "Cibersegurança para Todos"\n\nPode acompanhar a sua encomenda através da sua conta Amazon.\n\nAcompanhar encomenda: https://www.amazon.pt/orders\n\nObrigado por comprar na Amazon!`,
-                isPhishing: false,
-                indicators: ['Domínio oficial da Amazon', 'Link para o site oficial', 'Sem urgência', 'Formato profissional']
-            },
-            {
-                id: 5,
-                from: 'admin@microsofft-security.net',
-                subject: 'A sua subscrição expirou',
-                body: `Caro utilizador,\n\nA sua password expirou hoje. Para manter o acesso, deve fazer login imediatamente no link abaixo, caso contrário perderá todos os seus ficheiros.\n\nhttp://microsofft-update.net/login\n\nObrigado,\nAdmin`,
-                isPhishing: true,
-                indicators: ['Erro ortográfico (microsofft)', 'Ameaça de perda de dados', 'Link não oficial', 'Urgência desnecessária']
-            }
-        ];
-
+        // ==========================================
+        // ESTADO DO JOGO
+        // ==========================================
+        let emails = [];
         let currentIndex = 0;
         let score = 0;
         let answered = false;
 
-        // Iniciar Ícones
+        // Iniciar ícones
         lucide.createIcons();
 
-        // Renderizar primeiro email
-        renderEmail();
+        // ==========================================
+        // CARREGAR EMAILS DA BASE DE DADOS
+        // ==========================================
+        async function loadEmails() {
+            try {
+                const response = await fetch('/api/phishing/emails?limit=5');
+                if (!response.ok) throw new Error('Erro na API');
 
+                emails = await response.json();
+
+                if (emails.length === 0) {
+                    document.getElementById('loading-state').innerHTML = `
+                        <i data-lucide="alert-circle" style="color: #ef4444;"></i>
+                        <p>Nenhum email encontrado na base de dados.</p>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                // Esconder loading e mostrar o jogo
+                document.getElementById('loading-state').classList.add('phishing-hidden');
+                document.getElementById('email-display').classList.remove('phishing-hidden');
+
+                renderEmail();
+            } catch (error) {
+                console.error('Erro ao carregar emails:', error);
+                document.getElementById('loading-state').innerHTML = `
+                    <i data-lucide="wifi-off" style="color: #ef4444;"></i>
+                    <p>Erro ao ligar à base de dados. Tente novamente mais tarde.</p>
+                `;
+                lucide.createIcons();
+            }
+        }
+
+        // ==========================================
+        // RENDERIZAR EMAIL
+        // ==========================================
         function renderEmail() {
             const email = emails[currentIndex];
-            document.getElementById('email-from').textContent = email.from;
-            document.getElementById('email-subject').textContent = email.subject;
-            document.getElementById('email-body').textContent = email.body;
-            
-            // Atualizar Progresso
+            document.getElementById('email-from').textContent = email.remetente;
+            document.getElementById('email-subject').textContent = email.assunto;
+            document.getElementById('email-body').textContent = email.corpo;
+
+            // Atualizar progresso
             document.getElementById('progress-text').textContent = `Email ${currentIndex + 1} de ${emails.length}`;
             document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / emails.length) * 100}%`;
-            document.getElementById('score-text').textContent = `Pontuação: ${score}`;
+            document.getElementById('score-text').textContent = `Pontuação: ${score}/${emails.length}`;
 
             // Reset da UI
-            document.getElementById('feedback-area').classList.add('hidden');
-            document.getElementById('action-buttons').classList.remove('hidden');
-            document.getElementById('next-button').classList.add('hidden');
-            
-            // Check para ver se o email tem indicadores de formatação especiais
-            if(email.isPhishing) {
-                // Lógica visual opcional aqui
-            }
-            
+            document.getElementById('feedback-area').classList.add('phishing-hidden');
+            document.getElementById('action-buttons').classList.remove('phishing-hidden');
+            document.getElementById('next-button').classList.add('phishing-hidden');
+
             answered = false;
         }
 
+        // ==========================================
+        // VERIFICAR RESPOSTA
+        // ==========================================
         function checkAnswer(userSaysPhishing) {
             if (answered) return;
             answered = true;
 
             const email = emails[currentIndex];
-            const isCorrect = userSaysPhishing === email.isPhishing;
-            
+            const isCorrect = userSaysPhishing === email.e_phishing;
+
             if (isCorrect) score++;
 
-            // Atualizar UI
-            document.getElementById('action-buttons').classList.add('hidden');
-            document.getElementById('next-button').classList.remove('hidden');
+            // Esconder botões de ação, mostrar próximo
+            document.getElementById('action-buttons').classList.add('phishing-hidden');
+            document.getElementById('next-button').classList.remove('phishing-hidden');
 
-            // Preparar Feedback
-            const feedbackArea = document.getElementById('feedback-area');
-            const feedbackTitle = document.getElementById('feedback-title');
-            const feedbackMessage = document.getElementById('feedback-message');
-            const feedbackList = document.getElementById('feedback-list');
-
-            feedbackArea.classList.remove('hidden');
-            // Remove classes antigas e adiciona novas baseadas no resultado
-            feedbackArea.className = `border rounded-xl p-6 mb-6 shadow-sm animate-fade-in ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
-
-            feedbackTitle.innerHTML = isCorrect 
-                ? `<i data-lucide="check-circle" class="text-green-600 w-6 h-6"></i> <span class="text-green-800">Correto!</span>`
-                : `<i data-lucide="x-circle" class="text-red-600 w-6 h-6"></i> <span class="text-red-800">Incorreto!</span>`;
-            
-            feedbackMessage.innerHTML = `Este email é <strong>${email.isPhishing ? 'PHISHING (Perigoso)' : 'LEGÍTIMO (Seguro)'}</strong>.`;
-            
-            if(isCorrect) {
-                feedbackMessage.className = "text-green-800 mb-4 font-medium text-lg";
+            // Atualizar texto do botão
+            const nextBtn = document.getElementById('next-button');
+            if (currentIndex < emails.length - 1) {
+                nextBtn.innerHTML = 'Próximo Email <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>';
             } else {
-                feedbackMessage.className = "text-red-800 mb-4 font-medium text-lg";
+                nextBtn.innerHTML = 'Ver Resultados <i data-lucide="trophy" style="width: 18px; height: 18px;"></i>';
             }
 
-            // Lista de Indicadores
-            feedbackList.innerHTML = email.indicators.map(ind => 
-                `<li class="flex items-start gap-2"><i data-lucide="${email.isPhishing ? 'alert-triangle' : 'check'}" class="${email.isPhishing ? 'text-red-500' : 'text-green-500'} w-4 h-4 mt-1"></i> <span>${ind}</span></li>`
+            // Preparar feedback
+            const feedbackArea = document.getElementById('feedback-area');
+            feedbackArea.classList.remove('phishing-hidden', 'correct', 'wrong');
+            feedbackArea.classList.add(isCorrect ? 'correct' : 'wrong');
+
+            // Título do feedback
+            const feedbackTitle = document.getElementById('feedback-title');
+            if (isCorrect) {
+                feedbackTitle.innerHTML = `<i data-lucide="check-circle" style="color: #10b981;"></i> <span style="color: #10b981;">Correto!</span>`;
+            } else {
+                feedbackTitle.innerHTML = `<i data-lucide="x-circle" style="color: #ef4444;"></i> <span style="color: #ef4444;">Incorreto!</span>`;
+            }
+
+            // Mensagem
+            document.getElementById('feedback-message').innerHTML = `Este email é <strong>${email.e_phishing ? '🚨 PHISHING (Perigoso)' : '✅ LEGÍTIMO (Seguro)'}</strong>.`;
+
+            // Lista de indicadores
+            const feedbackList = document.getElementById('feedback-list');
+            const indicadores = email.indicadores || [];
+            feedbackList.innerHTML = indicadores.map(ind =>
+                `<div class="feedback-indicator">
+                    <i data-lucide="${email.e_phishing ? 'alert-triangle' : 'check'}" style="color: ${email.e_phishing ? '#ef4444' : '#10b981'};"></i>
+                    <span>${ind}</span>
+                </div>`
             ).join('');
 
-            // Re-renderizar ícones para o HTML injetado
+            // Atualizar pontuação
+            document.getElementById('score-text').textContent = `Pontuação: ${score}/${emails.length}`;
+
+            // Re-renderizar ícones Lucide
             lucide.createIcons();
-            
-            // Atualizar pontuação no topo imediatamente
-            document.getElementById('score-text').textContent = `Pontuação: ${score}`;
         }
 
+        // ==========================================
+        // PRÓXIMO EMAIL
+        // ==========================================
         function nextEmail() {
             if (currentIndex < emails.length - 1) {
                 currentIndex++;
@@ -297,15 +695,63 @@
             }
         }
 
-        function showResults() {
-            document.getElementById('game-container').classList.add('hidden');
-            document.getElementById('results-container').classList.remove('hidden');
-            
-            document.getElementById('final-score-text').textContent = `Identificou corretamente ${score} de ${emails.length} emails`;
-            document.getElementById('final-points').textContent = `${score * 20} pts`;
-            
+        // ==========================================
+        // MOSTRAR RESULTADOS E GUARDAR SCORE
+        // ==========================================
+        async function showResults() {
+            document.getElementById('game-container').style.display = 'none';
+            const overlay = document.getElementById('results-overlay');
+            overlay.classList.add('active');
+
+            const percentage = (score / emails.length) * 100;
+
+            // Ícone baseado no resultado
+            const iconContainer = document.getElementById('result-icon');
+            if (percentage === 100) {
+                iconContainer.innerHTML = '<i data-lucide="trophy" style="color: #eab308;"></i>';
+            } else if (percentage >= 60) {
+                iconContainer.innerHTML = '<i data-lucide="award" style="color: #3b82f6;"></i>';
+            } else {
+                iconContainer.innerHTML = '<i data-lucide="x-circle" style="color: #9ca3af;"></i>';
+            }
+
+            document.getElementById('result-text').textContent = `Identificou corretamente ${score} de ${emails.length} emails`;
+            document.getElementById('result-score').textContent = 'A calcular...';
+
             lucide.createIcons();
+
+            // Guardar score no servidor
+            try {
+                const response = await fetch('/api/phishing/save-score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        acertos: score,
+                        total_emails: emails.length
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    let scoreText = `+${data.pontos_ganhos} XP`;
+                    if (data.moedas_ganhas > 0) {
+                        scoreText += ` | +${data.moedas_ganhas} 🪙`;
+                    }
+                    document.getElementById('result-score').textContent = scoreText;
+                } else {
+                    document.getElementById('result-score').textContent = `+${score * 20} XP (offline)`;
+                }
+            } catch (error) {
+                console.error('Erro ao guardar score:', error);
+                document.getElementById('result-score').textContent = `+${score * 20} XP (offline)`;
+            }
         }
+
+        // ==========================================
+        // INICIAR O JOGO
+        // ==========================================
+        loadEmails();
     </script>
 </body>
+
 </html>
