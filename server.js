@@ -171,6 +171,9 @@ app.use('/api/medals', medalsRoutes);
 const phishingRoutes = require('./routes/phishing')(supabase);
 app.use('/api/phishing', phishingRoutes);
 
+const termoRoutes = require('./routes/termo')(supabase);
+app.use('/api/termo', termoRoutes);
+
 // Rota principal (Frontend)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));

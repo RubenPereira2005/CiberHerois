@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CiberTermo - Desafio Diário</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="cibertermo.css">
+    <link rel="stylesheet" href="popup_modal.css">
+    <link rel="stylesheet" href="preloader.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="theme.js"></script>
+    <script src="global-init.js"></script>
+</head>
+<body class="site-body">
+    <div id="global-loader">
+        <div class="loader-logo">Ciber<span>Heróis</span></div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="includedContent"></div>
+
+    <div class="termo-wrapper">
+        <div class="termo-header">
+            <h2>CiberTermo</h2>
+            <p>Adivinha a palavra de cibersegurança do dia em 6 tentativas.</p>
+        </div>
+
+        <div id="termo-msg-container" class="termo-message hidden">
+            <!-- Mensagens aparecem aqui (erro, vitória, derrota) -->
+        </div>
+
+        <div id="termo-grid" class="termo-grid">
+            <!-- As grelhas serão geradas via JS -->
+        </div>
+
+        <div id="termo-keyboard" class="termo-keyboard">
+            <!-- O teclado será gerado via JS -->
+        </div>
+    </div>
+
+    <!-- Modal Simplificado de Vitória/Derrota -->
+    <div id="termo-modal" class="modal">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                <div id="modal-icon-container" style="display: flex; justify-content: center; align-items: center; width: 80px; height: 80px; border-radius: 50%;">
+                    <i data-lucide="award" id="modal-icon" style="width: 44px; height: 44px; color: #10b981;"></i>
+                </div>
+            </div>
+            <h2 id="modal-title">Fim do Jogo!</h2>
+            <p id="modal-desc" style="margin: 20px 0; color: var(--text-color); font-size: 1.1rem;"></p>
+            
+            <div id="modal-sabias-que" style="display: none; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; text-align: left; border-radius: 4px;">
+                <h4 style="margin-bottom: 5px; color: #3b82f6; display: flex; align-items: center; gap: 5px;"><i data-lucide="lightbulb" style="width: 18px; height: 18px;"></i> Sabias Que...?</h4>
+                <p id="sabias-que-text" style="font-size: 0.95rem; margin:0; line-height: 1.5;"></p>
+            </div>
+
+            <div id="countdown-container" style="margin-bottom: 25px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                <p style="margin: 0 0 5px 0; font-size: 0.9rem; color: var(--text-muted);">Próximo CiberTermo em:</p>
+                <div id="termo-countdown" style="font-size: 1.5rem; font-weight: bold; color: var(--text-color); font-variant-numeric: tabular-nums;">--:--:--</div>
+            </div>
+
+            <div class="modal-actions" style="display: flex; flex-direction: column; gap: 10px; align-items: stretch;">
+                <button class="btn btn-primary" id="btn-curiosidade" onclick="pedirCuriosidade()">Ver Sabias Que</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('termo-modal').classList.remove('active')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="cibertermo.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
