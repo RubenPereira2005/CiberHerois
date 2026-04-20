@@ -19,21 +19,23 @@ let LS_ESTADO = 'cibertermo_estado';
 let LS_DATA = 'cibertermo_data';
 let LS_TAMANHO = 'cibertermo_tamanho';
 let LS_SABIAS_QUE = 'cibertermo_sabias_que';
+let LS_PALAVRAS_USADAS = 'cibertermo_palavras_usadas';
+let LS_PALAVRA_REVELADA = 'cibertermo_palavra_revelada';
 let LS_ULTIMO_USER_ID = 'cibertermo_ultimo_user_id'; // Mudanças de utilizador para localStorage
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', async () => {
     inicializarTeclado();
-    
+
     // 1. Descobrir primeiro qual é a configuração do dia
     await fetchTamanhoPalavra();
-    
+
     // 2. Iniciar o jogo com base nessa configuração e no estado guardado localmente
     verificarResetDiario();
     criarMatrizGrelha(); // Inicializa Array em branco apropriado
     carregarEstadoPreenchido();
     desenharGrelhaOriginal();
-    
+
     // Suporte para teclado físico
     document.addEventListener('keydown', processarTecladoFisico);
 });
@@ -45,12 +47,12 @@ async function fetchTamanhoPalavra() {
         if (res.ok) {
             const data = await res.json();
             LETRAS_POR_PALAVRA = data.tamanho;
-            
+
             // Garantir que as chaves de gravação locais no browser mudam de acordo com a conta logada!
             if (data.user_id) {
                 const uid = data.user_id;
                 const ultimoUserId = localStorage.getItem(LS_ULTIMO_USER_ID);
-                
+
                 // Se mudou de utilizador, limpar os dados antigos
                 if (ultimoUserId && ultimoUserId !== uid.toString()) {
                     localStorage.removeItem(LS_GRELHA);
@@ -61,10 +63,10 @@ async function fetchTamanhoPalavra() {
                     localStorage.removeItem(LS_TAMANHO);
                     localStorage.removeItem(LS_SABIAS_QUE);
                 }
-                
+
                 // Guardar o ID do utilizador atual para próximas verificações
                 localStorage.setItem(LS_ULTIMO_USER_ID, uid.toString());
-                
+
                 LS_GRELHA = `cibertermo_grelha_${uid}`;
                 LS_CORES = `cibertermo_cores_${uid}`;
                 LS_TENTATIVA = `cibertermo_tentativa_${uid}`;
@@ -72,8 +74,10 @@ async function fetchTamanhoPalavra() {
                 LS_DATA = `cibertermo_data_${uid}`;
                 LS_TAMANHO = `cibertermo_tamanho_${uid}`;
                 LS_SABIAS_QUE = `cibertermo_sabias_que_${uid}`;
+                LS_PALAVRAS_USADAS = `cibertermo_palavras_usadas_${uid}`;
+                LS_PALAVRA_REVELADA = `cibertermo_palavra_revelada_${uid}`;
             }
-            
+
             // Injeção visual da Média Social na UI
             if (data.jogadores > 0) {
                 const subtitle = document.querySelector('.termo-header p');
@@ -83,7 +87,7 @@ async function fetchTamanhoPalavra() {
                 }
             }
         }
-    } catch(e) {
+    } catch (e) {
         console.error("Falha ao obter info diária, fallback para 5 letras", e);
     }
 }
@@ -96,15 +100,15 @@ function criarMatrizGrelha() {
 function desenharGrelhaOriginal() {
     const gridContainer = document.getElementById('termo-grid');
     gridContainer.innerHTML = '';
-    
+
     for (let i = 0; i < TENTATIVAS_MAX; i++) {
         const row = document.createElement('div');
         row.className = 'termo-row';
         row.id = `row-${i}`;
-        
+
         // Magia Dinâmica do CSS aqui!
         row.style.gridTemplateColumns = `repeat(${LETRAS_POR_PALAVRA}, 1fr)`;
-        
+
         for (let j = 0; j < LETRAS_POR_PALAVRA; j++) {
             const tile = document.createElement('div');
             tile.className = 'termo-tile';
@@ -113,7 +117,7 @@ function desenharGrelhaOriginal() {
         }
         gridContainer.appendChild(row);
     }
-    
+
     // Preencher as letras e cores carregadas
     atualizarGrelhaVisual();
 }
@@ -124,27 +128,27 @@ function inicializarTeclado() {
         ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
         ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE']
     ];
-    
+
     const kbContainer = document.getElementById('termo-keyboard');
-    
+
     teclas.forEach(linha => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'keyboard-row';
-        
+
         linha.forEach(tecla => {
             const btn = document.createElement('button');
             btn.className = 'key';
             btn.textContent = tecla === 'BACKSPACE' ? '⌫' : tecla;
             btn.setAttribute('data-key', tecla);
-            
+
             if (tecla === 'ENTER' || tecla === 'BACKSPACE') {
                 btn.classList.add('wide');
             }
-            
+
             btn.addEventListener('click', () => processarInput(tecla));
             rowDiv.appendChild(btn);
         });
-        
+
         kbContainer.appendChild(rowDiv);
     });
 }
@@ -152,11 +156,11 @@ function inicializarTeclado() {
 // --- LÓGICA DE JOGO ---
 function processarTecladoFisico(e) {
     if (estadoJogo !== 'JOGANDO') return;
-    
+
     const key = e.key.toUpperCase();
-    
+
     if (e.ctrlKey || e.altKey || e.metaKey) return;
-    
+
     if (key === 'ENTER') {
         processarInput('ENTER');
     } else if (key === 'BACKSPACE') {
@@ -168,28 +172,28 @@ function processarTecladoFisico(e) {
 
 function processarInput(tecla) {
     if (estadoJogo !== 'JOGANDO') return;
-    
+
     if (tecla === 'BACKSPACE') {
         removerLetra();
         return;
     }
-    
+
     if (tecla === 'ENTER') {
         submeterPalavra();
         return;
     }
-    
+
     adicionarLetra(tecla);
 }
 
 function adicionarLetra(letra) {
     if (letraAtual < LETRAS_POR_PALAVRA) {
         grelha[tentativaAtual][letraAtual] = letra;
-        
+
         const tile = document.getElementById(`tile-${tentativaAtual}-${letraAtual}`);
         tile.textContent = letra;
         tile.setAttribute('data-state', 'tbd');
-        
+
         letraAtual++;
         guardarEstadoLocal();
     }
@@ -199,11 +203,11 @@ function removerLetra() {
     if (letraAtual > 0) {
         letraAtual--;
         grelha[tentativaAtual][letraAtual] = '';
-        
+
         const tile = document.getElementById(`tile-${tentativaAtual}-${letraAtual}`);
         tile.textContent = '';
         tile.removeAttribute('data-state');
-        
+
         guardarEstadoLocal();
     }
 }
@@ -214,31 +218,47 @@ async function submeterPalavra() {
         animarTremor(tentativaAtual);
         return;
     }
-    
+
     const palavraEnviada = grelha[tentativaAtual].join('');
-    
+
+    // Verificar se a palavra já foi submetida antes neste jogo
+    const usadasRaw = localStorage.getItem(LS_PALAVRAS_USADAS);
+    const usadas = usadasRaw ? JSON.parse(usadasRaw) : [];
+    if (usadas.includes(palavraEnviada)) {
+        mostrarMensagem('Já tentaste essa palavra!');
+        animarTremor(tentativaAtual);
+        estadoJogo = 'JOGANDO';
+        return;
+    }
+
     try {
-        estadoJogo = 'A_VERIFICAR'; 
-        
+        estadoJogo = 'A_VERIFICAR';
+
         const res = await fetch('/api/termo/verificar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 tentativa: palavraEnviada,
                 numero_tentativa: tentativaAtual + 1 // Para calcular pontos no servidor (entre 1 e 6)
             })
         });
-        
+
         const dados = await res.json();
-        
+
         if (!res.ok) {
             mostrarMensagem(dados.erro || 'Erro ao validar palavra.');
-            estadoJogo = 'JOGANDO'; 
+            estadoJogo = 'JOGANDO';
             return;
         }
-        
-        animarEAtualizarCores(dados.resultado, dados.vitoria, dados.ganhos);
-        
+
+        // Registar esta palavra como usada para impedir repetições
+        const usadasRaw2 = localStorage.getItem(LS_PALAVRAS_USADAS);
+        const usadas2 = usadasRaw2 ? JSON.parse(usadasRaw2) : [];
+        usadas2.push(palavraEnviada);
+        localStorage.setItem(LS_PALAVRAS_USADAS, JSON.stringify(usadas2));
+
+        animarEAtualizarCores(dados.resultado, dados.vitoria, dados.ganhos, dados.palavra_revelada);
+
     } catch (err) {
         console.error("Erro na verificação:", err);
         mostrarMensagem("Erro de ligação!");
@@ -246,21 +266,21 @@ async function submeterPalavra() {
     }
 }
 
-function animarEAtualizarCores(arrayCores, vitoria, ganhos) {
+function animarEAtualizarCores(arrayCores, vitoria, ganhos, palavraRevelada) {
     const rowId = tentativaAtual;
-    let coresLidas = guardarCoresLocais(); 
-    coresLidas[rowId] = arrayCores; 
-    
+    let coresLidas = guardarCoresLocais();
+    coresLidas[rowId] = arrayCores;
+
     localStorage.setItem(LS_CORES, JSON.stringify(coresLidas));
-    
+
     arrayCores.forEach((cor, i) => {
         setTimeout(() => {
             const tile = document.getElementById(`tile-${rowId}-${i}`);
             tile.setAttribute('data-state', cor);
             atualizarCorTeclado(grelha[rowId][i], cor);
-        }, i * 250); 
+        }, i * 250);
     });
-    
+
     setTimeout(() => {
         if (vitoria) {
             estadoJogo = 'VITORIA';
@@ -279,15 +299,17 @@ function animarEAtualizarCores(arrayCores, vitoria, ganhos) {
         } else {
             tentativaAtual++;
             letraAtual = 0;
-            
+
             if (tentativaAtual >= TENTATIVAS_MAX) {
                 estadoJogo = 'DERROTA';
-                mostrarModalFinal("Acabaram as tentativas... Volta amanhã e tenta o novo caso!", false);
+                // Guardar a palavra revelada no storage para persistir ao recarregar
+                if (palavraRevelada) localStorage.setItem(LS_PALAVRA_REVELADA, palavraRevelada);
+                mostrarModalFinal(`Acabaram as tentativas... Volta amanhã e tenta o novo caso!`, false, palavraRevelada);
             } else {
                 estadoJogo = 'JOGANDO';
             }
         }
-        
+
         localStorage.setItem(LS_TENTATIVA, tentativaAtual);
         localStorage.setItem(LS_ESTADO, estadoJogo);
     }, arrayCores.length * 250 + 100);
@@ -296,12 +318,12 @@ function animarEAtualizarCores(arrayCores, vitoria, ganhos) {
 function atualizarCorTeclado(letra, cor) {
     const btn = document.querySelector(`.key[data-key="${letra}"]`);
     if (!btn) return;
-    
+
     const bgColorAtual = btn.getAttribute('data-state');
-    
-    if (bgColorAtual === 'correct') return; 
+
+    if (bgColorAtual === 'correct') return;
     if (bgColorAtual === 'present' && cor === 'absent') return;
-    
+
     btn.setAttribute('data-state', cor);
 }
 
@@ -309,7 +331,7 @@ function atualizarCorTeclado(letra, cor) {
 function verificarResetDiario() {
     const dataGuardada = localStorage.getItem(LS_DATA);
     const tamanhoMatrizGuardado = localStorage.getItem(LS_TAMANHO);
-    
+
     // Se mudou o dia OU mudou o tamanho do tabuleiro de repente, limpa tudo!
     if (dataGuardada !== hoje || tamanhoMatrizGuardado !== LETRAS_POR_PALAVRA.toString()) {
         localStorage.removeItem(LS_GRELHA);
@@ -317,6 +339,8 @@ function verificarResetDiario() {
         localStorage.removeItem(LS_TENTATIVA);
         localStorage.removeItem(LS_ESTADO);
         localStorage.removeItem(LS_SABIAS_QUE);
+        localStorage.removeItem(LS_PALAVRAS_USADAS);
+        localStorage.removeItem(LS_PALAVRA_REVELADA);
         
         localStorage.setItem(LS_DATA, hoje);
         localStorage.setItem(LS_TAMANHO, LETRAS_POR_PALAVRA);
@@ -337,7 +361,7 @@ function carregarEstadoPreenchido() {
     if (strGrelha) {
         grelha = JSON.parse(strGrelha);
     }
-    
+
     const memTentativa = localStorage.getItem(LS_TENTATIVA);
     if (memTentativa !== null) {
         tentativaAtual = parseInt(memTentativa);
@@ -348,23 +372,27 @@ function carregarEstadoPreenchido() {
             }
         }
     }
-    
+
     const memEstado = localStorage.getItem(LS_ESTADO);
     if (memEstado) {
         estadoJogo = memEstado;
         if (estadoJogo === 'VITORIA') mostrarModalFinal("Incrível! Apanhaste o conceito de hoje!", true);
-        if (estadoJogo === 'DERROTA') mostrarModalFinal("Acabaram as tentativas... Volta amanhã e tenta o novo caso!", false);
+        if (estadoJogo === 'DERROTA') {
+            // Restaurar a palavra revelada guardada para mostrar no modal
+            const palavraGuardada = localStorage.getItem(LS_PALAVRA_REVELADA);
+            mostrarModalFinal("Acabaram as tentativas... Volta amanhã e tenta o novo caso!", false, palavraGuardada);
+        }
     }
 }
 
 function atualizarGrelhaVisual() {
     const arrayCores = guardarCoresLocais();
-    
+
     for (let r = 0; r < TENTATIVAS_MAX; r++) {
         for (let c = 0; c < LETRAS_POR_PALAVRA; c++) {
             const letra = grelha[r][c];
             const tile = document.getElementById(`tile-${r}-${c}`);
-            
+
             if (letra) {
                 tile.textContent = letra;
                 if (r < tentativaAtual || estadoJogo === 'VITORIA' || estadoJogo === 'DERROTA') {
@@ -387,7 +415,7 @@ function mostrarMensagem(msg) {
     el.textContent = msg;
     el.classList.remove('hidden');
     el.classList.add('show');
-    
+
     setTimeout(() => {
         el.classList.remove('show');
         setTimeout(() => el.classList.add('hidden'), 300);
@@ -404,16 +432,30 @@ function animarTremor(rowId) {
     }, 600);
 }
 
-function mostrarModalFinal(mensagem, sucesso) {
+function mostrarModalFinal(mensagem, sucesso, palavraRevelada) {
     const modal = document.getElementById('termo-modal');
     const titulo = sucesso ? 'Vitória!' : 'Fim do Jogo';
-    
+
     document.getElementById('modal-title').textContent = titulo;
-    document.getElementById('modal-desc').textContent = mensagem;
+    
+    const descEl = document.getElementById('modal-desc');
+    descEl.textContent = mensagem;
+
+    // Se for derrota e temos a palavra, criar um badge vistoso abaixo da mensagem
+    const badgeExistente = document.getElementById('palavra-revelada-badge');
+    if (badgeExistente) badgeExistente.remove();
+    
+    if (!sucesso && palavraRevelada) {
+        const badge = document.createElement('div');
+        badge.id = 'palavra-revelada-badge';
+        badge.style.cssText = 'margin: 12px 0; padding: 12px 20px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); border-radius: 8px; display: inline-block;';
+        badge.innerHTML = `<span style="font-size: 0.85rem; color: #ef4444; display: block; margin-bottom: 4px;">A palavra era:</span><span style="font-size: 1.8rem; font-weight: 900; letter-spacing: 6px; color: #f87171;">${palavraRevelada}</span>`;
+        descEl.insertAdjacentElement('afterend', badge);
+    }
 
     // Resetar o estado da curiosidade no modal
     const memoriaCuriosidade = localStorage.getItem(LS_SABIAS_QUE);
-    
+
     if (memoriaCuriosidade) {
         document.getElementById('modal-sabias-que').style.display = 'block';
         document.getElementById('sabias-que-text').innerHTML = memoriaCuriosidade;
@@ -439,7 +481,7 @@ function mostrarModalFinal(mensagem, sucesso) {
         modalIcon.style.color = '#ef4444';
         iconContainer.style.background = 'rgba(239, 68, 68, 0.1)';
     }
-    
+
     lucide.createIcons();
     modal.classList.add('active');
 
@@ -494,11 +536,11 @@ async function pedirCuriosidade() {
         if (res.ok && data.curiosidade) {
             btn.style.display = 'none'; // Esconde botão se teve sucesso
             container.style.display = 'block'; // Mostra a div azul
-            
+
             // Render basic markdown (bold) if Gemini responds with it
             let finalHtml = data.curiosidade.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             textoEl.innerHTML = finalHtml;
-            
+
             // Guarda na cache local do browser para não gastar mais queries da conta hoje
             localStorage.setItem(LS_SABIAS_QUE, finalHtml);
         } else {
@@ -507,7 +549,7 @@ async function pedirCuriosidade() {
             textoEl.textContent = data.error || "Ocorreu um erro. Tenta novamente.";
             container.style.display = 'block'; // Mostrar de qualquer forma para ver o erro
         }
-    } catch(e) {
+    } catch (e) {
         console.error(e);
         btn.disabled = false;
         btn.textContent = 'Ver Sabias Que';

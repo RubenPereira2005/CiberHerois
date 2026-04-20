@@ -38,7 +38,7 @@ module.exports = (supabase) => {
     // Nova Rota GET para o frontend saber quantas letras compõem o desafio de hoje
     router.get('/info', (req, res) => {
         const wordOfDay = getWordOfTheDay();
-        return res.json({ 
+        return res.json({
             tamanho: wordOfDay.length,
             user_id: req.session?.userId || null
         });
@@ -84,6 +84,7 @@ module.exports = (supabase) => {
 
         // Verifica se ganharam o jogo
         const vitoria = resultado.every(r => r === 'correct');
+        const eUltimaTentativa = (numero_tentativa || 0) >= 6;
 
         let ganhos = null;
 
@@ -137,7 +138,9 @@ module.exports = (supabase) => {
             jogada: guess,
             resultado: resultado,
             vitoria: vitoria,
-            ganhos: ganhos
+            ganhos: ganhos,
+            // Revela a palavra APENAS quando perde na última tentativa (seguro!)
+            palavra_revelada: (!vitoria && eUltimaTentativa) ? wordOfDay : null
         });
     });
 
