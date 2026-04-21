@@ -345,6 +345,10 @@
                         style="text-align: center; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                         <button type="button" class="btn btn-secondary" onclick="adicionarSeccao()">+ Secção
                             Normal</button>
+                        <button type="button" class="btn" id="btn-add-video"
+                            onclick="adicionarSeccao('video', 'Material Audiovisual', '', 'video')"
+                            style="background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid #ef4444;"><i
+                                data-lucide="video" style="width:16px;height:16px;"></i> + Secção Vídeo</button>
                         <button type="button" class="btn" id="btn-add-praticas"
                             onclick="adicionarSeccao('check-circle', 'Melhores Práticas', '', 'praticas')"
                             style="background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid #10b981;"><i
@@ -687,11 +691,12 @@
                 tempDiv.querySelectorAll('li').forEach(li => listaItens.push(li.textContent.trim()));
             }
 
-            const isEspecial = tipo === 'praticas' || tipo === 'aviso';
-            const corBorda = tipo === 'praticas' ? '#10b981' : tipo === 'aviso' ? '#f59e0b' : 'transparent';
-            const corFundo = tipo === 'praticas' ? 'rgba(16,185,129,0.06)' : tipo === 'aviso' ? 'rgba(245,158,11,0.06)' : 'transparent';
-            const labelTipo = tipo === 'praticas' ? '✅ Boas Práticas' : tipo === 'aviso' ? '⚠️ Pontos de Atenção' : '';
-            const borderStyle = isEspecial ? `border-left: 3px solid ${corBorda};` : '';
+            const isFixed = tipo === 'praticas' || tipo === 'aviso' || tipo === 'video';
+            const isVideo = tipo === 'video';
+            const corBorda = tipo === 'praticas' ? '#10b981' : tipo === 'aviso' ? '#f59e0b' : tipo === 'video' ? '#ef4444' : 'transparent';
+            const corFundo = tipo === 'praticas' ? 'rgba(16,185,129,0.06)' : tipo === 'aviso' ? 'rgba(245,158,11,0.06)' : tipo === 'video' ? 'rgba(239,68,68,0.05)' : 'transparent';
+            const labelTipo = tipo === 'praticas' ? '✅ Boas Práticas' : tipo === 'aviso' ? '⚠️ Pontos de Atenção' : tipo === 'video' ? '▶️ Bloco de Vídeo / Iframe' : '';
+            const borderStyle = isFixed ? `border-left: 3px solid ${corBorda};` : '';
 
             // Para secções normais, usar o select de ícones
             const opcoes = [
@@ -701,11 +706,12 @@
                 { val: 'shield', nome: 'Segurança / Escudo (🛡️)' },
                 { val: 'lock', nome: 'Privacidade / Cadeado (🔒)' },
                 { val: 'terminal', nome: 'Código / Consola (💻)' },
-                { val: 'help-circle', nome: 'Dúvida / Pergunta (❓)' }
+                { val: 'help-circle', nome: 'Dúvida / Pergunta (❓)' },
+                { val: 'video', nome: 'Vídeo (▶️)' }
             ];
 
             let itensHTML = '';
-            if (isEspecial) {
+            if (tipo === 'praticas' || tipo === 'aviso') {
                 if (listaItens.length > 0) {
                     listaItens.forEach((item, i) => {
                         itensHTML += `<div class="lista-item-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
@@ -725,31 +731,48 @@
 
             const html = `
                 <div class="form-group seccao-item" data-tipo="${tipo}" style="${borderStyle} background: ${corFundo}; border-radius: 8px; padding: 14px; margin-bottom: 12px; position: relative;">
-                    ${isEspecial ? `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    ${isFixed ? `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <span style="font-size: 0.8rem; font-weight: 600; color: ${corBorda};">${labelTipo}</span>
                         <button type="button" class="btn-danger" onclick="this.closest('.seccao-item').remove(); atualizarBotoesEspeciais();" style="padding: 4px 8px; border-radius: 6px;" title="Remover secção"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
-                    </div>` : `<div class="drag-handle" style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;"><i data-lucide="grip-vertical" style="width:16px;height:16px;color:var(--text-secondary);opacity:0.5;"></i><span style="font-size:0.75rem;color:var(--text-secondary);">Arrastar para reordenar</span></div>`}
+                    </div>` : `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <div class="drag-handle" style="display: flex; align-items: center; gap: 6px; cursor: grab;">
+                            <i data-lucide="grip-vertical" style="width:16px;height:16px;color:var(--text-secondary);opacity:0.5;"></i>
+                            <span style="font-size:0.75rem;color:var(--text-secondary);">Arrastar para reordenar</span>
+                        </div>
+                        <button type="button" class="btn-danger" onclick="this.closest('.seccao-item').remove(); atualizarBotoesEspeciais();" style="padding: 4px 8px; border-radius: 6px;" title="Remover secção"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                    </div>`}
                     <div class="gestao-flex-row">
                         <div style="flex: 1;">
-                            <label>Ícone da Secção</label>
-                            ${isEspecial ? `<input type="text" class="sec-icon form-input" value="${icone}" required>` : `<select class="sec-icon form-input" required>${opcoesHTML}</select>`}
+                            <label>Ícone</label>
+                            ${isFixed && !isVideo ? `<input type="text" class="sec-icon form-input" value="${icone}" required>` : isVideo ? `<input type="text" class="sec-icon form-input" value="video" readonly style="opacity:0.7;">` : `<select class="sec-icon form-input" required>${opcoesHTML}</select>`}
                         </div>
-                        <div style="flex: 2;">
-                            <label>Título da Secção</label>
-                            <input type="text" class="sec-title form-input" value="${titulo}" placeholder="Ex: O que é Phishing?" required>
+                        <div style="flex: 3;">
+                            <label>Título ${isVideo ? '(Opcional)' : ''}</label>
+                            <input type="text" class="sec-title form-input" value="${titulo}" placeholder="Ex: O que é Phishing?" ${isVideo ? '' : 'required'}>
                         </div>
                     </div>
-                    ${isEspecial ? `
+                    ${isFixed && !isVideo ? `
                         <label style="margin-top: 8px;">Itens da Lista</label>
                         <div class="sec-list-container">${itensHTML}</div>
                         <button type="button" class="btn btn-secondary" onclick="adicionarItemLista(this)" style="margin-top: 6px; font-size: 0.8rem; padding: 4px 10px;">+ Adicionar Item</button>
+                    ` : isVideo ? `
+                        <label style="margin-top: 8px;">Link do Vídeo (YouTube, Vimeo, etc.) ou Código Iframe</label>
+                        <textarea class="sec-text form-input" rows="2" placeholder="Ex: https://www.youtube.com/watch?v=..." required style="font-family: monospace;">${texto}</textarea>
                     ` : `
-                        <label>Texto da Secção</label>
+                        <label style="margin-top: 8px;">Texto (Suporta formatação básica HTML como &lt;b&gt;, &lt;br&gt;)</label>
                         <textarea class="sec-text form-input" rows="4" placeholder="Escreve o conteúdo aqui..." required>${texto}</textarea>
                     `}
                 </div>`;
                 
             if (tipo === 'normal') {
+                const refCentralNode = container.querySelector('.seccao-item[data-tipo="video"], .seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"]');
+                if (refCentralNode) {
+                    refCentralNode.insertAdjacentHTML('beforebegin', html);
+                } else {
+                    container.insertAdjacentHTML('beforeend', html);
+                }
+            } else if (tipo === 'video') {
                 const primeiraEspecial = container.querySelector('.seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"]');
                 if (primeiraEspecial) {
                     primeiraEspecial.insertAdjacentHTML('beforebegin', html);
@@ -775,6 +798,9 @@
             const container = document.getElementById('seccoes-container');
             const btnPraticas = document.getElementById('btn-add-praticas');
             const btnAviso = document.getElementById('btn-add-aviso');
+            const btnVideo = document.getElementById('btn-add-video');
+            const selectTipo = document.getElementById('rec-cat');
+
             if (btnPraticas) {
                 btnPraticas.disabled = !!container.querySelector('.seccao-item[data-tipo="praticas"]');
                 btnPraticas.style.opacity = btnPraticas.disabled ? '0.4' : '1';
@@ -784,6 +810,20 @@
                 btnAviso.disabled = !!container.querySelector('.seccao-item[data-tipo="aviso"]');
                 btnAviso.style.opacity = btnAviso.disabled ? '0.4' : '1';
                 btnAviso.style.cursor = btnAviso.disabled ? 'not-allowed' : 'pointer';
+            }
+            if (btnVideo && selectTipo) {
+                const isVideoType = selectTipo.value === 'video' || selectTipo.value === 'vídeo';
+                const videoBlock = container.querySelector('.seccao-item[data-tipo="video"]');
+                
+                if (!isVideoType) {
+                    btnVideo.style.display = 'none';
+                    if (videoBlock) videoBlock.remove();
+                } else {
+                    btnVideo.style.display = 'inline-flex';
+                    btnVideo.disabled = !!videoBlock;
+                    btnVideo.style.opacity = btnVideo.disabled ? '0.4' : '1';
+                    btnVideo.style.cursor = btnVideo.disabled ? 'not-allowed' : 'pointer';
+                }
             }
         }
 
@@ -807,7 +847,7 @@
             sortableInstance = new Sortable(container, {
                 animation: 250, // animação brutal e suave
                 handle: '.drag-handle',
-                filter: '.seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"]', // ignora especiais
+                filter: '.seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"], .seccao-item[data-tipo="video"]', // ignora especiais
                 preventOnFilter: false,
                 direction: 'vertical',
                 forceFallback: true, // força o uso JS custom ghost e abandona D&D nativo
@@ -816,7 +856,8 @@
                 ghostClass: 'seccao-placeholder', // o buraco escuro
                 onMove: function(evt) {
                     // Funcionalidade Mágica: Impede a barra normal de ser arrastada "para debaixo" ou cruzar as secções fixas
-                    if (evt.related.getAttribute('data-tipo') === 'praticas' || evt.related.getAttribute('data-tipo') === 'aviso') {
+                    const att = evt.related.getAttribute('data-tipo');
+                    if (att === 'praticas' || att === 'aviso' || att === 'video') {
                         return false; // Bate contra uma parede invisível!
                     }
                 }
@@ -825,6 +866,8 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initSortablePremium();
+            const rCat = document.getElementById('rec-cat');
+            if (rCat) rCat.addEventListener('change', atualizarBotoesEspeciais);
         });
 
         function prepararNovoRecurso() {
@@ -878,6 +921,27 @@
                     texto = `<ul class="resource-list">${listaItems.join('')}</ul>`;
                 } else {
                     texto = item.querySelector('.sec-text').value;
+                    
+                    // Se for Vídeo, transforma o link standard do Youtube num Embed iframe ANTES DE IR PARA A DB
+                    if (tipo === 'video') {
+                        let linkLimpo = texto.trim();
+                        let embedLink = linkLimpo;
+                        
+                        if (linkLimpo.includes('youtube.com/watch?v=')) {
+                            embedLink = linkLimpo.replace('watch?v=', 'embed/').split('&')[0];
+                        } else if (linkLimpo.includes('youtu.be/')) {
+                            embedLink = linkLimpo.replace('youtu.be/', 'youtube.com/embed/');
+                        } else if (linkLimpo.includes('vimeo.com/')) {
+                            embedLink = linkLimpo.replace('vimeo.com/', 'player.vimeo.com/video/');
+                        }
+                        
+                        // Envolve no iFrame apenas se não tiver sido já colocado um iFrame bruto
+                        if (!embedLink.includes('<iframe')) {
+                            texto = `<iframe width="560" height="315" src="${embedLink}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                        } else {
+                            texto = embedLink; 
+                        }
+                    }
                 }
 
                 const secObj = { icone, titulo, texto };
@@ -885,8 +949,8 @@
                 seccoesArray.push(secObj);
             });
 
-            // Ordenar por ordem rigorosa a pedido: Textos Normais (por ordem visual) -> Práticas -> Avisos Especiais (últimos sempre!)
-            const normais = seccoesArray.filter(s => !s.tipo);
+            // Ordenar por ordem rigorosa a pedido: Textos Normais e Videos (por ordem visual) -> Práticas -> Avisos Especiais (últimos sempre!)
+            const normais = seccoesArray.filter(s => !s.tipo || s.tipo === 'video');
             const praticas = seccoesArray.filter(s => s.tipo === 'praticas');
             const avisos = seccoesArray.filter(s => s.tipo === 'aviso');
             seccoesArray = [...normais, ...praticas, ...avisos];

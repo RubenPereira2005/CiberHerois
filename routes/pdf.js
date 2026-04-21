@@ -14,12 +14,38 @@ module.exports = (supabase) => {
 
         if (Array.isArray(seccoes)) {
             seccoes.forEach(sec => {
-                // Troca as quebras de linha por duplo <br> para fazer parágrafos bonitos
-                const texto = sec.texto ? String(sec.texto).replace(/\n/g, '<br><br>') : '';
+                // Tratar os vídeos (iframes) para mostrar o link!
+                let textoConvertido = sec.texto ? String(sec.texto) : '';
+                
+                // Procurar links de youtube/vimeo e criar caixa descritiva
+                if (textoConvertido.includes('<iframe')) {
+                    const srcMatch = textoConvertido.match(/src="([^"]+)"/);
+                    let urlVideo = (srcMatch && srcMatch[1]) ? srcMatch[1] : '';
+                    if (urlVideo) {
+                        textoConvertido = `<div style="padding: 10px; background-color: #f8fafc; border-left: 4px solid #ef4444; margin-top: 10px;">
+                                            <p style="margin: 0; font-weight: bold; color: #ef4444;">▶ Vídeo Disponível</p>
+                                            <p style="margin: 5px 0 0 0;">O conteúdo abaixo contém um vídeo que pode ser visualizado em:</p>
+                                            <a href="${urlVideo}" style="color: #3b82f6; word-break: break-all;">${urlVideo}</a>
+                                           </div>`;
+                    } else {
+                        textoConvertido = `[Vídeo Incorporado: Assista na plataforma CiberHeróis]`;
+                    }
+                } else if (sec.tipo === 'video' && (textoConvertido.startsWith('http') || textoConvertido.includes('youtube.com') || textoConvertido.includes('youtu.be'))) {
+                    // É um link cru
+                    let urlVideo = textoConvertido.trim();
+                    textoConvertido = `<div style="padding: 10px; background-color: #f8fafc; border-left: 4px solid #ef4444; margin-top: 10px;">
+                                        <p style="margin: 0; font-weight: bold; color: #ef4444;">▶ Vídeo Disponível</p>
+                                        <p style="margin: 5px 0 0 0;">Este recurso inclui um vídeo principal acessível em:</p>
+                                        <a href="${urlVideo}" style="color: #3b82f6; word-break: break-all;">${urlVideo}</a>
+                                       </div>`;
+                } else {
+                    textoConvertido = textoConvertido.replace(/\n/g, '<br><br>');
+                }
+                
                 seccoesHTML += `
                 <div class="section">
                     <h2>${sec.titulo || ''}</h2>
-                    <p>${texto}</p>
+                    <p>${textoConvertido}</p>
                 </div>`;
             });
         }

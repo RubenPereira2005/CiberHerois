@@ -128,6 +128,34 @@
                             htmlSeccoes += `<div class="resource-best-practices"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}" class="icon-24"></i>${sec.titulo}</h3>${texto}</div>`;
                         } else if (tipo === 'aviso') {
                             htmlSeccoes += `<div class="resource-warnings"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}" class="icon-24"></i>${sec.titulo}</h3>${texto}</div>`;
+                        } else if (tipo === 'video') {
+                            // Helper para transformar Link padrão em Embed
+                            function converterParaEmbed(url) {
+                                let linkLimpo = url.trim();
+                                if (linkLimpo.includes('youtube.com/watch?v=')) {
+                                    return linkLimpo.replace('watch?v=', 'embed/').split('&')[0];
+                                } else if (linkLimpo.includes('youtu.be/')) {
+                                    return linkLimpo.replace('youtu.be/', 'youtube.com/embed/');
+                                } else if (linkLimpo.includes('vimeo.com/')) {
+                                    return linkLimpo.replace('vimeo.com/', 'player.vimeo.com/video/');
+                                }
+                                return linkLimpo;
+                            }
+
+                            let embedHTML = texto.trim();
+                            if (!embedHTML.includes('<iframe')) {
+                                const embedLink = converterParaEmbed(embedHTML);
+                                embedHTML = `<iframe src="${embedLink}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></iframe>`;
+                            } else {
+                                embedHTML = embedHTML.replace('<iframe ', '<iframe style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;" ');
+                            }
+                            
+                            htmlSeccoes += `<div class="resource-section border-${corDinamica}" style="padding-bottom: 25px;">
+                                                <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;"><i data-lucide="${icone}" class="icon-24 icon-${corDinamica}"></i>${sec.titulo || 'Vídeo'}</h3>
+                                                <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                                                    ${embedHTML}
+                                                </div>
+                                            </div>`;
                         } else {
                             htmlSeccoes += `<div class="resource-section border-${corDinamica}"><div style="display: flex; align-items: flex-start; gap: 12px;"><i data-lucide="${icone}" class="icon-24 icon-${corDinamica}" style="margin-top: 4px;"></i><div><h2>${sec.titulo}</h2><p>${texto.replace(/\\n/g, '<br>')}</p></div></div></div>`;
                         }
