@@ -16,32 +16,46 @@
     <style>
         /* Estilos PREMIUM de arrastar e soltar (SortableJS fallback) */
         @keyframes cardFlutter {
-            0%, 100% { rotate: 1.2deg; }
-            50% { rotate: 0.8deg; }
+
+            0%,
+            100% {
+                rotate: 1.2deg;
+            }
+
+            50% {
+                rotate: 0.8deg;
+            }
         }
+
         .seccao-dragged {
             rotate: 1.2deg;
             scale: 1.02;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
             opacity: 0.85 !important;
             background-color: var(--bg-secondary, #ffffff) !important;
             z-index: 999999 !important;
             cursor: grabbing !important;
-            animation: cardFlutter 0.8s infinite ease-in-out; /* Tremor muito subtil e lento */
+            animation: cardFlutter 0.8s infinite ease-in-out;
+            /* Tremor muito subtil e lento */
         }
+
         body.dark-mode .seccao-dragged {
-            background-color: #1e293b !important; /* fundo apropriado escuro */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
+            background-color: #1e293b !important;
+            /* fundo apropriado escuro */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
         }
+
         .seccao-placeholder {
             opacity: 0.2 !important;
             background: var(--bg-secondary) !important;
             border: 2px dashed #8b5cf6 !important;
             transform: scale(0.98);
         }
+
         .drag-handle {
             cursor: grab;
         }
+
         .drag-handle:active {
             cursor: grabbing;
         }
@@ -67,6 +81,12 @@
                 <button class="auth-navbar-btn" id="theme-toggle" title="Mudar Tema">
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
                 </button>
+                <a href="profile" class="auth-navbar-btn" title="Ver Perfil">
+                    <i data-lucide="user" class="auth-navbar-icon"></i>
+                </a>
+                <button onclick="window.fazerLogout()" class="auth-navbar-btn auth-navbar-logout" title="Sair">
+                    <i data-lucide="log-out" class="auth-navbar-icon"></i>
+                </button>
                 <a href="quizzes" class="btn btn-secondary" style="margin-left: 10px;">Voltar aos Quizzes</a>
             </div>
         </div>
@@ -87,7 +107,7 @@
 
         <div id="tab-turmas" class="tab-content active">
             <div class="gestao-actions-top">
-                <button class="btn btn-primary" onclick="prepararNovaTurma()" style="background-color: #10b981;">
+                <button class="btn btn-primary theme-green" onclick="prepararNovaTurma()">
                     <i data-lucide="users"></i> Criar Novo Esquadrão
                 </button>
             </div>
@@ -110,7 +130,7 @@
 
         <div id="tab-recursos" class="tab-content">
             <div class="gestao-actions-top">
-                <button class="btn btn-primary" onclick="prepararNovoRecurso()" style="background-color: #10b981;">
+                <button class="btn btn-primary theme-green" onclick="prepararNovoRecurso()">
                     <i data-lucide="plus"></i> Criar Novo Recurso Visual
                 </button>
             </div>
@@ -133,7 +153,7 @@
 
         <div id="tab-quizzes" class="tab-content">
             <div class="gestao-actions-top" style="justify-content: space-between;">
-                <button class="btn btn-primary" onclick="prepararNovoQuiz()" style="background-color: #10b981;">
+                <button class="btn btn-primary theme-green" onclick="prepararNovoQuiz()">
                     <i data-lucide="plus"></i> Adicionar Pergunta
                 </button>
                 <div class="filter-container" style="display: flex; gap: 15px; align-items: flex-end;">
@@ -209,8 +229,8 @@
                 <div class="modal-actions" style="margin-top: 20px;">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-turma')">Cancelar</button>
-                    <button type="submit" id="btn-submit-turma" class="btn btn-primary"
-                        style="background-color: #10b981;">Guardar Turma</button>
+                    <button type="submit" id="btn-submit-turma" class="btn btn-primary theme-green">Guardar
+                        Turma</button>
                 </div>
             </form>
         </div>
@@ -236,8 +256,8 @@
                 <div class="modal-actions" style="margin-top: 20px;">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-editar-turma')">Cancelar</button>
-                    <button type="submit" id="btn-submit-edit-turma" class="btn btn-primary"
-                        style="background-color: #10b981;">Guardar</button>
+                    <button type="submit" id="btn-submit-edit-turma"
+                        class="btn btn-primary theme-green">Guardar</button>
                 </div>
             </form>
         </div>
@@ -363,8 +383,8 @@
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-recurso')">Cancelar</button>
-                    <button type="submit" id="btn-submit-recurso" class="btn btn-primary"
-                        style="background-color: #10b981;">Gravar e Gerar HTML</button>
+                    <button type="submit" id="btn-submit-recurso" class="btn btn-primary theme-green">Gravar e Gerar
+                        HTML</button>
                 </div>
             </form>
         </div>
@@ -413,8 +433,8 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-quiz')">Cancelar</button>
-                    <button type="submit" id="btn-submit-quiz" class="btn btn-primary"
-                        style="background-color: #10b981;">Guardar Pergunta</button>
+                    <button type="submit" id="btn-submit-quiz" class="btn btn-primary theme-green">Guardar
+                        Pergunta</button>
                 </div>
             </form>
         </div>
@@ -764,7 +784,7 @@
                         <textarea class="sec-text form-input" rows="4" placeholder="Escreve o conteúdo aqui..." required>${texto}</textarea>
                     `}
                 </div>`;
-                
+
             if (tipo === 'normal') {
                 const refCentralNode = container.querySelector('.seccao-item[data-tipo="video"], .seccao-item[data-tipo="praticas"], .seccao-item[data-tipo="aviso"]');
                 if (refCentralNode) {
@@ -814,7 +834,7 @@
             if (btnVideo && selectTipo) {
                 const isVideoType = selectTipo.value === 'video' || selectTipo.value === 'vídeo';
                 const videoBlock = container.querySelector('.seccao-item[data-tipo="video"]');
-                
+
                 if (!isVideoType) {
                     btnVideo.style.display = 'none';
                     if (videoBlock) videoBlock.remove();
@@ -854,7 +874,7 @@
                 fallbackOnBody: true, // EVITA QUE O CARTAO FIQUE PRESO DENTRO DO MODAL/SCROLL!
                 fallbackClass: 'seccao-dragged', // o cartão voador (inclinado)
                 ghostClass: 'seccao-placeholder', // o buraco escuro
-                onMove: function(evt) {
+                onMove: function (evt) {
                     // Funcionalidade Mágica: Impede a barra normal de ser arrastada "para debaixo" ou cruzar as secções fixas
                     const att = evt.related.getAttribute('data-tipo');
                     if (att === 'praticas' || att === 'aviso' || att === 'video') {
@@ -864,7 +884,7 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             initSortablePremium();
             const rCat = document.getElementById('rec-cat');
             if (rCat) rCat.addEventListener('change', atualizarBotoesEspeciais);
@@ -921,12 +941,12 @@
                     texto = `<ul class="resource-list">${listaItems.join('')}</ul>`;
                 } else {
                     texto = item.querySelector('.sec-text').value;
-                    
+
                     // Se for Vídeo, transforma o link standard do Youtube num Embed iframe ANTES DE IR PARA A DB
                     if (tipo === 'video') {
                         let linkLimpo = texto.trim();
                         let embedLink = linkLimpo;
-                        
+
                         if (linkLimpo.includes('youtube.com/watch?v=')) {
                             embedLink = linkLimpo.replace('watch?v=', 'embed/').split('&')[0];
                         } else if (linkLimpo.includes('youtu.be/')) {
@@ -934,12 +954,12 @@
                         } else if (linkLimpo.includes('vimeo.com/')) {
                             embedLink = linkLimpo.replace('vimeo.com/', 'player.vimeo.com/video/');
                         }
-                        
+
                         // Envolve no iFrame apenas se não tiver sido já colocado um iFrame bruto
                         if (!embedLink.includes('<iframe')) {
                             texto = `<iframe width="560" height="315" src="${embedLink}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                         } else {
-                            texto = embedLink; 
+                            texto = embedLink;
                         }
                     }
                 }
