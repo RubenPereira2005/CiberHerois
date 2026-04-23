@@ -55,6 +55,60 @@ module.exports = (supabase) => {
 
         const guess = tentativa.toUpperCase();
 
+        // VALIDAÇÃO DE DICIONÁRIO
+        // Se não for a palavra do dia, nem estiver na lista de palavras do jogo, validamos no dicionário
+        if (guess !== wordOfDay && !WORDS.includes(guess)) {
+            if (typeof fetch !== 'undefined') {
+                try {
+                    const guessLow = guess.toLowerCase();
+                    
+                    // Executar verificações em paralelo para ser muito mais rápido
+                    const checkPt = fetch(`https://api.dicionario-aberto.net/word/${guessLow}`)
+                        .then(res => res.json())
+                        .then(data => data && data.length > 0)
+                        .catch(() => false);
+                        
+                    const checkEn = fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${guessLow}`)
+                        .then(res => res.ok)
+                        .catch(() => false);
+
+                    const results = await Promise.all([checkPt, checkEn]);
+                    let isValid = results.some(v => v === true);
+
+                    // --- TRATAMENTO INTELIGENTE DE PLURAIS (PORTUGUÊS) ---
+                    // O dicionário inglês já suporta plurais nativamente, mas o dicionário português não.
+                    // Se a palavra falhou, vamos tentar ver se é um plural de uma palavra válida!
+                    if (!isValid && guessLow.endsWith('s')) {
+                        const checksSingular = [];
+                        
+                        // 1. Plural simples: Remove o 's' (ex: casas -> casa)
+                        checksSingular.push(fetch(`https://api.dicionario-aberto.net/word/${guessLow.slice(0, -1)}`).then(res => res.json()).then(data => data && data.length > 0).catch(() => false));
+                        
+                        // 2. Plural com 'es': Remove o 'es' (ex: computadores -> computador)
+                        if (guessLow.endsWith('es')) {
+                            checksSingular.push(fetch(`https://api.dicionario-aberto.net/word/${guessLow.slice(0, -2)}`).then(res => res.json()).then(data => data && data.length > 0).catch(() => false));
+                        }
+                        
+                        // 3. Plural com 'is': Substitui por 'l' (ex: animais -> animal, pinceis -> pincel)
+                        if (guessLow.endsWith('is')) {
+                            checksSingular.push(fetch(`https://api.dicionario-aberto.net/word/${guessLow.slice(0, -2)}l`).then(res => res.json()).then(data => data && data.length > 0).catch(() => false));
+                        }
+
+                        const singularResults = await Promise.all(checksSingular);
+                        if (singularResults.some(v => v === true)) {
+                            isValid = true; // É um plural legítimo, o jogo deve aceitar!
+                        }
+                    }
+
+                    if (!isValid) {
+                        return res.status(400).json({ erro: 'Palavra não encontrada no dicionário!' });
+                    }
+                } catch (err) {
+                    console.warn("Erro na validação de dicionário externo:", err);
+                }
+            }
+        }
+
         // Estado por defeito: tudo incorreto (absent)
         let resultado = new Array(tamanhoCorreto).fill('absent');
 
@@ -90,48 +144,50 @@ module.exports = (supabase) => {
 
         // Se o jogador acertou E tem sessão iniciada, vamos registar a pontuação
         if (vitoria && req.session && req.session.userId && numero_tentativa) {
-            try {
-                // Matemática da economia
-                const pontosBónus = (6 - numero_tentativa) * 10;
-                const pontosBase = tamanhoCorreto * 5;
-                const totalPontos = pontosBase + pontosBónus;
-                const totalMoedas = Math.floor(totalPontos / 5);
+            const pontosBónus = (6 - numero_tentativa) * 10;
+            const pontosBase = tamanhoCorreto * 5;
+            const totalPontos = pontosBase + pontosBónus;
+            const totalMoedas = Math.floor(totalPontos / 5);
 
-                // Tentar inserir no histórico (Falha se já houver um para hoje devido ao UNIQUE CONSTRAINT)
-                const { error: histError } = await supabase
-                    .from('cibertermo_historico')
-                    .insert({
-                        id_utilizador: req.session.userId,
-                        tamanho_palavra: tamanhoCorreto,
-                        tentativas: numero_tentativa,
-                        pontos_ganhos: totalPontos,
-                        moedas_ganhas: totalMoedas
-                    });
+            ganhos = { pontos: totalPontos, moedas: totalMoedas };
 
-                // Se não deu erro de duplicação, significa que é a sua primeira vitória de hoje!
-                if (!histError) {
-                    // Damos-lhe os pontos
-                    const { data: userData } = await supabase
-                        .from('utilizador')
-                        .select('pontos_totais, coins')
-                        .eq('id_utilizador', req.session.userId)
-                        .single();
+            // Tarefa em Background: Atualizar Base de Dados sem bloquear a resposta ao utilizador!
+            (async () => {
+                try {
+                    // Tentar inserir no histórico (Falha se já houver um para hoje devido ao UNIQUE CONSTRAINT)
+                    const { error: histError } = await supabase
+                        .from('cibertermo_historico')
+                        .insert({
+                            id_utilizador: req.session.userId,
+                            tamanho_palavra: tamanhoCorreto,
+                            tentativas: numero_tentativa,
+                            pontos_ganhos: totalPontos,
+                            moedas_ganhas: totalMoedas
+                        });
 
-                    if (userData) {
-                        await supabase
+                    // Se não deu erro de duplicação, significa que é a sua primeira vitória de hoje!
+                    if (!histError) {
+                        // Damos-lhe os pontos
+                        const { data: userData } = await supabase
                             .from('utilizador')
-                            .update({
-                                pontos_totais: (userData.pontos_totais || 0) + totalPontos,
-                                coins: (userData.coins || 0) + totalMoedas
-                            })
-                            .eq('id_utilizador', req.session.userId);
+                            .select('pontos_totais, coins')
+                            .eq('id_utilizador', req.session.userId)
+                            .single();
 
-                        ganhos = { pontos: totalPontos, moedas: totalMoedas };
+                        if (userData) {
+                            await supabase
+                                .from('utilizador')
+                                .update({
+                                    pontos_totais: (userData.pontos_totais || 0) + totalPontos,
+                                    coins: (userData.coins || 0) + totalMoedas
+                                })
+                                .eq('id_utilizador', req.session.userId);
+                        }
                     }
+                } catch (err) {
+                    console.error("Erro ao gravar termo em background:", err);
                 }
-            } catch (err) {
-                console.error("Erro ao gravar termo:", err);
-            }
+            })();
         }
 
         return res.json({

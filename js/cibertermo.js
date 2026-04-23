@@ -233,6 +233,7 @@ async function submeterPalavra() {
 
     try {
         estadoJogo = 'A_VERIFICAR';
+        mostrarMensagem('A validar...', 0); // 0 = Fica no ecrã sem desaparecer automaticamente
 
         const res = await fetch('/api/termo/verificar', {
             method: 'POST',
@@ -247,9 +248,12 @@ async function submeterPalavra() {
 
         if (!res.ok) {
             mostrarMensagem(dados.erro || 'Erro ao validar palavra.');
+            animarTremor(tentativaAtual);
             estadoJogo = 'JOGANDO';
             return;
         }
+
+        esconderMensagem(); // Esconde imediatamente se a palavra for válida!
 
         // Registar esta palavra como usada para impedir repetições
         const usadasRaw2 = localStorage.getItem(LS_PALAVRAS_USADAS);
@@ -341,7 +345,7 @@ function verificarResetDiario() {
         localStorage.removeItem(LS_SABIAS_QUE);
         localStorage.removeItem(LS_PALAVRAS_USADAS);
         localStorage.removeItem(LS_PALAVRA_REVELADA);
-        
+
         localStorage.setItem(LS_DATA, hoje);
         localStorage.setItem(LS_TAMANHO, LETRAS_POR_PALAVRA);
     }
@@ -410,16 +414,28 @@ function atualizarGrelhaVisual() {
 }
 
 // --- UTILITIES UI ---
-function mostrarMensagem(msg) {
+let msgTimeout = null;
+
+function mostrarMensagem(msg, duracao = 2000) {
     const el = document.getElementById('termo-msg-container');
     el.textContent = msg;
     el.classList.remove('hidden');
     el.classList.add('show');
 
-    setTimeout(() => {
-        el.classList.remove('show');
-        setTimeout(() => el.classList.add('hidden'), 300);
-    }, 2000);
+    if (msgTimeout) clearTimeout(msgTimeout);
+
+    if (duracao > 0) {
+        msgTimeout = setTimeout(() => {
+            esconderMensagem();
+        }, duracao);
+    }
+}
+
+function esconderMensagem() {
+    const el = document.getElementById('termo-msg-container');
+    if (msgTimeout) clearTimeout(msgTimeout);
+    el.classList.remove('show');
+    setTimeout(() => el.classList.add('hidden'), 300);
 }
 
 function animarTremor(rowId) {
@@ -437,14 +453,14 @@ function mostrarModalFinal(mensagem, sucesso, palavraRevelada) {
     const titulo = sucesso ? 'Vitória!' : 'Fim do Jogo';
 
     document.getElementById('modal-title').textContent = titulo;
-    
+
     const descEl = document.getElementById('modal-desc');
     descEl.textContent = mensagem;
 
     // Se for derrota e temos a palavra, criar um badge vistoso abaixo da mensagem
     const badgeExistente = document.getElementById('palavra-revelada-badge');
     if (badgeExistente) badgeExistente.remove();
-    
+
     if (!sucesso && palavraRevelada) {
         const badge = document.createElement('div');
         badge.id = 'palavra-revelada-badge';
