@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CiberHeróis - Aprenda Cibersegurança</title>
+    <meta name="description"
+        content="Aprenda cibersegurança de forma interativa e divertida. Complete quizzes, ganhe medalhas e torne-se um expert em segurança digital.">
     <link rel="icon" type="image/x-icon" href="img/favicon.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
@@ -243,7 +245,7 @@
 
         <footer class="index-footer">
             <div class="container">
-                <p>© 2025 CiberHeróis. Todos os direitos reservados.</p>
+                <p>&copy; <span id="copyright-year"></span> CiberHeróis.</p>
             </div>
         </footer>
 
@@ -251,6 +253,7 @@
 
     <script>
         lucide.createIcons();
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
 
         // Função Mouse following para o cursor 
         (function () {

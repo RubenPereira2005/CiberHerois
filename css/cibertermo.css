@@ -7,6 +7,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
 
 .termo-header {
@@ -147,7 +148,7 @@ body.dark-mode .termo-tile[data-state="absent"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.2s;
+    transition: all 0.2s, background-color 0.35s ease, color 0.35s ease;
     user-select: none;
 }
 
@@ -266,5 +267,21 @@ body.dark-mode .key[data-state="absent"] {
     
     .key.wide {
         font-size: 0.75rem;
+    }
+}
+
+/* Tablet Adjustments */
+@media (min-width: 501px) and (max-width: 768px) {
+    .termo-wrapper {
+        padding: 15px;
+    }
+    .termo-tile {
+        font-size: 1.7rem;
+        max-width: 58px;
+        max-height: 58px;
+    }
+    .key {
+        height: 54px;
+        font-size: 1.05rem;
     }
 }

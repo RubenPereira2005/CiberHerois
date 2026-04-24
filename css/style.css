@@ -49,6 +49,7 @@ body.site-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 
 .auth-navbar-left {
@@ -1162,7 +1163,6 @@ body.index-body {
 
 .step-desc {
   color: #6b7280;
-  margin: 0;
   font-size: 15px;
   line-height: 1.6;
   max-width: 280px;
@@ -1327,6 +1327,13 @@ body.index-body {
   }
 }
 
+/* ---- Index Intermediate Responsive ---- */
+@media (max-width: 768px) {
+  .cta-card {
+    padding: 48px 32px;
+  }
+}
+
 /* ========== Footer (global) ========== */
 .site-footer {
   background: #fff;
@@ -1364,6 +1371,14 @@ body.index-body {
   .profile-avatar-container {
     width: 80px;
     height: 80px;
+  }
+
+  .profile-header-badge {
+    padding: 10px 12px;
+  }
+
+  .profile-header-badge-text {
+    font-size: 13px;
   }
 
   /* Resource detail */
@@ -1471,6 +1486,18 @@ body.index-body {
 .btn:focus {
   outline: 2px solid rgba(37, 99, 235, 0.2);
   outline-offset: 2px;
+}
+
+/* Hero CTA focus states for accessibility */
+.hero-btn-primary:focus-visible,
+.hero-btn-secondary:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.cta-btn-white:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
 }
 
 /* ========== Login Page ========== */
@@ -2048,11 +2075,7 @@ body.index-body {
 
 /* ====== Resource Passwords Page ====== */
 
-.resource-section-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
+/* Note: .resource-section-content is already defined in the resource detail section above */
 
 .resource-section-icon {
   color: #3b82f6;
@@ -2618,12 +2641,15 @@ body.index-body {
   justify-content: space-between;
   margin-bottom: 24px;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .profile-header-left {
   display: flex;
   align-items: flex-start;
   gap: 24px;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Novo Contentor Seguro para a Sanduíche de Imagens */
@@ -3015,21 +3041,36 @@ body.index-body {
   stroke-width: 2px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .profile-header-content {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
 
+  .profile-header-left {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
   .profile-header-right {
     width: 100%;
-    margin-top: 16px;
+    margin-top: 8px;
   }
 
   .settings-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .profile-header-badges {
+    justify-content: center;
+  }
+
+  .profile-header-title {
+    font-size: 24px;
   }
 }
 
@@ -3057,7 +3098,7 @@ body.index-body {
   }
 }
 
-@keyframes slideDown {
+@keyframes slideDownRequirements {
   0% {
     opacity: 0;
     transform: translateY(-10px);
@@ -3096,7 +3137,7 @@ body.index-body {
     position: relative;
     width: 100%;
     margin-top: 10px;
-    animation: slideDown 0.3s ease forwards;
+    animation: slideDownRequirements 0.3s ease forwards;
   }
 }
 
@@ -3709,6 +3750,17 @@ body.index-body {
   color: #ffffff;
 }
 
+@media (max-width: 640px) {
+  .quiz-question-text {
+    font-size: 18px;
+    margin: 0 0 24px 0;
+  }
+
+  .quiz-play-container {
+    padding: 32px 16px;
+  }
+}
+
 .quiz-options-container {
   display: flex;
   flex-direction: column;
@@ -3956,6 +4008,7 @@ body.index-body {
   border-radius: 12px;
   border: 1px solid var(--border-color);
   transition: transform 0.2s ease;
+  gap: 12px;
 }
 
 .ranking-item:hover {
@@ -3972,6 +4025,9 @@ body.index-body {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .ranking-pos {
@@ -3998,6 +4054,56 @@ body.index-body {
   font-weight: 600;
   color: var(--text-color);
   font-size: 1.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+@media (max-width: 480px) {
+  .ranking-name {
+    max-width: 120px;
+    font-size: 0.95rem;
+  }
+
+  .ranking-pos {
+    font-size: 1rem;
+    width: 24px;
+  }
+
+  .ranking-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .ranking-item {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .ranking-left {
+    gap: 10px;
+  }
+
+  .ranking-points {
+    font-size: 0.95rem;
+  }
+
+  .ranking-level {
+    font-size: 0.75rem;
+  }
+
+  .ranking-right {
+    min-width: 55px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ranking-item.top-1:hover,
+  .ranking-item.top-2:hover,
+  .ranking-item.top-3:hover {
+    transform: none;
+  }
 }
 
 .ranking-level {
@@ -4007,6 +4113,8 @@ body.index-body {
 
 .ranking-right {
   text-align: right;
+  flex-shrink: 0;
+  min-width: 70px;
 }
 
 .ranking-points {

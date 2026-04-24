@@ -20,10 +20,10 @@ window.fazerLogout = async function() {
     try {
         await fetch('/api/logout', { method: 'POST' });
         // Limpa tokens locais se houver (por precaução) e redireciona
-        window.location.href = 'index.html';
+        window.location.href = 'index';
     } catch (e) {
         console.error("Erro ao terminar sessão", e);
-        window.location.href = 'index.html'; // Redireciona na mesma por segurança
+        window.location.href = 'index'; // Redireciona na mesma por segurança
     }
 };
 
@@ -95,13 +95,13 @@ window.iniciarPesquisa = function() {
                 if (Array.isArray(results) && results.length > 0) {
                     const matchExato = results.find(u => u.nome.trim().toLowerCase() === query.toLowerCase());
                     if (matchExato) {
-                        window.location.href = 'profile.html?id=' + matchExato.id_utilizador;
+                        window.location.href = 'profile?id=' + matchExato.id_utilizador;
                         return; 
                     }
                 }
             } catch (error) { console.error("Erro:", error); }
 
-            window.location.href = 'search.html?q=' + encodeURIComponent(query);
+            window.location.href = 'search?q=' + encodeURIComponent(query);
         }
     };
 
@@ -197,7 +197,7 @@ window.iniciarPesquisa = function() {
                     const nomeComHighlight = user.nome.replace(regexHighlight, "<span class='search-highlight'>$1</span>");
 
                     const item = document.createElement('a');
-                    item.href = 'profile.html?id=' + user.id_utilizador;
+                    item.href = 'profile?id=' + user.id_utilizador;
                     item.className = 'search-result-item';
                     
                     item.innerHTML = `
@@ -212,7 +212,7 @@ window.iniciarPesquisa = function() {
 
                 // Botão de "Ver todos"
                 const moreLink = document.createElement('a');
-                moreLink.href = 'search.html?q=' + encodeURIComponent(query);
+                moreLink.href = 'search?q=' + encodeURIComponent(query);
                 moreLink.className = 'search-result-item search-dropdown-footer'; 
                 moreLink.innerHTML = 'Ver todos os resultados <i data-lucide="arrow-right" style="width: 14px; height: 14px; margin-left: 4px; vertical-align: middle;"></i>';
                 dropdown.appendChild(moreLink);
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Navbar Link Ativo
-                const current = window.location.pathname.split('/').pop() || 'index.html';
+                const current = window.location.pathname.split('/').pop() || 'index';
                 document.querySelectorAll('.auth-navbar-link').forEach(link => {
                     if (link.getAttribute('href') === current) link.classList.add('auth-navbar-link-active');
                 });

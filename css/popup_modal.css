@@ -135,9 +135,15 @@ body.dark-mode .close-modal-btn:hover {
 
 .avatar-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 1.5rem;
     justify-items: center; /* Centra os itens na grelha */
+}
+
+@media (max-width: 480px) {
+    .avatar-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* O contentor adapta-se à grelha, mas permite que o preço "saia" para fora */
