@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const { createClient } = require('@supabase/supabase-js');
 const logger = require('../utils/logger');
+
+// Função auxiliar para criar um cliente limpo para Auth, não contaminando o cliente global (service_role)
+const getAuthClient = () => createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, { 
+    auth: { persistSession: false, autoRefreshToken: false } 
+});
 
 module.exports = (supabase) => {
     
@@ -10,7 +16,8 @@ module.exports = (supabase) => {
         const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
 
         try {
-            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+            const authClient = getAuthClient();
+            const { data: authData, error: authError } = await authClient.auth.signUp({ email, password });
 
             if (authError) {
                 logger.error(`[400] Erro Auth no registo: ${authError.message} | IP: ${userIp}`);
@@ -44,7 +51,8 @@ module.exports = (supabase) => {
         const { email, password } = req.body;
 
         try {
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+            const authClient = getAuthClient();
+            const { data: authData, error: authError } = await authClient.auth.signInWithPassword({ email, password });
             
             if (authError) {
                 // A MÁGICA: Se o erro do Supabase falar em confirmação, mandamos essa mensagem específica
@@ -58,7 +66,8 @@ module.exports = (supabase) => {
             const { data: userData } = await supabase.from('utilizador').select('*').eq('id_utilizador', userId).single();
 
             if (userData && userData.mfa_ativo === true) {
-                const { error: otpError } = await supabase.auth.signInWithOtp({ email });
+                const authClient = getAuthClient();
+                const { error: otpError } = await authClient.auth.signInWithOtp({ email });
                 if (otpError) return res.status(500).json({ error: "Erro ao enviar código MFA." });
                 return res.json({ step: 'mfa', email: userData.email, message: "Password correta. Código enviado." });
             } else {
@@ -68,6 +77,7 @@ module.exports = (supabase) => {
                 return res.json({ step: 'done', role: userData.role, message: "Login efetuado!" });
             }
         } catch (e) {
+            console.error('[LOGIN ERROR]', e.message, e);
             res.status(500).json({ error: "Erro interno no servidor." });
         }
     });
@@ -80,7 +90,8 @@ module.exports = (supabase) => {
         try {
             if (!token) return res.status(400).json({ error: "Token Google em falta." });
 
-            const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({ provider: 'google', token: token });
+            const authClient = getAuthClient();
+            const { data: authData, error: authError } = await authClient.auth.signInWithIdToken({ provider: 'google', token: token });
             if (authError) throw authError;
 
             const user = authData.user;
@@ -113,7 +124,8 @@ module.exports = (supabase) => {
             }
 
             if (finalUser.mfa_ativo === true) {
-                const { error: otpError } = await supabase.auth.signInWithOtp({ email: finalUser.email });
+                const authClient = getAuthClient();
+                const { error: otpError } = await authClient.auth.signInWithOtp({ email: finalUser.email });
                 if (otpError) throw otpError;
                 return res.json({ step: 'mfa', email: finalUser.email, message: "Google verificado. Código enviado." });
             } else {
@@ -136,7 +148,8 @@ module.exports = (supabase) => {
         try {
             if (!email || !code) return res.status(400).json({ error: "Email e código são obrigatórios." });
 
-            const { data: authData, error: authError } = await supabase.auth.verifyOtp({ email, token: code, type: 'magiclink' });
+            const authClient = getAuthClient();
+            const { data: authData, error: authError } = await authClient.auth.verifyOtp({ email, token: code, type: 'magiclink' });
             if (authError) return res.status(401).json({ error: "Código inválido ou expirado." });
 
             const user = authData.user;
