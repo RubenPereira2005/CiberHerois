@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Dicionário Dinâmico (Misto de comprimentos)
-// Vamos usar tamanhos entre 4 e 8 para ficar usável em mobile.
+// Lista de palavras validas do jogo (comprimentos entre 4 e 8 letras para usabilidade mobile)
 const WORDS = [
     // 4 Letras
     "REDE", "WIFI", "URLS", "BOTS", "SPAM", "DADO", "HACK",
@@ -17,25 +16,25 @@ const WORDS = [
     "FIREWALL", "PHISHING", "MALWARES", "PASSWORD"
 ];
 
-// Data de início fixa para calcular sempre a mesma palavra do dia
-const START_DATE = new Date("2026-04-01T00:00:00Z");
+// Data de inicio fixa para calcular a mesma palavra do dia independentemente do servidor
+const START_DATE = new Date('2026-04-01T00:00:00Z');
 
 function getWordOfTheDay() {
     const today = new Date();
-    // Usa UTC para garantir que é a mesma palavra a nível global, independentemente do fuso horário do servidor
+    // Usa UTC para garantir que e a mesma palavra globalmente, independente do fuso horario do servidor
     const diffTime = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()) -
         Date.UTC(START_DATE.getUTCFullYear(), START_DATE.getUTCMonth(), START_DATE.getUTCDate());
 
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    // Assegura que o index nunca é negativo e dá loops no array infinitamente
+    // Garante que o indice nunca e negativo e da ciclo infinito no array
     const index = Math.abs(diffDays) % WORDS.length;
     return WORDS[index];
 }
 
 module.exports = (supabase) => {
 
-    // Nova Rota GET para o frontend saber quantas letras compõem o desafio de hoje
+    // Devolve o tamanho da palavra do dia e o ID do utilizador (se autenticado)
     router.get('/info', (req, res) => {
         const wordOfDay = getWordOfTheDay();
         return res.json({
@@ -55,14 +54,14 @@ module.exports = (supabase) => {
 
         const guess = tentativa.toUpperCase();
 
-        // VALIDAÇÃO DE DICIONÁRIO
-        // Se não for a palavra do dia, nem estiver na lista de palavras do jogo, validamos no dicionário
+        // VALIDACAO DE DICIONARIO
+        // Se nao for a palavra do dia nem estiver na lista interna, valida contra dicionarios externos
         if (guess !== wordOfDay && !WORDS.includes(guess)) {
             if (typeof fetch !== 'undefined') {
                 try {
                     const guessLow = guess.toLowerCase();
                     
-                    // Executar verificações em paralelo para ser muito mais rápido
+                    // Executa as verificacoes em paralelo para maior desempenho
                     const checkPt = fetch(`https://api.dicionario-aberto.net/word/${guessLow}`)
                         .then(res => res.json())
                         .then(data => data && data.length > 0)
@@ -75,28 +74,27 @@ module.exports = (supabase) => {
                     const results = await Promise.all([checkPt, checkEn]);
                     let isValid = results.some(v => v === true);
 
-                    // --- TRATAMENTO INTELIGENTE DE PLURAIS (PORTUGUÊS) ---
-                    // O dicionário inglês já suporta plurais nativamente, mas o dicionário português não.
-                    // Se a palavra falhou, vamos tentar ver se é um plural de uma palavra válida!
+                    // Tratamento de plurais em portugues: o dicionario PT nao suporta plurais nativamente
+                    // Tenta verificar a forma singular antes de rejeitar a palavra
                     if (!isValid && guessLow.endsWith('s')) {
                         const checksSingular = [];
                         
-                        // 1. Plural simples: Remove o 's' (ex: casas -> casa)
+                        // Plural simples: remove o 's' (ex: casas -> casa)
                         checksSingular.push(fetch(`https://api.dicionario-aberto.net/word/${guessLow.slice(0, -1)}`).then(res => res.json()).then(data => data && data.length > 0).catch(() => false));
-                        
-                        // 2. Plural com 'es': Remove o 'es' (ex: computadores -> computador)
+
+                        // Plural com 'es': remove o 'es' (ex: computadores -> computador)
                         if (guessLow.endsWith('es')) {
                             checksSingular.push(fetch(`https://api.dicionario-aberto.net/word/${guessLow.slice(0, -2)}`).then(res => res.json()).then(data => data && data.length > 0).catch(() => false));
                         }
                         
-                        // 3. Plural com 'is': Substitui por 'l' (ex: animais -> animal, pinceis -> pincel)
+                        // Plural com 'is': substitui por 'l' (ex: animais -> animal)
                         if (guessLow.endsWith('is')) {
                             checksSingular.push(fetch(`https://api.dicionario-aberto.net/word/${guessLow.slice(0, -2)}l`).then(res => res.json()).then(data => data && data.length > 0).catch(() => false));
                         }
 
                         const singularResults = await Promise.all(checksSingular);
                         if (singularResults.some(v => v === true)) {
-                            isValid = true; // É um plural legítimo, o jogo deve aceitar!
+                            isValid = true; // E um plural legitimo
                         }
                     }
 
@@ -109,10 +107,10 @@ module.exports = (supabase) => {
             }
         }
 
-        // Estado por defeito: tudo incorreto (absent)
+        // Estado inicial: todas as posicoes marcadas como ausentes
         let resultado = new Array(tamanhoCorreto).fill('absent');
 
-        // Precisamos de contar as letras para a lógica dos amarelos
+        // Contagem de letras da palavra correta para logica dos amarelos
         let wordCounts = {};
 
         for (let i = 0; i < tamanhoCorreto; i++) {
@@ -120,7 +118,7 @@ module.exports = (supabase) => {
             wordCounts[char] = (wordCounts[char] || 0) + 1;
         }
 
-        // Primeira passagem: Identificar os Verdes (certos no sítio certo)
+        // Primeira passagem: identifica as letras certas no lugar certo (verde)
         for (let i = 0; i < tamanhoCorreto; i++) {
             if (guess[i] === wordOfDay[i]) {
                 resultado[i] = 'correct';
@@ -128,11 +126,11 @@ module.exports = (supabase) => {
             }
         }
 
-        // Segunda passagem: Identificar os Amarelos (certos no sítio errado)
+        // Segunda passagem: identifica as letras certas no lugar errado (amarelo)
         for (let i = 0; i < tamanhoCorreto; i++) {
             if (resultado[i] !== 'correct' && wordCounts[guess[i]] > 0) {
                 resultado[i] = 'present';
-                wordCounts[guess[i]]--; // Remove uma letra disponível
+                wordCounts[guess[i]]--; // Consome uma ocorrencia disponivel
             }
         }
 
@@ -142,7 +140,7 @@ module.exports = (supabase) => {
 
         let ganhos = null;
 
-        // Se o jogador acertou E tem sessão iniciada, vamos registar a pontuação
+        // Se o jogador acertou e tem sessao iniciada, regista a pontuacao (em background)
         if (vitoria && req.session && req.session.userId && numero_tentativa) {
             const pontosBónus = (6 - numero_tentativa) * 10;
             const pontosBase = tamanhoCorreto * 5;
@@ -151,10 +149,10 @@ module.exports = (supabase) => {
 
             ganhos = { pontos: totalPontos, moedas: totalMoedas };
 
-            // Tarefa em Background: Atualizar Base de Dados sem bloquear a resposta ao utilizador!
+            // Atualiza a BD de forma assincrona sem bloquear a resposta ao utilizador
             (async () => {
                 try {
-                    // Tentar inserir no histórico (Falha se já houver um para hoje devido ao UNIQUE CONSTRAINT)
+                    // Tenta inserir no historico; falha silenciosamente se ja existir uma entrada para hoje (UNIQUE CONSTRAINT)
                     const { error: histError } = await supabase
                         .from('cibertermo_historico')
                         .insert({
@@ -165,9 +163,8 @@ module.exports = (supabase) => {
                             moedas_ganhas: totalMoedas
                         });
 
-                    // Se não deu erro de duplicação, significa que é a sua primeira vitória de hoje!
+                    // Se nao deu erro, e a primeira vitoria de hoje: atribui os pontos
                     if (!histError) {
-                        // Damos-lhe os pontos
                         const { data: userData } = await supabase
                             .from('utilizador')
                             .select('pontos_totais, coins')
@@ -195,7 +192,7 @@ module.exports = (supabase) => {
             resultado: resultado,
             vitoria: vitoria,
             ganhos: ganhos,
-            // Revela a palavra APENAS quando perde na última tentativa (seguro!)
+            // Revela a palavra apenas quando o jogador perde na ultima tentativa
             palavra_revelada: (!vitoria && eUltimaTentativa) ? wordOfDay : null
         });
     });

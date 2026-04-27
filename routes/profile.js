@@ -3,18 +3,18 @@ const router = express.Router();
 const multer = require('multer');
 const { verificarEAtribuirMedalhas } = require('./medals');
 
-// --- CONFIGURAÇÃO DO MULTER (Memória em vez de Disco) ---
+// Uploads de avatar ficam em memoria e sao enviados para o Supabase Storage
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 2 * 1024 * 1024 } // Limite de 2MB!
+    limits: { fileSize: 2 * 1024 * 1024 } // Limite de 2 MB
 });
 
 module.exports = (supabase) => {
 
-    // --- ROTA 1: Obter dados (Agora puxa também as opções de privacidade) ---
+    // Devolve o perfil, definicoes de privacidade e info de turma do utilizador autenticado
     router.get('/me', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
 
         const { data, error } = await supabase
             .from('utilizador')
@@ -22,7 +22,7 @@ module.exports = (supabase) => {
             .eq('id_utilizador', req.session.userId)
             .single();
 
-        if (error || !data) return res.status(404).json({ error: "Utilizador não encontrado." });
+        if (error || !data) return res.status(404).json({ error: 'Utilizador nao encontrado.' });
 
         if (data.id_turma) {
             const { data: turmaData } = await supabase
@@ -45,98 +45,91 @@ module.exports = (supabase) => {
         res.json(data);
     });
 
-    // --- ROTA 2: Atualizar Nome ---
+    // Atualiza o nome de exibicao do utilizador autenticado
     router.put('/update', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
 
         const { nome } = req.body;
-        if (!nome || nome.trim() === "") return res.status(400).json({ error: "O nome não pode estar vazio." });
+        if (!nome || nome.trim() === '') return res.status(400).json({ error: 'O nome nao pode estar vazio.' });
 
         const { error } = await supabase.from('utilizador').update({ nome: nome }).eq('id_utilizador', req.session.userId);
-        if (error) return res.status(500).json({ error: "Erro ao atualizar dados." });
-        res.json({ message: "Dados atualizados com sucesso!" });
+        if (error) return res.status(500).json({ error: 'Erro ao atualizar dados.' });
+        res.json({ message: 'Dados atualizados com sucesso!' });
     });
 
-    // --- NOVA ROTA: Atualizar Privacidade ---
+    // Atualiza as definicoes de privacidade do utilizador autenticado
     router.put('/update-privacy', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
 
         const { priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, priv_estatisticas } = req.body;
 
         try {
             const { error } = await supabase.from('utilizador').update({
-                priv_perfil_publico,
-                priv_turma,
-                priv_pontos,
-                priv_medalhas,
-                priv_historico,
-                priv_ranking,
-                priv_ofensiva,
-                priv_estatisticas
+                priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas,
+                priv_historico, priv_ranking, priv_ofensiva, priv_estatisticas
             }).eq('id_utilizador', req.session.userId);
 
             if (error) throw error;
-            res.json({ message: "Privacidade atualizada com sucesso!" });
+            res.json({ message: 'Privacidade atualizada com sucesso!' });
         } catch (error) {
-            console.error("Erro ao atualizar privacidade:", error);
-            res.status(500).json({ error: "Erro ao atualizar protocolos de privacidade." });
+            console.error('Erro ao atualizar privacidade:', error);
+            res.status(500).json({ error: 'Erro ao atualizar protocolos de privacidade.' });
         }
     });
 
-    // --- ROTA 3: Apagar Conta ---
+    // Elimina permanentemente a conta do utilizador autenticado via Supabase Admin
     router.delete('/delete', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
 
         try {
-            const { data, error } = await supabase.auth.admin.deleteUser(req.session.userId);
+            const { error } = await supabase.auth.admin.deleteUser(req.session.userId);
             if (error) throw error;
 
             req.session.destroy((err) => {
-                if (err) return res.status(500).json({ error: "Conta apagada, mas erro ao limpar a sessão no browser." });
-                res.json({ message: "Conta eliminada permanentemente de todo o sistema." });
+                if (err) return res.status(500).json({ error: 'Conta apagada, mas erro ao limpar a sessao no browser.' });
+                res.json({ message: 'Conta eliminada permanentemente de todo o sistema.' });
             });
         } catch (error) {
-            console.error("Erro ao apagar conta (Supabase Admin):", error);
-            res.status(500).json({ error: "Erro ao apagar conta permanentemente." });
+            console.error('Erro ao apagar conta:', error);
+            res.status(500).json({ error: 'Erro ao apagar conta permanentemente.' });
         }
     });
 
-    // --- ROTA 4: Atualizar Avatar (Clicando nos Bonecos) ---
+    // Atualiza o avatar preset selecionado pelo utilizador
     router.put('/update-avatar', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Nao autenticado' });
         const { avatar } = req.body;
-        if (!avatar) return res.status(400).json({ error: "Nenhum avatar enviado." });
+        if (!avatar) return res.status(400).json({ error: 'Nenhum avatar enviado.' });
 
         const { error } = await supabase.from('utilizador').update({ foto_perfil: avatar }).eq('id_utilizador', req.session.userId);
-        if (error) return res.status(500).json({ error: "Erro ao atualizar avatar." });
-        res.json({ message: "Avatar atualizado com sucesso!" });
+        if (error) return res.status(500).json({ error: 'Erro ao atualizar avatar.' });
+        res.json({ message: 'Avatar atualizado com sucesso!' });
     });
 
-    // --- ROTA 4.5: Atualizar Moldura ---
+    // Atualiza a moldura do perfil. Enviar string vazia remove a moldura.
     router.put('/update-border', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Nao autenticado' });
         const { border } = req.body;
-        
-        // Se ele enviar string vazia, tira a moldura
         const molduraFinal = border === '' ? null : border;
 
         const { error } = await supabase.from('utilizador').update({ moldura_perfil: molduraFinal }).eq('id_utilizador', req.session.userId);
-        if (error) return res.status(500).json({ error: "Erro ao atualizar moldura." });
-        res.json({ message: "Moldura atualizada com sucesso!" });
+        if (error) return res.status(500).json({ error: 'Erro ao atualizar moldura.' });
+        res.json({ message: 'Moldura atualizada com sucesso!' });
     });
 
-    // --- ROTA 5: Upload de Nova Foto Personalizada ---
+    // Faz upload de uma foto personalizada para o Supabase Storage e atualiza o perfil
     router.post('/upload-avatar', upload.single('ficheiroAvatar'), async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
-        if (!req.file) return res.status(400).json({ error: "Nenhum ficheiro recebido." });
+        if (!req.session.userId) return res.status(401).json({ error: 'Nao autenticado' });
+        if (!req.file) return res.status(400).json({ error: 'Nenhum ficheiro recebido.' });
 
         try {
+            // Apaga o upload anterior do Supabase Storage se existir
             const { data: user } = await supabase.from('utilizador').select('foto_upload').eq('id_utilizador', req.session.userId).single();
 
             if (user && user.foto_upload && user.foto_upload.includes('supabase.co')) {
                 const urlPartes = user.foto_upload.split('/');
                 const ficheiroAntigo = urlPartes[urlPartes.length - 1];
-                supabase.storage.from('avatars').remove([ficheiroAntigo]).catch(err => console.error("Erro ao apagar antiga:", err));
+                supabase.storage.from('avatars').remove([ficheiroAntigo]).catch(err => console.error('Erro ao apagar avatar antigo:', err));
             }
 
             const extensao = req.file.originalname.split('.').pop();
@@ -156,19 +149,18 @@ module.exports = (supabase) => {
                 .eq('id_utilizador', req.session.userId);
             if (dbError) throw dbError;
 
-            res.json({ message: "Upload concluído!", filename: urlImagem });
+            res.json({ message: 'Upload concluido!', filename: urlImagem });
 
         } catch (error) {
-            console.error("Erro no upload do Supabase:", error);
-            res.status(500).json({ error: "Erro ao guardar a imagem na nuvem." });
+            console.error('Erro no upload do avatar:', error);
+            res.status(500).json({ error: 'Erro ao guardar a imagem na nuvem.' });
         }
     });
 
-    // --- ROTA 6: Ligar/Desligar MFA (COM RECOMPENSA ÚNICA E SEGURANÇA DE MISSÃO) ---
+    // Ativa ou desativa o MFA. Atribui uma recompensa unica ao ativar pela primeira vez via o banner da missao.
     router.put('/update-mfa', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
 
-        // Adicionamos a variável 'veio_da_missao' que o Frontend vai ter de enviar!
         const { mfa_ativo, veio_da_missao } = req.body;
         const isAtivando = (mfa_ativo === true || mfa_ativo === 'true');
 
@@ -181,34 +173,27 @@ module.exports = (supabase) => {
 
             if (userError) throw userError;
 
-            // Só dá pontos se estiver a ativar + nunca recebeu + VEIO DA MISSÃO!
+            // Atribui bonus unico ao ativar via banner da missao, apenas se a recompensa ainda nao foi dada
             if (isAtivando && userDados && userDados.mfa_recompensa_recebida === false && veio_da_missao === true) {
                 const novosPontos = (userDados.pontos_totais || 0) + 50;
                 const novasMoedas = (userDados.coins || 0) + 10;
 
                 const { error: updateError } = await supabase
                     .from('utilizador')
-                    .update({
-                        mfa_ativo: true,
-                        pontos_totais: novosPontos,
-                        coins: novasMoedas, 
-                        mfa_recompensa_recebida: true 
-                    })
+                    .update({ mfa_ativo: true, pontos_totais: novosPontos, coins: novasMoedas, mfa_recompensa_recebida: true })
                     .eq('id_utilizador', req.session.userId);
 
                 if (updateError) throw updateError;
 
-                // Verificar a atribuição da medalha também nesta situação!
                 const novasMedalhas = await verificarEAtribuirMedalhas(supabase, req.session.userId);
-
-                return res.json({ 
-                    message: "Missão Concluída! Ganhaste +50 XP e +10 CiberCoins!", 
+                return res.json({
+                    message: 'Missao Concluida! Ganhaste +50 XP e +10 CiberCoins!',
                     recompensa: true,
                     novas_medalhas: novasMedalhas
                 });
             }
 
-            // 🔴 SE FOR UMA ATIVAÇÃO NORMAL (SEM VIR DO BANNER) OU SE ESTIVER A DESLIGAR
+            // Alternancia padrao sem recompensa
             const { error: normalUpdateError } = await supabase
                 .from('utilizador')
                 .update({ mfa_ativo: isAtivando })
@@ -216,64 +201,68 @@ module.exports = (supabase) => {
 
             if (normalUpdateError) throw normalUpdateError;
 
-            // Se está a ativar (mesmo sem vir do banner), verifica a medalha
             let novasMedalhas = [];
             if (isAtivando) {
                 novasMedalhas = await verificarEAtribuirMedalhas(supabase, req.session.userId);
             }
 
-            res.json({ 
-                message: isAtivando ? "MFA ativado com sucesso." : "MFA desativado. A tua conta está vulnerável!", 
+            res.json({
+                message: isAtivando ? 'MFA ativado com sucesso.' : 'MFA desativado. A tua conta esta vulneravel!',
                 recompensa: false,
                 novas_medalhas: novasMedalhas
             });
 
         } catch (error) {
-            console.error("Erro ao atualizar estado MFA:", error);
-            res.status(500).json({ error: "Erro ao atualizar estado MFA." });
+            console.error('Erro ao atualizar MFA:', error);
+            res.status(500).json({ error: 'Erro ao atualizar estado MFA.' });
         }
     });
 
-    // --- ROTA 7 e 8: Histórico e Atividade ---
+    // Devolve as 5 atividades mais recentes do utilizador autenticado
     router.get('/recent-activity', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
         try {
-            const { data, error } = await supabase.from('progresso').select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)').eq('id_utilizador', req.session.userId).order('data_realizacao', { ascending: false }).limit(5);
+            const { data, error } = await supabase.from('progresso')
+                .select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)')
+                .eq('id_utilizador', req.session.userId)
+                .order('data_realizacao', { ascending: false })
+                .limit(5);
             if (error) throw error;
             res.json(data);
-        } catch (error) { res.status(500).json({ error: "Erro ao carregar atividade recente." }); }
+        } catch (error) { res.status(500).json({ error: 'Erro ao carregar atividade recente.' }); }
     });
 
+    // Devolve o historico completo de atividades do utilizador autenticado
     router.get('/history', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
         try {
-            const { data, error } = await supabase.from('progresso').select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)').eq('id_utilizador', req.session.userId).order('data_realizacao', { ascending: false });
+            const { data, error } = await supabase.from('progresso')
+                .select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)')
+                .eq('id_utilizador', req.session.userId)
+                .order('data_realizacao', { ascending: false });
             if (error) throw error;
             res.json(data);
-        } catch (error) { res.status(500).json({ error: "Erro ao carregar histórico." }); }
+        } catch (error) { res.status(500).json({ error: 'Erro ao carregar historico.' }); }
     });
 
-    // --- ROTA 8.5: Histórico PÚBLICO (Com censura de Privacidade) ---
+    // Devolve o historico de um perfil publico, sujeito as definicoes de privacidade desse utilizador
     router.get('/history/:id', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
         const targetId = req.params.id;
 
         try {
-            // 1. Verifica as regras de privacidade do utilizador procurado
             const { data: user, error: userErr } = await supabase
                 .from('utilizador')
                 .select('priv_perfil_publico, priv_historico')
                 .eq('id_utilizador', targetId)
                 .single();
 
-            if (userErr || !user) return res.status(404).json({ error: "Utilizador não encontrado." });
+            if (userErr || !user) return res.status(404).json({ error: 'Utilizador nao encontrado.' });
 
-            // 2. Se o perfil for privado OU o histórico for privado, bloqueia!
             if (user.priv_perfil_publico === false || user.priv_historico === false) {
-                return res.status(403).json({ error: "Acesso Negado pelas configurações de Privacidade." });
+                return res.status(403).json({ error: 'Acesso Negado pelas configuracoes de Privacidade.' });
             }
 
-            // 3. Se estiver tudo OK, busca o histórico completo
             const { data, error } = await supabase
                 .from('progresso')
                 .select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)')
@@ -284,29 +273,29 @@ module.exports = (supabase) => {
             res.json(data);
 
         } catch (error) {
-            console.error("Erro no histórico público:", error);
-            res.status(500).json({ error: "Erro ao carregar histórico." });
+            console.error('Erro no historico publico:', error);
+            res.status(500).json({ error: 'Erro ao carregar historico.' });
         }
     });
 
-    // --- ROTA 9: Juntar a um Esquadrão ---
+    // Associa o utilizador autenticado a uma turma usando um codigo de acesso
     router.post('/join-turma', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Nao autenticado' });
         const { codigo } = req.body;
-        if (!codigo || codigo.trim() === '') return res.status(400).json({ error: "O código não pode estar vazio." });
+        if (!codigo || codigo.trim() === '') return res.status(400).json({ error: 'O codigo nao pode estar vazio.' });
 
         const { data: turma, error: turmaErr } = await supabase.from('turma').select('id_turma, nome').eq('codigo_acesso', codigo.trim().toUpperCase()).single();
-        if (turmaErr || !turma) return res.status(404).json({ error: "Código inválido. Verifica se escreveste bem!" });
+        if (turmaErr || !turma) return res.status(404).json({ error: 'Codigo invalido. Verifica se escreveste bem!' });
 
         const { error: updateErr } = await supabase.from('utilizador').update({ id_turma: turma.id_turma }).eq('id_utilizador', req.session.userId);
-        if (updateErr) return res.status(500).json({ error: "Erro ao associar ao esquadrão." });
+        if (updateErr) return res.status(500).json({ error: 'Erro ao associar ao esquadrao.' });
 
-        res.json({ message: `Acesso Concedido! Agora pertences ao esquadrão ${turma.nome}!` });
+        res.json({ message: `Acesso Concedido! Agora pertences ao esquadrao ${turma.nome}!` });
     });
 
-    // --- ROTA 10: DE PESQUISA ---
+    // Pesquisa utilizadores por nome (apenas perfis publicos, exclui o utilizador que fez o pedido)
     router.get('/search', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
 
         const query = req.query.q;
         const limit = parseInt(req.query.limit) || 6;
@@ -326,43 +315,37 @@ module.exports = (supabase) => {
             if (error) throw error;
             res.json(data);
         } catch (error) {
-            console.error("Erro na pesquisa:", error);
-            res.status(500).json({ error: "Erro na pesquisa" });
+            console.error('Erro na pesquisa de utilizadores:', error);
+            res.status(500).json({ error: 'Erro na pesquisa' });
         }
     });
 
-    // --- ROTA 11: PÚBLICA DE PERFIL (CENSURADA CONFORME A PRIVACIDADE) ---
+    // Devolve um perfil publico com os campos filtrados de acordo com as definicoes de privacidade do utilizador
     router.get('/user/:id', async (req, res) => {
-        if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
+        if (!req.session.userId) return res.status(401).json({ error: 'Nao autenticado' });
         const { id } = req.params;
 
         try {
             const { data, error } = await supabase
                 .from('utilizador')
-                // 👇 CORREÇÃO: Adicionado pontos_totais e priv_estatisticas AQUI TAMBÉM!
                 .select('nome, email, role, mfa_ativo, foto_perfil, moldura_perfil, foto_google, foto_upload, id_turma, priv_perfil_publico, priv_turma, priv_pontos, priv_medalhas, priv_historico, priv_ranking, priv_ofensiva, coins, pontos_totais, priv_estatisticas')
                 .eq('id_utilizador', id)
                 .single();
 
-            if (error) return res.status(404).json({ error: "Erro na BD: " + error.message });
-            if (!data) return res.status(404).json({ error: "Utilizador não encontrado." });
+            if (error) return res.status(404).json({ error: 'Erro na BD: ' + error.message });
+            if (!data) return res.status(404).json({ error: 'Utilizador nao encontrado.' });
 
-            // 🔴 1. SE O PERFIL FOR PRIVADO
             if (data.priv_perfil_publico === false) {
-                return res.status(404).json({ error: "Utilizador não encontrado." });
+                return res.status(404).json({ error: 'Utilizador nao encontrado.' });
             }
 
-            // 🟢 2. SE FOR PÚBLICO: Avalia as restantes opções de privacidade
-
-            // Privacidade de Pontos e Nível
+            // Visibilidade de pontos e nivel
             if (data.priv_pontos === false) {
                 delete data.pontos_totais;
                 data.nivel = null;
             } else {
                 const totalPontos = data.pontos_totais || 0;
-                let nivel = 1;
-                let pontosDoNivelAtual = 0;
-                let pontosParaSubir = 200;
+                let nivel = 1, pontosDoNivelAtual = 0, pontosParaSubir = 200;
                 while (totalPontos >= pontosDoNivelAtual + pontosParaSubir) {
                     pontosDoNivelAtual += pontosParaSubir;
                     nivel++;
@@ -371,7 +354,7 @@ module.exports = (supabase) => {
                 data.nivel = nivel;
             }
 
-            // Privacidade de Turma
+            // Visibilidade da turma
             if (data.priv_turma === false) {
                 delete data.id_turma;
             } else {
@@ -385,13 +368,15 @@ module.exports = (supabase) => {
                 }
             }
 
-            // Privacidade de Atividade
+            // Visibilidade da atividade recente
             if (data.priv_historico) {
-                const { data: acts } = await supabase.from('progresso').select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)').eq('id_utilizador', id).order('data_realizacao', { ascending: false }).limit(5);
+                const { data: acts } = await supabase.from('progresso')
+                    .select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)')
+                    .eq('id_utilizador', id).order('data_realizacao', { ascending: false }).limit(5);
                 data.atividades_recentes = acts || [];
             }
 
-            // Privacidade do Ranking
+            // Visibilidade da posicao no ranking
             if (data.priv_ranking && data.role === 'aluno') {
                 const { data: rankingData } = await supabase.from('utilizador').select('id_utilizador').eq('role', 'aluno').eq('priv_ranking', true).order('pontos_totais', { ascending: false });
                 if (rankingData) {
@@ -400,7 +385,7 @@ module.exports = (supabase) => {
                 }
             }
 
-            // Privacidade da Ofensiva
+            // Visibilidade da ofensiva (sequencia diaria)
             if (data.priv_ofensiva) {
                 const { data: progresso } = await supabase.from('progresso').select('data_realizacao').eq('id_utilizador', id);
                 let ofensiva = 0;
@@ -429,7 +414,7 @@ module.exports = (supabase) => {
                 data.ofensiva = ofensiva;
             }
 
-            // 🟢 PRIVACIDADE DE ESTATÍSTICAS (Quizzes, Precisão, Respostas)
+            // Visibilidade das estatisticas de quizzes
             if (data.priv_estatisticas) {
                 const { data: progressoStats } = await supabase
                     .from('progresso')
@@ -438,7 +423,6 @@ module.exports = (supabase) => {
                     .eq('atividade.tipo', 'quiz');
 
                 let quizzes = 0, respostas = 0, corretas = 0;
-
                 if (progressoStats && progressoStats.length > 0) {
                     quizzes = progressoStats.length;
                     progressoStats.forEach(p => {
@@ -447,23 +431,22 @@ module.exports = (supabase) => {
                     });
                 }
                 data.estatisticas = {
-                    quizzes: quizzes,
-                    respostas: respostas,
+                    quizzes,
+                    respostas,
                     precisao: respostas > 0 ? Math.round((corretas / respostas) * 100) : 0
                 };
             }
 
-            // 🟢 SE MOSTRAR MEDALHAS: Contamos as medalhas da pessoa
+            // Visibilidade do total de medalhas
             if (data.priv_medalhas) {
                 const { count, error: erroMedalhas } = await supabase
                     .from('utilizador_medalha')
                     .select('*', { count: 'exact', head: true })
                     .eq('id_utilizador', id);
-
                 data.total_medalhas = (!erroMedalhas) ? (count || 0) : 0;
             }
 
-            // Passa as flags para o Frontend esconder as coisas
+            // Passa as flags de visibilidade para o frontend
             data.showMedalhas = data.priv_medalhas;
             data.showHistorico = data.priv_historico;
             data.showRanking = data.priv_ranking;
@@ -473,8 +456,8 @@ module.exports = (supabase) => {
             res.json(data);
 
         } catch (error) {
-            console.error("❌ Erro interno no servidor:", error);
-            res.status(500).json({ error: "Erro ao procurar perfil público." });
+            console.error('Erro no perfil publico:', error);
+            res.status(500).json({ error: 'Erro ao procurar perfil publico.' });
         }
     });
 

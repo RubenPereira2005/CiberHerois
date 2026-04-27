@@ -7,7 +7,7 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
         try {
-            // 1. Pontuação total e MOEDAS do utilizador
+            // 1. Pontuacao total e moedas do utilizador
             const { data: userData, error: userError } = await supabase
                 .from('utilizador')
                 .select('pontos_totais, role, coins')
@@ -32,7 +32,7 @@ module.exports = (supabase) => {
             const pontosRestantes = pontosParaSubir - pontosFeitosNesteNivel;
             const progressoPerc = Math.round((pontosFeitosNesteNivel / pontosParaSubir) * 100);
 
-            // 2. Calcular a precisão e ir buscar datas para a OFENSIVA (Streak)
+            // 2. Calcula a precisao global e vai buscar as datas para o calculo da ofensiva
             const { data: progresso, error: erroProgresso } = await supabase
                 .from('progresso')
                 .select('respostas_corretas, total_perguntas, data_realizacao, atividade(tipo)')
@@ -52,11 +52,11 @@ module.exports = (supabase) => {
                     if (p.total_perguntas !== null) totalRespostas += p.total_perguntas;
                 });
 
-                // --- CÁLCULO DA OFENSIVA ---
+                // Calculo da ofensiva: conta os dias consecutivos jogados ate hoje
                 const diasJogados = [...new Set(progresso.map(p => {
                     const d = new Date(p.data_realizacao);
-                    d.setHours(0, 0, 0, 0); 
-                    return d.getTime();     
+                    d.setHours(0, 0, 0, 0);
+                    return d.getTime();
                 }))];
 
                 const hoje = new Date(); hoje.setHours(0, 0, 0, 0);

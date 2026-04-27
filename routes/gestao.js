@@ -3,9 +3,7 @@ const router = express.Router();
 
 module.exports = (supabase) => {
 
-    // ==========================================
-    // MIDDLEWARE DE SEGURANÇA: Apenas ADMIN
-    // ==========================================
+    // Middleware de seguranca: bloqueia o acesso a utilizadores sem role de administrador
     const verificarAdmin = async (req, res, next) => {
         if (!req.session.userId) return res.redirect('/404');
 
@@ -20,9 +18,9 @@ module.exports = (supabase) => {
     };
 
 
-    // ==========================================
-    // RECURSOS
-    // ==========================================
+    // ==========================================================
+    // RECURSOS PEDAGOGICOS
+    // ==========================================================
 
     router.get('/resources', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').order('id_material', { ascending: false });
@@ -38,7 +36,7 @@ module.exports = (supabase) => {
 
     router.post('/resources', async (req, res) => {
         const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
-        const id_professor = req.session.userId || 1;
+        const id_professor = req.session.userId;
 
         const seccoesStr = JSON.stringify(seccoes);
         const tipoMinusculo = tipo.toLowerCase();
@@ -74,9 +72,9 @@ module.exports = (supabase) => {
         res.json({ message: 'Apagado!' });
     });
 
-    // ==========================================
-    // QUIZZES: Lógica de Mudança Dinâmica
-    // ==========================================
+    // ==========================================================
+    // QUIZZES
+    // ==========================================================
 
     router.get('/quizzes', async (req, res) => {
         const { data, error } = await supabase
@@ -124,7 +122,8 @@ module.exports = (supabase) => {
         });
     });
 
-    // Procura Atividade + Procura Pontuação Automática
+    // Localiza a atividade existente para a categoria/dificuldade dada, ou cria-a automaticamente.
+    // Devolve o id da atividade e os pontos por pergunta calculados.
     async function obterAtividadeEPontos(categoria, dificuldade, id_professor) {
         let { data: ativ } = await supabase.from('atividade')
             .select('id_atividade, pontos')
@@ -135,11 +134,11 @@ module.exports = (supabase) => {
             .maybeSingle();
 
         let id_atividade;
-        let pontos_pergunta = 10; // Fallback
+        let pontos_pergunta = 10; // Valor padrao para dificuldade facil
 
         if (ativ) {
             id_atividade = ativ.id_atividade;
-            // Procurar uma pergunta desta atividade para descobrir o valor exato dos pontos nela!
+            // Vai buscar uma pergunta existente para obter o valor exato de pontos configurado
             let { data: perg } = await supabase.from('pergunta')
                 .select('pontos_pergunta')
                 .eq('id_atividade', id_atividade)
@@ -147,16 +146,16 @@ module.exports = (supabase) => {
                 .maybeSingle();
 
             if (perg && perg.pontos_pergunta) {
-                pontos_pergunta = perg.pontos_pergunta; // Copia o valor da BD
+                pontos_pergunta = perg.pontos_pergunta;
             } else if (ativ.pontos) {
-                // Se não houver perguntas, divide os pontos globais por 5 (como configuraste na DB)
+                // Se nao houver perguntas ainda, estima dividindo os pontos globais por 5
                 pontos_pergunta = Math.round(ativ.pontos / 5);
             } else {
                 if (dificuldade === 'medio') pontos_pergunta = 20;
                 if (dificuldade === 'dificil') pontos_pergunta = 30;
             }
         } else {
-            // Se a Atividade ainda não existir, cria-a com as tuas regras
+            // Atividade ainda nao existe: cria-a automaticamente com os pontos calculados por dificuldade
             let pontosAtiv = 50;
             if (dificuldade === 'medio') { pontosAtiv = 100; pontos_pergunta = 20; }
             else if (dificuldade === 'dificil') { pontosAtiv = 150; pontos_pergunta = 30; }
@@ -181,21 +180,20 @@ module.exports = (supabase) => {
 
     router.post('/quiz', async (req, res) => {
         const { texto_pergunta, categoria, dificuldade, opcoes, corretaIndex } = req.body;
-        const id_professor = req.session.userId || 1;
+        const id_professor = req.session.userId;
 
         try {
-            // Usa o sistema automático
             const { id_atividade, pontos_pergunta } = await obterAtividadeEPontos(categoria, dificuldade, id_professor);
 
-            // Insere Pergunta
+            // Insere a pergunta
             const { data: perg, error: pergErr } = await supabase.from('pergunta').insert([{
                 id_atividade: id_atividade,
                 texto_pergunta,
-                pontos_pergunta: pontos_pergunta // Envia a pontuação para a DB!
+                pontos_pergunta: pontos_pergunta
             }]).select('id_pergunta').single();
             if (pergErr) throw pergErr;
 
-            // Insere Opções
+            // Insere as opcoes de resposta
             const opcoesArray = opcoes.map((texto, index) => ({
                 id_pergunta: perg.id_pergunta,
                 texto_opcao: texto,
@@ -210,13 +208,12 @@ module.exports = (supabase) => {
 
     router.put('/quizzes/:id', async (req, res) => {
         const { texto_pergunta, categoria, dificuldade, opcoes, corretaIndex } = req.body;
-        const id_professor = req.session.userId || 1;
+        const id_professor = req.session.userId;
 
         try {
-            // Obter dados dinâmicos
             const { id_atividade, pontos_pergunta } = await obterAtividadeEPontos(categoria, dificuldade, id_professor);
 
-            // MOVE a pergunta e ATUALIZA a pontuação, deixando o resto quieto
+            // Atualiza o texto, move a pergunta para a atividade correta e recalcula a pontuacao
             const { error: pergErr } = await supabase.from('pergunta')
                 .update({
                     texto_pergunta,
@@ -225,7 +222,7 @@ module.exports = (supabase) => {
                 }).eq('id_pergunta', req.params.id);
             if (pergErr) throw pergErr;
 
-            // Apagar opções velhas e Inserir Novas
+            // Apaga as opcoes antigas e insere as novas
             const { error: delErr } = await supabase.from('opcao_resposta')
                 .delete().eq('id_pergunta', req.params.id);
             if (delErr) throw delErr;
@@ -249,9 +246,11 @@ module.exports = (supabase) => {
     });
 
 
-    // ==========================================
+    // ==========================================================
     // TURMAS
-    // ==========================================
+    // ==========================================================
+
+    // Gera um codigo de acesso aleatorio de 6 caracteres alfanumericos
     const gerarCodigoAcesso = () => {
         const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let codigo = '';
@@ -320,14 +319,12 @@ module.exports = (supabase) => {
     });
 
 
-    // --- ROTA DINÂMICA DE OPÇÕES (ESCALÁVEL) ---
+    // Devolve as categorias e dificuldades unicas existentes, para preencher os filtros dinamicamente
     router.get('/opcoes-quiz', async (req, res) => {
         try {
-            // Vai buscar tudo à tabela atividade
             const { data, error } = await supabase.from('atividade').select('categoria, dificuldade').eq('tipo', 'quiz');
             if (error) throw error;
 
-            // Remove os duplicados automaticamente (cria arrays únicos)
             const categorias = [...new Set(data.map(item => item.categoria))].filter(Boolean).sort();
             const dificuldades = [...new Set(data.map(item => item.dificuldade))].filter(Boolean);
 

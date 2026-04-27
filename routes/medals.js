@@ -13,7 +13,7 @@ module.exports = (supabase) => {
             .eq('id_medalha', id_medalha)
             .maybeSingle();
 
-        if (jatem) return false; // Já tinha, não atribui de novo
+        if (jatem) return false; // Ja tinha, nao atribui de novo
 
         const { error } = await supabase
             .from('utilizador_medalha')
@@ -31,7 +31,7 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado' });
 
         try {
-            // Vai buscar TODAS as medalhas existentes
+            // Vai buscar todas as medalhas existentes na base de dados
             const { data: todasMedalhas, error: erroTodas } = await supabase
                 .from('medalha')
                 .select('id_medalha, nome, descricao, icone, imagem_url')
@@ -39,7 +39,7 @@ module.exports = (supabase) => {
 
             if (erroTodas) throw erroTodas;
 
-            // Vai buscar as que o utilizador desbloqueou
+            // Vai buscar as medalhas que o utilizador ja desbloqueou
             const { data: conquistadas, error: erroConq } = await supabase
                 .from('utilizador_medalha')
                 .select('id_medalha, data_conquista')
@@ -47,13 +47,13 @@ module.exports = (supabase) => {
 
             if (erroConq) throw erroConq;
 
-            // Cria um mapa para lookup rápido
+            // Cria um mapa para lookup rapido por id
             const conquistadasMap = {};
             (conquistadas || []).forEach(c => {
                 conquistadasMap[c.id_medalha] = c.data_conquista;
             });
 
-            // Junta tudo: medalha desbloqueada ou bloqueada
+            // Combina todas as medalhas com o estado de desbloqueio do utilizador
             const resultado = (todasMedalhas || []).map(m => ({
                 id_medalha: m.id_medalha,
                 nome: m.nome,
@@ -88,7 +88,7 @@ module.exports = (supabase) => {
                 return res.status(403).json({ error: 'Privacidade ativa.' });
             }
 
-            // Só mostra as que ele já desbloqueou (não as bloqueadas)
+            // Mostra apenas as medalhas que o utilizador ja desbloqueou
             const { data: conquistadas } = await supabase
                 .from('utilizador_medalha')
                 .select('id_medalha, data_conquista, medalha(nome, descricao, icone, imagem_url)')
@@ -111,7 +111,7 @@ module.exports = (supabase) => {
         }
     });
 
-    // --- ROTA 3: Verificar e atribuir medalhas manualmente (chamada interna ou de debug) ---
+    // Verifica e atribui medalhas manualmente (util para chamadas internas ou de teste)
     router.post('/verificar', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: 'Não autenticado' });
 
@@ -122,15 +122,15 @@ module.exports = (supabase) => {
     return router;
 };
 
-// ==========================================
-// FUNÇÃO EXPORTADA PARA USO INTERNO
-// Verifica as 3 medalhas e atribui se necessário
-// ==========================================
+// ==========================================================
+// FUNCAO EXPORTADA PARA USO INTERNO
+// Verifica as condicoes de todas as medalhas e atribui as que se aplicam
+// ==========================================================
 async function verificarEAtribuirMedalhas(supabase, id_utilizador) {
     const novasMedalhas = [];
 
     try {
-        // --- Vai buscar as IDs das 3 medalhas pela DB ---
+        // Vai buscar todas as medalhas da base de dados para mapear pelo nome
         const { data: medalhasDB } = await supabase
             .from('medalha')
             .select('id_medalha, nome')
@@ -157,7 +157,7 @@ async function verificarEAtribuirMedalhas(supabase, id_utilizador) {
             }
         }
 
-        // --- Ir buscar o progresso do utilizador ---
+        // Vai buscar o progresso do utilizador para verificar as restantes condicoes
         const { data: progressoList } = await supabase
             .from('progresso')
             .select('respostas_corretas, total_perguntas, atividade!inner(categoria, dificuldade)')
@@ -177,10 +177,10 @@ async function verificarEAtribuirMedalhas(supabase, id_utilizador) {
             }
         }
 
-        // --- 3. MEDALHA: "Mestre Completo" (todas as dificuldades de uma categoria) ---
+        // --- Medalha: 'Mestre Completo' (todas as dificuldades de uma categoria concluidas) ---
         const idMestre = medalhaMap['Mestre Completo'];
         if (idMestre) {
-            // Agrupa por categoria as dificuldades completadas COM TODA A CATEGORIA COMPLETADA (qualquer pontuação)
+            // Agrupa por categoria as dificuldades concluidas pelo utilizador
             const categorias = {};
             progressoList.forEach(p => {
                 if (!p.atividade) return;
@@ -190,7 +190,7 @@ async function verificarEAtribuirMedalhas(supabase, id_utilizador) {
                 categorias[cat].add(diff);
             });
 
-            // Verifica se alguma categoria tem {facil, medio, dificil}
+            // Verifica se alguma categoria tem as tres dificuldades concluidas
             const temMestre = Object.values(categorias).some(diffs =>
                 diffs.has('facil') && diffs.has('medio') && diffs.has('dificil')
             );

@@ -8,26 +8,25 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: "Utilizador não autenticado" });
 
         try {
-            // 1. Ir buscar os utilizadores à base de dados, ordenados por pontos
+            // Vai buscar os alunos ordenados por pontos, apenas os que consentiram aparecer no ranking
             const { data: utilizadores, error } = await supabase
                 .from('utilizador')
                 .select('id_utilizador, nome, pontos_totais, foto_perfil')
                 .eq('role', 'aluno')
-                // Só puxa quem ativou a opção de aparecer no ranking
-                .eq('priv_ranking', true) 
-                .order('pontos_totais', { ascending: false }) // Do maior para o menor
-                .limit(10); // Mostra o Top 10
+                .eq('priv_ranking', true)
+                .order('pontos_totais', { ascending: false })
+                .limit(10);
 
             if (error) throw error;
 
-            // 2. Tratar os dados (Calcular níveis e formatar imagem)
+            // Calcula o nivel e formata o caminho do avatar para cada utilizador
             const ranking = utilizadores.map((user, index) => {
                 let totalPontos = user.pontos_totais || 0;
                 
-                // Matemática Progressiva dos Níveis
+                // Calculo progressivo de niveis com crescimento exponencial
                 let nivel = 1;
-                let pontosDoNivelAtual = 0; 
-                let pontosParaSubir = 200;  
+                let pontosDoNivelAtual = 0;
+                let pontosParaSubir = 200;
 
                 while (totalPontos >= pontosDoNivelAtual + pontosParaSubir) {
                     pontosDoNivelAtual += pontosParaSubir; 
@@ -35,7 +34,7 @@ module.exports = (supabase) => {
                     pontosParaSubir = Math.floor(pontosParaSubir * 1.5); 
                 }
 
-                // Definir caminho correto do Avatar
+                // Determina o caminho correto da imagem do avatar
                 let avatarFinal = '/img/default_avatar.png';
                 if (user.foto_perfil) {
                     if (user.foto_perfil.startsWith('http')) {
@@ -49,13 +48,13 @@ module.exports = (supabase) => {
 
                 return {
                     id_utilizador: user.id_utilizador,
-                    posicao: index + 1, // 1º, 2º, 3º, etc.
+                    posicao: index + 1,
                     nome: user.nome,
                     pontos: totalPontos,
                     nivel: nivel,
                     avatar: avatarFinal,
-                    // Permite destacar a linha se for o próprio utilizador a ver a tabela
-                    eOUtilizador: user.id_utilizador === req.session.userId 
+                    // Indica se a entrada pertence ao utilizador que esta a ver o ranking
+                    eOUtilizador: user.id_utilizador === req.session.userId
                 };
             });
 

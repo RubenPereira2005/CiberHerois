@@ -14,16 +14,15 @@ module.exports = (supabase) => {
         return codigo;
     };
 
-    // Middleware de segurança (AGORA GUARDA O NOME DO PROFESSOR)
+    // Middleware de seguranca: permite acesso apenas a utilizadores com role de professor ou admin
     const verificarProfessor = async (req, res, next) => {
         if (!req.session.userId) return res.redirect('/404.html');
 
-        // Puxamos o "nome" da base de dados também!
         const { data: user, error } = await supabase.from('utilizador').select('role, nome').eq('id_utilizador', req.session.userId).single();
 
         if (error || !user || (user.role !== 'professor' && user.role !== 'admin')) return res.redirect('/404.html');
 
-        // Guardamos o nome na "request" para usar mais à frente na criação do HTML
+        // Guarda o nome do professor na request para uso nas rotas seguintes
         req.nomeProfessor = user.nome;
 
         next();
@@ -125,9 +124,9 @@ module.exports = (supabase) => {
         res.json({ message: 'Recurso apagado da base de dados!' });
     });
 
-    // ==========================================
-    // QUIZZES DO PROFESSOR (LÓGICA CORRIGIDA)
-    // ==========================================
+    // ==========================================================
+    // QUIZZES DO PROFESSOR
+    // ==========================================================
 
     router.get('/quizzes', verificarProfessor, async (req, res) => {
         const { data, error } = await supabase
@@ -169,14 +168,14 @@ module.exports = (supabase) => {
         } catch (error) { res.status(500).json({ error: error.message }); }
     });
 
-    // Função de Inteligência para Mudar de Pasta
+    // Localiza a atividade existente para a categoria/dificuldade do professor, ou cria-a automaticamente
     async function obterAtividadeEPontos(categoria, dificuldade, id_professor) {
         let { data: ativ } = await supabase.from('atividade')
             .select('id_atividade, pontos')
             .ilike('categoria', categoria.trim())
             .ilike('dificuldade', dificuldade.trim())
             .eq('tipo', 'quiz')
-            .eq('id_professor', id_professor) // Garante que a pasta pertence ao professor
+            .eq('id_professor', id_professor) // Garante que a atividade pertence a este professor
             .limit(1)
             .maybeSingle();
 
@@ -251,18 +250,18 @@ module.exports = (supabase) => {
         const id_professor = req.session.userId;
 
         try {
-            // Verifica segurança (se a pergunta pertence mesmo a este professor)
+            // Verifica se a pergunta pertence ao professor autenticado antes de editar
             const { data: check } = await supabase.from('pergunta').select('atividade!inner(id_professor)').eq('id_pergunta', req.params.id).single();
             if (!check || check.atividade.id_professor !== id_professor) return res.status(403).json({ error: 'Acesso negado' });
 
             const { id_atividade, pontos_pergunta } = await obterAtividadeEPontos(categoria, dificuldade, id_professor);
 
-            // Move a pergunta e atualiza pontos
+            // Atualiza o texto e move a pergunta para a atividade correta
             await supabase.from('pergunta')
                 .update({ texto_pergunta, id_atividade, pontos_pergunta })
                 .eq('id_pergunta', req.params.id);
 
-            // Refaz opções
+            // Elimina as opcoes antigas e insere as novas
             await supabase.from('opcao_resposta').delete().eq('id_pergunta', req.params.id);
 
             const opsToInsert = opcoes.map((op, idx) => ({
@@ -287,24 +286,22 @@ module.exports = (supabase) => {
     });
 
 
-    // --- ROTA DINÂMICA DE OPÇÕES (ESCALÁVEL) ---
+    // Devolve as categorias e dificuldades unicas para preencher os filtros do formulario
     router.get('/opcoes-quiz', async (req, res) => {
         try {
-            // Vai buscar tudo à tabela atividade
             const { data, error } = await supabase.from('atividade').select('categoria, dificuldade').eq('tipo', 'quiz');
             if (error) throw error;
-            
-            // Remove os duplicados automaticamente (cria arrays únicos)
+
             const categorias = [...new Set(data.map(item => item.categoria))].filter(Boolean).sort();
             const dificuldades = [...new Set(data.map(item => item.dificuldade))].filter(Boolean);
-            
+
             res.json({ categorias, dificuldades });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     });
     
-    // --- NOVA ROTA: GERAR OPÇÕES COM IA ---
+    // Gera 3 opcoes de resposta para uma pergunta usando IA Gemini, incluindo a resposta correta
     router.post('/generate-options', async (req, res) => {
         
         if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
@@ -332,7 +329,7 @@ module.exports = (supabase) => {
             const result = await model.generateContent(prompt);
             let text = result.response.text();
             
-            // Limpa formatação Markdown que a IA pode adicionar (como \`\`\`json)
+            // Remove formatacao Markdown que a IA possa ter adicionado
             text = text.replace(/```json/g, '').replace(/```/g, '').trim();
 
             const jsonResposta = JSON.parse(text);

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { GoogleGenerativeAI } = require('@google/generative-ai'); // Importa a AI do Gemini
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { verificarEAtribuirMedalhas } = require('./medals');
 
 module.exports = (supabase) => {
@@ -28,7 +28,7 @@ module.exports = (supabase) => {
         }
     });
 
-    // --- NOVA ROTA: Obter o progresso do utilizador (Estrelas / Desbloqueios) ---
+    // Devolve o progresso do utilizador por categoria e dificuldade (usado para mostrar estrelas de conclusao)
     router.get('/user-progress/all', async (req, res) => {
         if (!req.session.userId) return res.json({});
         try {
@@ -48,7 +48,7 @@ module.exports = (supabase) => {
                     progress[cat] = { facil: false, medio: false, dificil: false };
                 }
 
-                // A REGRA DE OURO: Para ganhar a estrela, tem de acertar TUDO (ex: 5/5)
+                // Para ganhar a estrela, o utilizador tem de acertar em todas as perguntas
                 if (p.respostas_corretas === p.total_perguntas && p.total_perguntas > 0) {
                     progress[cat][diff] = true;
                 }
@@ -190,7 +190,7 @@ module.exports = (supabase) => {
                     coins: (userData.coins || 0) + moedasGanhas
                 }).eq('id_utilizador', req.session.userId);
             }
-            // --- VERIFICAR E ATRIBUIR MEDALHAS AUTOMATICAMENTE ---
+            // Verifica e atribui medalhas automaticamente apos guardar a pontuacao
             const novasMedalhas = await verificarEAtribuirMedalhas(supabase, req.session.userId);
 
             res.json({
@@ -205,16 +205,14 @@ module.exports = (supabase) => {
         }
     });
 
-    // --- NOVA ROTA: O Ciber-Mentor (IA Gemini) ---
+    // Gera uma dica personalizada usando IA Gemini, sem revelar a resposta correta
     router.post('/hint', async (req, res) => {
         const { pergunta, respostaErrada } = req.body;
 
         try {
-            // Inicializa a IA com a tua chave do ficheiro .env
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-            // Prompt para a IA: Explica o erro de forma amigável, sem dar a resposta certa
             const prompt = `Assume a persona de "Ciber-Mentor", um professor especialista em Cibersegurança.
 
             CONTEXTO DO ALUNO:

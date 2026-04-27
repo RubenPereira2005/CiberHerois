@@ -8,15 +8,15 @@ module.exports = (supabase) => {
         if (!req.session.userId) return res.status(401).json({ error: "Não autenticado" });
         
         try {
-            // 1. Vai buscar todos os itens que existem na loja
+            // Vai buscar todos os itens disponiveis na loja
             const { data: itens, error: errorItens } = await supabase
                 .from('loja_itens')
                 .select('*')
-                .order('preco', { ascending: true }); // Ordena do mais barato (grátis) para o mais caro
+                .order('preco', { ascending: true });
             
             if (errorItens) throw errorItens;
 
-            // 2. Vai buscar o inventário (o que este utilizador já comprou)
+            // Vai buscar os itens que o utilizador ja comprou
             const { data: inventario, error: errorInv } = await supabase
                 .from('utilizador_itens')
                 .select('id_item')
@@ -24,13 +24,13 @@ module.exports = (supabase) => {
 
             if (errorInv) throw errorInv;
 
-            // Transforma o inventário num array de IDs para ser mais fácil verificar (ex: [1, 3, 5])
+            // Transforma o inventario num Set para verificacao eficiente
             const itensComprados = inventario.map(i => i.id_item);
 
-            // 3. Junta tudo: Diz ao frontend se cada item está "desbloqueado" ou não
+            // Junta a informacao da loja com o estado de compra de cada item
             const lojaComStatus = itens.map(item => ({
                 ...item,
-                // É considerado comprado se o preço for 0 (Free) OU se o ID do item estiver no inventário dele
+                // Item considerado comprado se o preco for 0 (gratuito) ou se o ID estiver no inventario
                 comprado: item.preco === 0 || itensComprados.includes(item.id_item)
             }));
 
@@ -47,7 +47,7 @@ module.exports = (supabase) => {
         const { id_item } = req.body;
 
         try {
-            // 1. Verificar o preço do item
+            // Verifica o preco do item
             const { data: item, error: errorItem } = await supabase
                 .from('loja_itens')
                 .select('preco, nome')
@@ -56,7 +56,7 @@ module.exports = (supabase) => {
             
             if (errorItem || !item) return res.status(404).json({ error: "Item não encontrado na loja." });
 
-            // 2. Verificar o saldo do utilizador
+            // Verifica o saldo atual do utilizador
             const { data: user, error: errorUser } = await supabase
                 .from('utilizador')
                 .select('coins')
@@ -65,12 +65,12 @@ module.exports = (supabase) => {
 
             if (errorUser) throw errorUser;
 
-            // 3. A Lógica de Validação: Tem moedas?
+            // Valida se o utilizador tem moedas suficientes
             if (user.coins < item.preco) {
                 return res.status(400).json({ error: "Não tens CiberCoins suficientes para comprar isto." });
             }
 
-            // 4. A Lógica de Validação: Já comprou antes?
+            // Valida se o utilizador ja tem este item
             const { data: jaTem } = await supabase
                 .from('utilizador_itens')
                 .select('id_item')
@@ -80,16 +80,16 @@ module.exports = (supabase) => {
             
             if (jaTem) return res.status(400).json({ error: "Já tens este avatar no teu inventário!" });
 
-            // 5. Fazer a Transação: Descontar moedas E adicionar ao inventário
+            // Executa a transacao: desconta as moedas e regista o item no inventario
             const novasCoins = user.coins - item.preco;
 
-            // Atualiza o saldo
+            // Atualiza o saldo do utilizador
             await supabase
                 .from('utilizador')
                 .update({ coins: novasCoins })
                 .eq('id_utilizador', req.session.userId);
             
-            // Adiciona ao inventário
+            // Adiciona o item ao inventario do utilizador
             await supabase
                 .from('utilizador_itens')
                 .insert({ id_utilizador: req.session.userId, id_item: id_item });

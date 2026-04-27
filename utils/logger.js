@@ -1,15 +1,15 @@
 const winston = require('winston');
 const path = require('path');
 
-// Emojis para identificação visual rápida
-const levelEmojis = {
-    info: '✅',
-    warn: '⚠️',
-    error: '❌',
-    debug: '🐛'
+// Rotulos de nivel para identificacao visual no log
+const levelLabels = {
+    info: '[INFO]',
+    warn: '[AVISO]',
+    error: '[ERRO]',
+    debug: '[DEBUG]'
 };
 
-// Filtro para garantir que o security.log não recebe erros técnicos pesados
+// Filtro para garantir que o security.log nao recebe erros tecnicos pesados
 const soInfoEWarn = winston.format((info) => {
     return (info.level === 'info' || info.level === 'warn') ? info : false;
 });
@@ -18,8 +18,7 @@ const soInfoEWarn = winston.format((info) => {
 const logFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.printf(info => {
-        const emoji = levelEmojis[info.level] || '🔹';
-        return `[${info.timestamp}] ${emoji} ${info.level.toUpperCase()}: ${info.message}`;
+        return `[${info.timestamp}] ${levelLabels[info.level] || info.level.toUpperCase()} ${info.message}`;
     })
 );
 
@@ -40,7 +39,7 @@ const logger = winston.createLogger({
     ]
 });
 
-// Mostrar no terminal durante o desenvolvimento
+// Apresenta os logs no terminal durante o desenvolvimento
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
         format: winston.format.combine(
