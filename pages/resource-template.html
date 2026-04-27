@@ -125,9 +125,9 @@
                         textoCompleto += sec.titulo + " " + texto + " ";
 
                         if (tipo === 'praticas') {
-                            htmlSeccoes += `<div class="resource-best-practices"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}" class="icon-24"></i>${sec.titulo}</h3>${texto}</div>`;
+                            htmlSeccoes += `<div class="resource-best-practices"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}"></i>${sec.titulo}</h3>${texto}</div>`;
                         } else if (tipo === 'aviso') {
-                            htmlSeccoes += `<div class="resource-warnings"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}" class="icon-24"></i>${sec.titulo}</h3>${texto}</div>`;
+                            htmlSeccoes += `<div class="resource-warnings"><h3 style="display: flex; align-items: center; gap: 8px;"><i data-lucide="${icone}"></i>${sec.titulo}</h3>${texto}</div>`;
                         } else if (tipo === 'video') {
                             // Helper para transformar Link padrão em Embed
                             function converterParaEmbed(url) {
@@ -151,13 +151,19 @@
                             }
                             
                             htmlSeccoes += `<div class="resource-section border-${corDinamica}" style="padding-bottom: 25px;">
-                                                <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;"><i data-lucide="${icone}" class="icon-24 icon-${corDinamica}"></i>${sec.titulo || 'Vídeo'}</h3>
+                                                <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;"><i data-lucide="${icone}" class="icon-${corDinamica}"></i>${sec.titulo || 'Vídeo'}</h3>
                                                 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
                                                     ${embedHTML}
                                                 </div>
                                             </div>`;
                         } else {
-                            htmlSeccoes += `<div class="resource-section border-${corDinamica}"><div style="display: flex; align-items: flex-start; gap: 12px;"><i data-lucide="${icone}" class="icon-24 icon-${corDinamica}" style="margin-top: 4px;"></i><div><h2>${sec.titulo}</h2><p>${texto.replace(/\\n/g, '<br>')}</p></div></div></div>`;
+                            htmlSeccoes += `<div class="resource-section border-${corDinamica}">
+                                                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                                                    <i data-lucide="${icone}" class="icon-${corDinamica}"></i>
+                                                    ${sec.titulo}
+                                                </h2>
+                                                <p>${texto.replace(/\\n/g, '<br>')}</p>
+                                            </div>`;
                         }
                     });
                 }
@@ -180,7 +186,7 @@
                     window.location.href = `/api/pdf/download/${urlName}`;
                 };
 
-                // 👉 SE FOR GUIA INTERATIVO, CARREGA O QUIZ DA BASE DE DADOS!
+                // SE FOR GUIA INTERATIVO, CARREGA O QUIZ DA BASE DE DADOS!
                 if (r.tipo === 'guia-interativo' || r.tipo === 'guia interativo') {
                     // Deduz a categoria pelo URL (ex: resource-phishing -> guia-phishing)
                     const baseCat = r.url_conteudo ? r.url_conteudo.replace('resource-', '') : 'phishing';
