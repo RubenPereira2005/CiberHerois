@@ -84,6 +84,80 @@ module.exports = (supabase) => {
     // ROTAS DE RECURSOS
     // ==========================================
 
+    async function syncInteractiveGuide(url_conteudo, perguntas, id_professor, titulo) {
+        if (!perguntas || perguntas.length === 0) return;
+        const slug = url_conteudo.replace('resource-', '');
+        const categoria = 'guia-' + slug;
+
+        let { data: ativ } = await supabase.from('atividade')
+            .select('id_atividade')
+            .eq('tipo', 'miniquiz')
+            .eq('categoria', categoria)
+            .maybeSingle();
+
+        let id_atividade;
+        if (!ativ) {
+            const { data: newAtiv, error: errAtiv } = await supabase.from('atividade').insert([{
+                titulo: `Mini-Quiz: ${titulo}`,
+                descricao: 'Guia Interativo',
+                tipo: 'miniquiz',
+                categoria: categoria,
+                dificuldade: 'facil',
+                pontos: 50,
+                id_professor
+            }]).select('id_atividade').single();
+            if (errAtiv) throw errAtiv;
+            id_atividade = newAtiv.id_atividade;
+        } else {
+            id_atividade = ativ.id_atividade;
+            const { data: pergs } = await supabase.from('pergunta').select('id_pergunta').eq('id_atividade', id_atividade);
+            if (pergs && pergs.length > 0) {
+                const ids = pergs.map(p => p.id_pergunta);
+                await supabase.from('opcao_resposta').delete().in('id_pergunta', ids);
+                await supabase.from('pergunta').delete().eq('id_atividade', id_atividade);
+            }
+        }
+
+        for (const p of perguntas) {
+            const { data: novaPerg, error: errP } = await supabase.from('pergunta').insert([{
+                id_atividade,
+                texto_pergunta: p.texto_pergunta,
+                pontos_pergunta: 10
+            }]).select('id_pergunta').single();
+            
+            if (errP) continue;
+
+            const opcoesToInsert = p.opcoes.map((op, idx) => ({
+                id_pergunta: novaPerg.id_pergunta,
+                texto_opcao: op,
+                e_correta: idx.toString() === p.corretaIndex.toString()
+            }));
+
+            await supabase.from('opcao_resposta').insert(opcoesToInsert);
+        }
+    }
+    async function deleteInteractiveGuideActivity(url_conteudo) {
+        const slug = url_conteudo.replace('resource-', '');
+        const categoria = 'guia-' + slug;
+
+        const { data: ativ } = await supabase.from('atividade')
+            .select('id_atividade')
+            .eq('tipo', 'miniquiz')
+            .eq('categoria', categoria)
+            .maybeSingle();
+
+        if (ativ) {
+            const id_atividade = ativ.id_atividade;
+            const { data: pergs } = await supabase.from('pergunta').select('id_pergunta').eq('id_atividade', id_atividade);
+            if (pergs && pergs.length > 0) {
+                const ids = pergs.map(p => p.id_pergunta);
+                await supabase.from('opcao_resposta').delete().in('id_pergunta', ids);
+                await supabase.from('pergunta').delete().eq('id_atividade', id_atividade);
+            }
+            await supabase.from('atividade').delete().eq('id_atividade', id_atividade);
+        }
+    }
+
     router.get('/resources', verificarProfessor, async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').eq('id_professor', req.session.userId);
         if (error) return res.status(500).json({ error: error.message });
@@ -92,6 +166,9 @@ module.exports = (supabase) => {
 
     router.post('/resources', verificarProfessor, async (req, res) => {
         const payload = { ...req.body, id_professor: req.session.userId };
+        const perguntasGuia = payload.perguntas;
+        delete payload.perguntas;
+
         if (payload.seccoes && typeof payload.seccoes !== 'string') {
             payload.seccoes = JSON.stringify(payload.seccoes);
         }
@@ -101,11 +178,23 @@ module.exports = (supabase) => {
             console.error("ERRO AO CRIAR RECURSO:", error);
             return res.status(500).json({ error: error.message });
         }
+        
+        if (payload.tipo === 'guia-interativo' && perguntasGuia) {
+            try {
+                await syncInteractiveGuide(payload.url_conteudo, perguntasGuia, req.session.userId, payload.titulo);
+            } catch (err) {
+                console.error("Erro ao sincronizar guia interativo:", err);
+            }
+        }
+        
         res.json(data[0]);
     });
 
     router.put('/resources/:id', verificarProfessor, async (req, res) => {
         const payload = { ...req.body };
+        const perguntasGuia = payload.perguntas;
+        delete payload.perguntas;
+
         if (payload.seccoes && typeof payload.seccoes !== 'string') {
             payload.seccoes = JSON.stringify(payload.seccoes);
         }
@@ -115,10 +204,24 @@ module.exports = (supabase) => {
             console.error("ERRO AO ATUALIZAR RECURSO:", error);
             return res.status(500).json({ error: error.message });
         }
+        
+        if (payload.tipo === 'guia-interativo' && perguntasGuia) {
+            try {
+                await syncInteractiveGuide(payload.url_conteudo, perguntasGuia, req.session.userId, payload.titulo);
+            } catch (err) {
+                console.error("Erro ao sincronizar guia interativo:", err);
+            }
+        }
+        
         res.json({ message: 'Recurso atualizado na Base de Dados!' });
     });
 
     router.delete('/resources/:id', verificarProfessor, async (req, res) => {
+        const { data: recData } = await supabase.from('materialpedagogico').select('tipo, url_conteudo').eq('id_material', req.params.id).single();
+        if (recData && recData.tipo === 'guia-interativo') {
+            await deleteInteractiveGuideActivity(recData.url_conteudo);
+        }
+
         const { error } = await supabase.from('materialpedagogico').delete().eq('id_material', req.params.id).eq('id_professor', req.session.userId);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Recurso apagado da base de dados!' });

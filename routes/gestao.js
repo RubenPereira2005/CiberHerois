@@ -22,6 +22,80 @@ module.exports = (supabase) => {
     // RECURSOS PEDAGOGICOS
     // ==========================================================
 
+    async function syncInteractiveGuide(url_conteudo, perguntas, id_professor, titulo) {
+        if (!perguntas || perguntas.length === 0) return;
+        const slug = url_conteudo.replace('resource-', '');
+        const categoria = 'guia-' + slug;
+
+        let { data: ativ } = await supabase.from('atividade')
+            .select('id_atividade')
+            .eq('tipo', 'miniquiz')
+            .eq('categoria', categoria)
+            .maybeSingle();
+
+        let id_atividade;
+        if (!ativ) {
+            const { data: newAtiv, error: errAtiv } = await supabase.from('atividade').insert([{
+                titulo: `Mini-Quiz: ${titulo}`,
+                descricao: 'Guia Interativo',
+                tipo: 'miniquiz',
+                categoria: categoria,
+                dificuldade: 'facil',
+                pontos: 50,
+                id_professor
+            }]).select('id_atividade').single();
+            if (errAtiv) throw errAtiv;
+            id_atividade = newAtiv.id_atividade;
+        } else {
+            id_atividade = ativ.id_atividade;
+            const { data: pergs } = await supabase.from('pergunta').select('id_pergunta').eq('id_atividade', id_atividade);
+            if (pergs && pergs.length > 0) {
+                const ids = pergs.map(p => p.id_pergunta);
+                await supabase.from('opcao_resposta').delete().in('id_pergunta', ids);
+                await supabase.from('pergunta').delete().eq('id_atividade', id_atividade);
+            }
+        }
+
+        for (const p of perguntas) {
+            const { data: novaPerg, error: errP } = await supabase.from('pergunta').insert([{
+                id_atividade,
+                texto_pergunta: p.texto_pergunta,
+                pontos_pergunta: 10
+            }]).select('id_pergunta').single();
+            
+            if (errP) continue;
+
+            const opcoesToInsert = p.opcoes.map((op, idx) => ({
+                id_pergunta: novaPerg.id_pergunta,
+                texto_opcao: op,
+                e_correta: idx.toString() === p.corretaIndex.toString()
+            }));
+
+            await supabase.from('opcao_resposta').insert(opcoesToInsert);
+        }
+    }
+    async function deleteInteractiveGuideActivity(url_conteudo) {
+        const slug = url_conteudo.replace('resource-', '');
+        const categoria = 'guia-' + slug;
+
+        const { data: ativ } = await supabase.from('atividade')
+            .select('id_atividade')
+            .eq('tipo', 'miniquiz')
+            .eq('categoria', categoria)
+            .maybeSingle();
+
+        if (ativ) {
+            const id_atividade = ativ.id_atividade;
+            const { data: pergs } = await supabase.from('pergunta').select('id_pergunta').eq('id_atividade', id_atividade);
+            if (pergs && pergs.length > 0) {
+                const ids = pergs.map(p => p.id_pergunta);
+                await supabase.from('opcao_resposta').delete().in('id_pergunta', ids);
+                await supabase.from('pergunta').delete().eq('id_atividade', id_atividade);
+            }
+            await supabase.from('atividade').delete().eq('id_atividade', id_atividade);
+        }
+    }
+
     router.get('/resources', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').order('id_material', { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
@@ -31,11 +105,32 @@ module.exports = (supabase) => {
     router.get('/resources/:id', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').eq('id_material', req.params.id).single();
         if (error || !data) return res.status(404).json({ error: 'Não encontrado' });
+        
+        if (data.tipo === 'guia-interativo') {
+            const slug = data.url_conteudo.replace('resource-', '');
+            const categoria = 'guia-' + slug;
+            const { data: perguntas } = await supabase.from('pergunta')
+                .select('id_pergunta, texto_pergunta, opcao_resposta(id_opcao, texto_opcao, e_correta), atividade!inner(id_atividade)')
+                .eq('atividade.categoria', categoria)
+                .eq('atividade.tipo', 'miniquiz')
+                .order('id_pergunta', { ascending: true });
+            
+            if (perguntas) {
+                data.perguntas = perguntas.map(p => {
+                    if (p.opcao_resposta) p.opcao_resposta.sort((a,b) => a.id_opcao - b.id_opcao);
+                    return {
+                        texto_pergunta: p.texto_pergunta,
+                        opcoes: p.opcao_resposta
+                    };
+                });
+            }
+        }
+
         res.json(data);
     });
 
     router.post('/resources', async (req, res) => {
-        const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
+        const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes, perguntas } = req.body;
         const id_professor = req.session.userId;
 
         const seccoesStr = JSON.stringify(seccoes);
@@ -46,15 +141,29 @@ module.exports = (supabase) => {
         }]);
 
         if (error) return res.status(500).json({ error: error.message });
+        
+        if (tipoMinusculo === 'guia-interativo' && perguntas) {
+            try {
+                await syncInteractiveGuide(url_conteudo, perguntas, id_professor, titulo);
+            } catch (err) {
+                console.error("Erro ao sincronizar guia interativo:", err);
+            }
+        }
+
         res.json({ message: 'Recurso criado com sucesso!' });
     });
 
     router.put('/resources/:id', async (req, res) => {
-        const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes } = req.body;
+        const { titulo, descricao, tipo, cor_card, icone_card, url_conteudo, seccoes, perguntas } = req.body;
         const id = req.params.id;
 
         const seccoesStr = JSON.stringify(seccoes);
         const tipoMinusculo = tipo.toLowerCase();
+        
+        // Vamos obter o id_professor a partir da base de dados (ou usar req.session.userId se for dono)
+        // No painel gestao (admin), o admin pode editar recursos de outros, por isso lemos o id_professor do recurso
+        const { data: recData } = await supabase.from('materialpedagogico').select('id_professor').eq('id_material', id).single();
+        const id_prof = recData ? recData.id_professor : req.session.userId;
 
         try {
             const { error } = await supabase.from('materialpedagogico').update({
@@ -62,11 +171,24 @@ module.exports = (supabase) => {
             }).eq('id_material', id);
 
             if (error) return res.status(500).json({ error: error.message });
+            
+            if (tipoMinusculo === 'guia-interativo' && perguntas) {
+                await syncInteractiveGuide(url_conteudo, perguntas, id_prof, titulo);
+            }
+
             res.json({ message: 'Recurso atualizado!' });
-        } catch (err) { res.status(500).json({ error: "Erro ao atualizar recurso." }); }
+        } catch (err) { 
+            console.error(err);
+            res.status(500).json({ error: "Erro ao atualizar recurso." }); 
+        }
     });
 
     router.delete('/resources/:id', async (req, res) => {
+        const { data: recData } = await supabase.from('materialpedagogico').select('tipo, url_conteudo').eq('id_material', req.params.id).single();
+        if (recData && recData.tipo === 'guia-interativo') {
+            await deleteInteractiveGuideActivity(recData.url_conteudo);
+        }
+
         const { error } = await supabase.from('materialpedagogico').delete().eq('id_material', req.params.id);
         if (error) return res.status(500).json({ error: error.message });
         res.json({ message: 'Apagado!' });

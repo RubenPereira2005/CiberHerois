@@ -342,6 +342,15 @@
                             Atenção</button>
                     </div>
                 </div>
+
+                <div id="perguntas-guia-container" class="gestao-panel-section" style="display: none; margin-top: 20px; background: rgba(139, 92, 246, 0.05); border: 1px solid #8b5cf6;">
+                    <h3 class="gestao-panel-title purple">3. Perguntas do Guia Interativo (Opcional)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">Preenche até 5 perguntas. Apenas as perguntas com texto serão guardadas.</p>
+                    <div id="lista-perguntas-guia">
+                        <!-- Gerado por JS na inicializacao/abertura do modal -->
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-recurso')">Cancelar</button>
@@ -682,6 +691,48 @@
                     btnVideo.style.cursor = btnVideo.disabled ? 'not-allowed' : 'pointer';
                 }
             }
+            
+            // Lógica do Guia Interativo
+            const containerPerguntas = document.getElementById('perguntas-guia-container');
+            if (containerPerguntas && selectTipo) {
+                if (selectTipo.value === 'guia-interativo') {
+                    containerPerguntas.style.display = 'block';
+                } else {
+                    containerPerguntas.style.display = 'none';
+                }
+            }
+        }
+
+        function renderizarBlocosPerguntasGuia() {
+            const container = document.getElementById('lista-perguntas-guia');
+            if (!container) return;
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                container.innerHTML += `
+                    <div class="form-group pergunta-guia-item" style="border-left: 3px solid #8b5cf6; padding: 12px; margin-bottom: 12px; background: var(--bg-card);">
+                        <label style="font-weight: 600; color: #8b5cf6; margin-bottom: 8px; display: block;">Pergunta ${i}</label>
+                        <input type="text" id="guia-pergunta-${i}" class="form-input" placeholder="Texto da Pergunta ${i}..." style="margin-bottom: 10px;">
+                        <div style="display: flex; flex-direction: column; gap: 6px; padding-left: 10px;">
+                            <div class="radio-group" style="margin-bottom: 0;">
+                                <input type="radio" name="guia-correta-${i}" id="guia-radio-${i}-0" value="0" checked>
+                                <input type="text" id="guia-op-${i}-0" class="form-input form-input-sm" placeholder="Opção 1 (Correta por defeito)" style="height: 30px; font-size: 0.85rem;">
+                            </div>
+                            <div class="radio-group" style="margin-bottom: 0;">
+                                <input type="radio" name="guia-correta-${i}" id="guia-radio-${i}-1" value="1">
+                                <input type="text" id="guia-op-${i}-1" class="form-input form-input-sm" placeholder="Opção 2" style="height: 30px; font-size: 0.85rem;">
+                            </div>
+                            <div class="radio-group" style="margin-bottom: 0;">
+                                <input type="radio" name="guia-correta-${i}" id="guia-radio-${i}-2" value="2">
+                                <input type="text" id="guia-op-${i}-2" class="form-input form-input-sm" placeholder="Opção 3" style="height: 30px; font-size: 0.85rem;">
+                            </div>
+                            <div class="radio-group" style="margin-bottom: 0;">
+                                <input type="radio" name="guia-correta-${i}" id="guia-radio-${i}-3" value="3">
+                                <input type="text" id="guia-op-${i}-3" class="form-input form-input-sm" placeholder="Opção 4 (Opcional)" style="height: 30px; font-size: 0.85rem;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         function adicionarItemLista(btn) {
@@ -733,6 +784,8 @@
             document.getElementById('seccoes-container').innerHTML = '';
 
             adicionarSeccao();
+            renderizarBlocosPerguntasGuia();
+            atualizarBotoesEspeciais();
 
             document.getElementById('titulo-modal-recurso').textContent = 'Criar Novo Recurso';
             document.getElementById('btn-submit-recurso').textContent = 'Gravar e Gerar HTML';
@@ -774,6 +827,26 @@
                 } else {
                     adicionarSeccao();
                 }
+
+                renderizarBlocosPerguntasGuia();
+                if (r.perguntas && r.perguntas.length > 0) {
+                    r.perguntas.forEach((p, idx) => {
+                        const i = idx + 1;
+                        if (i > 5) return;
+                        document.getElementById(`guia-pergunta-${i}`).value = p.texto_pergunta || '';
+                        if (p.opcoes && p.opcoes.length > 0) {
+                            p.opcoes.forEach((op, opIdx) => {
+                                if (opIdx < 4) {
+                                    document.getElementById(`guia-op-${i}-${opIdx}`).value = op.texto_opcao || '';
+                                    if (op.e_correta) {
+                                        document.getElementById(`guia-radio-${i}-${opIdx}`).checked = true;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                atualizarBotoesEspeciais();
 
                 document.getElementById('titulo-modal-recurso').textContent = 'Editar Recurso #' + id;
                 document.getElementById('btn-submit-recurso').textContent = 'Atualizar Recurso';
@@ -842,6 +915,39 @@
             const slug = tituloInserido.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "").trim().replace(/\s+/g, '-');
             const urlGeradaAutomatica = `resource-${slug}`;
 
+            // Coletar perguntas do Guia Interativo
+            const perguntasGuia = [];
+            if (document.getElementById('rec-cat').value === 'guia-interativo') {
+                for (let i = 1; i <= 5; i++) {
+                    const texto = document.getElementById(`guia-pergunta-${i}`).value.trim();
+                    if (texto) {
+                        const op0 = document.getElementById(`guia-op-${i}-0`).value.trim();
+                        const op1 = document.getElementById(`guia-op-${i}-1`).value.trim();
+                        const op2 = document.getElementById(`guia-op-${i}-2`).value.trim();
+                        const op3 = document.getElementById(`guia-op-${i}-3`).value.trim();
+                        
+                        const opcoesArray = [op0, op1, op2];
+                        if (op3) opcoesArray.push(op3);
+                        
+                        const rChecked = document.querySelector(`input[name="guia-correta-${i}"]:checked`);
+                        const corretaIndex = rChecked ? rChecked.value : "0";
+
+                        perguntasGuia.push({
+                            texto_pergunta: texto,
+                            opcoes: opcoesArray,
+                            corretaIndex: corretaIndex
+                        });
+                    }
+                }
+            }
+
+            if (document.getElementById('rec-cat').value === 'guia-interativo') {
+                if (perguntasGuia.length < 5) {
+                    alert('Para um Guia Interativo, tens de preencher obrigatoriamente as 5 perguntas!');
+                    return;
+                }
+            }
+
             const payload = {
                 titulo: tituloInserido,
                 tipo: document.getElementById('rec-cat').value,
@@ -849,7 +955,8 @@
                 cor_card: document.getElementById('rec-cor').value,
                 icone_card: document.getElementById('rec-icone').value,
                 url_conteudo: urlGeradaAutomatica,
-                seccoes: seccoesArray
+                seccoes: seccoesArray,
+                perguntas: perguntasGuia
             };
 
             const btn = document.getElementById('btn-submit-recurso');
