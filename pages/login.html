@@ -74,14 +74,6 @@
         <div class="loader-spinner"></div>
     </div>
 
-    <div id="toast-container" class="toast-container">
-        <div class="toast-content">
-            <i id="toast-icon-element" data-lucide="alert-circle" class="toast-icon"></i>
-            <span id="toast-message-element" class="toast-message">Mensagem aqui</span>
-        </div>
-        <div class="toast-progress"></div>
-    </div>
-
     <div class="login-wrapper">
         <div class="login-box">
             <div class="login-header">
@@ -182,19 +174,6 @@
         const supabaseUrl = 'https://xpmdiqqbgpzdditkbuzz.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwbWRpcXFiZ3B6ZGRpdGtidXp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDY5MzMsImV4cCI6MjA4ODIyMjkzM30.mwWcvrNrnLO_EjgbY9V1Ozdcfs9SBk0S4nWKxagiuUU';
         const db = supabase.createClient(supabaseUrl, supabaseKey);
-
-        const toastContainer = document.getElementById('toast-container');
-        const toastMessage = document.getElementById('toast-message-element');
-        const toastIcon = document.getElementById('toast-icon-element');
-
-        function showToast(mensagem, tipo = 'error') {
-            toastMessage.textContent = mensagem;
-            toastContainer.className = `toast-container active ${tipo}`;
-            const iconName = tipo === 'success' ? 'check-circle' : 'alert-circle';
-            toastIcon.setAttribute('data-lucide', iconName);
-            lucide.createIcons();
-            setTimeout(() => { toastContainer.classList.remove('active'); }, 4000);
-        }
 
         function toggleVisibility(inputId) {
             const input = document.getElementById(inputId);
@@ -467,7 +446,7 @@
                         window.location.href = 'quizzes'; // Redirecionamento direto
                     }
                 } else {
-                    // NOVO: Se o servidor disser que a conta não existe, redireciona para o registo
+                    // Se o servidor disser que a conta não existe, redireciona para o registo
                     showToast(data.error || "Falha na autenticação Google", "error");
                     if (data.redirectToRegister) {
                         setTimeout(() => {

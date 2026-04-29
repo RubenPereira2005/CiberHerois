@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="preloader.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
-    <script src="global-init.js"></script>        
+    <script src="global-init.js"></script>
 </head>
 
 <body class="site-body">
@@ -68,13 +68,6 @@
         <a href="resources" class="btn btn-primary">Voltar à Academia</a>
     </div>
 
-    <div id="download-toast" class="toast-container">
-        <div class="toast-content">
-            <i data-lucide="loader" class="toast-icon spin-animation"></i>
-            <span class="toast-message">A preparar o PDF, por favor aguarde...</span>
-        </div>
-        <div class="toast-progress"></div>
-    </div>
 
     <script>
         lucide.createIcons();
@@ -149,7 +142,7 @@
                             } else {
                                 embedHTML = embedHTML.replace('<iframe ', '<iframe style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;" ');
                             }
-                            
+
                             htmlSeccoes += `<div class="resource-section border-${corDinamica}" style="padding-bottom: 25px;">
                                                 <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;"><i data-lucide="${icone}" class="icon-${corDinamica}"></i>${sec.titulo || 'Vídeo'}</h3>
                                                 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
@@ -179,10 +172,11 @@
                 lucide.createIcons();
 
                 // Download PDF
-                const urlName = r.url_conteudo ? r.url_conteudo.replace('', '') : r.id_material;
+                const urlName = r.url_conteudo || r.id_material;
                 document.getElementById('btn-download-pdf').onclick = function () {
-                    const toast = document.getElementById('download-toast');
-                    if (toast) { toast.classList.add('active'); setTimeout(() => toast.classList.remove('active'), 3500); }
+                    if (window.showGlobalToast) {
+                        window.showGlobalToast('A preparar o PDF! Aguarde...', 'success');
+                    }
                     window.location.href = `/api/pdf/download/${urlName}`;
                 };
 
@@ -265,7 +259,7 @@
             if (isCorrect) {
                 // É só adicionar a classe! O CSS com !important trata do resto.
                 clickedBtn.classList.add('correct');
-                
+
                 score++;
                 feedbackBox.innerHTML = `<div class="feedback-box feedback-correct"><i data-lucide="check-circle"></i> Excelente! Resposta correta.</div>`;
                 lucide.createIcons();
@@ -276,7 +270,7 @@
 
                 // Procura qual era a verdadeira correta e mete verde nela!
                 allBtns.forEach(b => {
-                    if(b.getAttribute('data-id') == questionData.correctAnswer) {
+                    if (b.getAttribute('data-id') == questionData.correctAnswer) {
                         b.classList.add('correct');
                     }
                 });
@@ -299,21 +293,21 @@
                 document.getElementById('next-btn').classList.remove('hidden');
 
                 // Lógica da IA
-                document.getElementById('btn-pedir-dica').addEventListener('click', async function() {
+                document.getElementById('btn-pedir-dica').addEventListener('click', async function () {
                     this.style.display = 'none';
                     const hintContainer = document.getElementById('ia-hint-container');
-                    
+
                     hintContainer.innerHTML = `<div style="display: flex; align-items: center; gap: 8px;"><i data-lucide="loader" class="spin-animation"></i> A pedir dica ao mentor...</div>`;
                     lucide.createIcons();
 
                     try {
                         const iaRes = await fetch('/api/quiz/hint', {
-                            method: 'POST', 
+                            method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ pergunta: questionData.question, respostaErrada: clickedBtn.textContent })
                         });
                         const iaData = await iaRes.json();
-                        
+
                         hintContainer.innerHTML = `
                             <div style="padding-top: 10px; border-top: 1px solid rgba(239, 68, 68, 0.3); margin-top: 5px;">
                                 <strong>Dica do Mentor:</strong> ${iaData.hint || "Pensa bem no conceito por trás desta pergunta."}

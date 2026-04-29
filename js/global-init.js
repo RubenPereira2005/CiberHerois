@@ -5,7 +5,7 @@
  */
 
 // Esconde e remove o overlay de carregamento de pagina inteira
-window.esconderLoader = function() {
+window.esconderLoader = function () {
     const loader = document.getElementById('global-loader');
     if (loader) {
         loader.style.transition = 'opacity 0.4s ease';
@@ -16,8 +16,79 @@ window.esconderLoader = function() {
     }
 };
 
+// =========================================================
+// SISTEMA GLOBAL DE TOAST STACKABLE
+// =========================================================
+window.showGlobalToast = function(mensagem, tipo = 'warning') {
+    let wrapper = document.getElementById('toast-wrapper');
+    
+    if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.id = 'toast-wrapper';
+        document.body.appendChild(wrapper);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast-container ${tipo}`;
+    
+    let iconName = 'alert-circle';
+    if (tipo === 'success') iconName = 'check-circle';
+    else if (tipo === 'error') iconName = 'alert-triangle';
+
+    const mensagemLimpa = mensagem.toString().replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i data-lucide="${iconName}" class="toast-icon"></i>
+            <span class="toast-message">${mensagemLimpa}</span>
+            <button class="toast-close" title="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="toast-progress"></div>
+    `;
+
+    wrapper.appendChild(toast);
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ root: toast });
+    }
+
+    setTimeout(() => {
+        toast.classList.add('active');
+    }, 10);
+
+    const fecharToast = () => {
+        toast.classList.remove('active');
+        toast.classList.add('closing');
+        setTimeout(() => toast.remove(), 400);
+    };
+
+    toast.querySelector('.toast-close').addEventListener('click', fecharToast);
+    setTimeout(fecharToast, 4000);
+};
+
+// Override das funcoes nativas para usarem o nosso toast global
+window.showToast = window.showGlobalToast;
+
+window.alert = function(mensagem) {
+    let tipo = 'warning';
+    const msgLower = mensagem.toString().toLowerCase();
+    
+    if (msgLower.includes('sucesso') || msgLower.includes('atualizado') || msgLower.includes('equipado') || msgLower.includes('concluída')) {
+        tipo = 'success';
+    } else if (msgLower.includes('erro') || msgLower.includes('insuficiente') || msgLower.includes('falha')) {
+        tipo = 'error';
+    }
+    
+    window.showGlobalToast(mensagem, tipo);
+};
+
 // Chama a API de logout e redireciona para a pagina inicial
-window.fazerLogout = async function() {
+window.fazerLogout = async function () {
     try {
         await fetch('/api/logout', { method: 'POST' });
         window.location.href = 'index';
@@ -28,7 +99,7 @@ window.fazerLogout = async function() {
 };
 
 // Vai buscar as estatisticas do utilizador atual e atualiza os badges da navbar
-window.atualizarHeaderGlobal = async function() {
+window.atualizarHeaderGlobal = async function () {
     try {
         const response = await fetch('/api/stats');
         if (response.ok) {
@@ -56,7 +127,7 @@ window.atualizarHeaderGlobal = async function() {
 };
 
 // Inicializa a pesquisa de utilizadores com debounce, navegacao por teclado e realce de texto
-window.iniciarPesquisa = function() {
+window.iniciarPesquisa = function () {
     const searchInput = document.getElementById('global-search-input');
     const dropdown = document.getElementById('search-results-dropdown');
     const searchBtn = document.querySelector('.search-trigger');
@@ -217,7 +288,7 @@ window.iniciarPesquisa = function() {
 };
 
 // Inicializa o menu hamburger para navegacao mobile
-window.iniciarHamburger = function() {
+window.iniciarHamburger = function () {
     const hamburgerBtn = document.getElementById('hamburger-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
 

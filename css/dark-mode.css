@@ -107,6 +107,15 @@ body.dark-mode .toast-message {
     color: #ffffff !important;
 }
 
+body.dark-mode .toast-close {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .toast-close:hover {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
 
 
 /* ====== Dark Mode: Resources Page Specifics ====== */
@@ -968,6 +977,52 @@ body.dark-mode .quiz-completed p {
 /* Banner de MFA */
 .dark-mode .mfa-banner {
     background: linear-gradient(to right, rgba(245, 158, 11, 0.15), rgba(30, 41, 59, 0.8));
+}
+
+
+/* =========================================
+   DARK MODE - PÁGINA ABOUT (CiberHeróis)
+   ========================================= */
+
+/* Títulos em branco no modo escuro */
+body.dark-mode .ch-about-title,
+body.dark-mode .ch-about-text-box h2,
+body.dark-mode .ch-about-section-title,
+body.dark-mode .ch-agent-info h3,
+body.dark-mode .ch-about-cta h2 {
+    color: #ffffff;
+}
+
+/* Textos em cinza claro */
+body.dark-mode .ch-about-subtitle,
+body.dark-mode .ch-about-text-box p,
+body.dark-mode .ch-agent-info p,
+body.dark-mode .ch-about-cta p {
+    color: #b0b0b0;
+}
+
+/* Fundos escuros para as caixas/crachá */
+body.dark-mode .ch-about-mission,
+body.dark-mode .ch-agent-badge {
+    background: #1e1e2e;
+    border-color: #2c2e43;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Bolha de gradiente mais escura na Missão */
+body.dark-mode .ch-about-visual {
+    background: linear-gradient(135deg, #2a3a2e, #1a241c);
+}
+
+/* Fundo verde escuro para a foto do Crachá */
+body.dark-mode .ch-agent-photo {
+    background: rgba(76, 175, 80, 0.15);
+}
+
+/* Secção Final (Call to Action) Escura */
+body.dark-mode .ch-about-cta {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(0, 0, 0, 0.2));
+    border-color: rgba(76, 175, 80, 0.3);
 }
 
 /* =========================================

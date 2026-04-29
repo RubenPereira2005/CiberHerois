@@ -300,15 +300,6 @@
             <p class="suggestion-section-description">Ajude-nos a melhorar a nossa biblioteca de recursos educativos</p>
             <button class="suggestion-section-btn">Enviar Sugestão</button>
         </div>
-
-        <div id="toast-container" class="toast-container">
-            <div class="toast-content">
-                <i data-lucide="check-circle" class="toast-icon" id="toast-icon-element"></i>
-                <span class="toast-message" id="toast-message-element">Login bem-sucedido!</span>
-            </div>
-            <div class="toast-progress"></div>
-        </div>
-
     </div>
 
     <div id="modal-dificuldade" class="modal">
@@ -391,19 +382,16 @@
         let userQuizProgress = {}; 
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Mostrar o Toast de Login
-            const toast = document.getElementById('toast-container');
+            // 1. Mostrar o Toast de Login Globalmente
             const shouldShow = sessionStorage.getItem('showLoginToast');
 
-            if (shouldShow === 'true' && toast) {
-                toast.classList.add('success');
-                setTimeout(() => { toast.classList.add('active'); }, 300);
+            if (shouldShow === 'true') {
                 sessionStorage.removeItem('showLoginToast');
-                
                 setTimeout(() => { 
-                    toast.classList.remove('active'); 
-                    setTimeout(() => toast.classList.remove('success'), 400); 
-                }, 3500);
+                    if (window.showGlobalToast) {
+                        window.showGlobalToast('Login bem-sucedido!', 'success');
+                    }
+                }, 300);
             }
 
             // 2. Carregar informações base

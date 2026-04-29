@@ -69,48 +69,15 @@
             </button>
         </div>
 
-        <div id="download-toast" class="toast-container">
-            <div class="toast-content">
-                <i data-lucide="loader" class="toast-icon spin-animation"></i>
-                <span class="toast-message">O seu download foi iniciado, aguarde...</span>
-            </div>
-            <div class="toast-progress"></div>
-        </div>
-    </div>
-
-    <style>
-        .spin-animation { 
-            animation: loader-rotate 2s linear infinite; 
-        }
-        @keyframes loader-rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        /* Garante visibilidade do Toast se não estiver no CSS principal */
-        .toast-container.active {
-            transform: translateX(0) !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-    </style>
-
-    <script>
+        <script>
         lucide.createIcons();
 
         // Função para lidar com o download do recurso
         function handleDownload(resourceName) {
-            const toast = document.getElementById('download-toast');
-            
-            if (toast) {
-                toast.classList.add('active');
-                lucide.createIcons();
-                window.location.href = `/api/pdf/download/${resourceName}`;
-                setTimeout(() => {
-                    toast.classList.remove('active');
-                }, 3200);
-            } else {
-                window.location.href = `/api/pdf/download/${resourceName}`;
+            if (window.showGlobalToast) {
+                window.showGlobalToast('Download iniciado! Aguarde...', 'success');
             }
+            window.location.href = `/api/pdf/download/${resourceName}`;
         }
 
         // Função para carregar os recursos da Base de Dados e adicioná-los à página
@@ -138,6 +105,12 @@
                     let tipoFormatado = rec.tipo ? rec.tipo.replace(/-/g, ' ') : 'Documento';
                     tipoFormatado = tipoFormatado.split(' ').map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1)).join(' ');
 
+                    // Parâmetro seguro para o onclick
+                    let downloadParam = rec.url_conteudo || rec.id_material;
+                    if (typeof downloadParam === 'string') {
+                        downloadParam = downloadParam.replace(/'/g, "\\'"); // Escapa aspas simples
+                    }
+
                     // Cria o HTML do cartão dinâmico
                     const htmlCartao = `
                         <div class="resource-card resource-card-${cor}">
@@ -158,7 +131,7 @@
                                         <i data-lucide="external-link"></i>
                                         Ver
                                     </a>
-                                    <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('${rec.url_conteudo ? rec.url_conteudo.replace('', '') : rec.id_material}')">
+                                    <button class="resource-card-btn resource-card-btn-secondary" onclick="handleDownload('${downloadParam}')">
                                         <i data-lucide="download"></i>
                                     </button>
                                 </div>
