@@ -59,6 +59,46 @@
         .drag-handle:active {
             cursor: grabbing;
         }
+
+        /* Esconde os spinners nativos dos inputs number (fundo branco em dark mode) */
+        #modal-editar-utilizador input[type=number]::-webkit-inner-spin-button,
+        #modal-editar-utilizador input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #modal-editar-utilizador input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Botão "→ 0" — hover limpo sem artefactos */
+        .btn-zero-reset {
+            flex-shrink: 0;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 6px;
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: background 0.18s, border-color 0.18s, color 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .btn-zero-reset:hover {
+            background: rgba(239, 68, 68, 0.18);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-zero-reset:active {
+            background: rgba(239, 68, 68, 0.28);
+        }
     </style>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
@@ -99,6 +139,8 @@
             <button class="gestao-tab active" onclick="switchTab('recursos')">Tabela de Recursos</button>
             <button class="gestao-tab" onclick="switchTab('quizzes')">Tabela de Quizzes</button>
             <button class="gestao-tab" onclick="switchTab('turmas')">Tabela de Turmas</button>
+            <button class="gestao-tab"
+                onclick="switchTab('utilizadores'); carregarUtilizadores();">Utilizadores</button>
         </div>
 
         <div id="tab-recursos" class="tab-content active">
@@ -205,6 +247,66 @@
                     </thead>
                     <tbody id="turmas-admin-tbody"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- ==================== TAB UTILIZADORES ==================== -->
+        <div id="tab-utilizadores" class="tab-content">
+            <div class="gestao-actions-top" style="justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span id="utilizadores-count-badge" style="font-size:0.85rem; color:var(--text-secondary);"></span>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                    <div>
+                        <label for="search-utilizador"
+                            style="font-weight:600;font-size:0.85rem;color:var(--text-color);display:block;margin-bottom:4px;">Pesquisar:</label>
+                        <div style="position:relative;">
+                            <i data-lucide="search"
+                                style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-secondary);"></i>
+                            <input type="text" id="search-utilizador" class="form-input" placeholder="Nome ou email..."
+                                oninput="resetPaginacaoUtilizadores()"
+                                style="padding-left:30px;height:36px;min-width:220px;">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="filter-role"
+                            style="font-weight:600;font-size:0.85rem;color:var(--text-color);display:block;margin-bottom:4px;">Filtrar
+                            Role:</label>
+                        <select id="filter-role" class="filter-select" onchange="resetPaginacaoUtilizadores()"
+                            style="height:36px;">
+                            <option value="todos">Todos</option>
+                            <option value="aluno">Aluno</option>
+                            <option value="professor">Professor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>Avatar</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Pontos</th>
+                            <th>Turma</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="utilizadores-tbody"></tbody>
+                </table>
+                <div class="pagination-container">
+                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaUtilizadores(-1)" id="btn-prev-util">
+                        <i data-lucide="chevron-left"></i> Anterior
+                    </button>
+                    <span id="page-info-util" class="page-info">Pág 1 de 1</span>
+                    <button class="btn btn-secondary btn-sm" onclick="mudarPaginaUtilizadores(1)" id="btn-next-util">
+                        Próxima <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -343,9 +445,11 @@
                     </div>
                 </div>
 
-                <div id="perguntas-guia-container" class="gestao-panel-section" style="display: none; margin-top: 20px; background: rgba(139, 92, 246, 0.05); border: 1px solid #8b5cf6;">
+                <div id="perguntas-guia-container" class="gestao-panel-section"
+                    style="display: none; margin-top: 20px; background: rgba(139, 92, 246, 0.05); border: 1px solid #8b5cf6;">
                     <h3 class="gestao-panel-title purple">3. Perguntas do Guia Interativo (Opcional)</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">Preenche até 5 perguntas. Apenas as perguntas com texto serão guardadas.</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">Preenche até 5
+                        perguntas. Apenas as perguntas com texto serão guardadas.</p>
                     <div id="lista-perguntas-guia">
                         <!-- Gerado por JS na inicializacao/abertura do modal -->
                     </div>
@@ -399,6 +503,135 @@
                     <button type="submit" id="btn-submit-quiz" class="btn btn-primary">Guardar Pergunta</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ========== MODAL EDITAR UTILIZADOR ========== -->
+    <div id="modal-editar-utilizador" class="modal">
+        <div class="modal-content" style="max-width: 460px;">
+            <div class="modal-header">
+                <h2>Editar Utilizador</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-editar-utilizador')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <!-- Avatar preview -->
+            <div
+                style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:14px;background:var(--bg-secondary);border-radius:10px;">
+                <img id="edit-util-avatar" src="" alt="Avatar"
+                    style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--border-color);">
+                <div>
+                    <div id="edit-util-email-preview"
+                        style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:2px;"></div>
+                    <div id="edit-util-role-badge-preview" style="font-size:0.75rem;font-weight:700;"></div>
+                </div>
+            </div>
+            <form id="form-editar-utilizador" onsubmit="guardarEdicaoUtilizador(event)">
+                <input type="hidden" id="edit-util-id">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="edit-util-nome" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="edit-util-role" class="form-input" required>
+                        <option value="aluno">Aluno</option>
+                        <option value="professor">Professor</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div
+                    style="margin-top:6px;padding:14px;background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.2);border-radius:8px;">
+                    <p
+                        style="font-size:0.8rem;font-weight:700;color:var(--text-color);margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+                        <i data-lucide="sliders" style="width:13px;height:13px;"></i> Ajustar Valores
+                    </p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label
+                                style="font-size:0.75rem;color:var(--text-secondary);display:block;margin-bottom:4px;">&#11088;
+                                Pontos XP</label>
+                            <div style="display:flex;gap:5px;align-items:center;">
+                                <input type="number" id="edit-util-pontos" class="form-input" min="0"
+                                    style="height:34px;font-size:0.85rem;">
+                                <button type="button" class="btn-zero-reset" title="Limpar Pontos"
+                                    onclick="document.getElementById('edit-util-pontos').value=0">
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                style="font-size:0.75rem;color:var(--text-secondary);display:block;margin-bottom:4px;">&#129689;
+                                CiberCoins</label>
+                            <div style="display:flex;gap:5px;align-items:center;">
+                                <input type="number" id="edit-util-coins" class="form-input" min="0"
+                                    style="height:34px;font-size:0.85rem;">
+                                <button type="button" class="btn-zero-reset" title="Limpar Coins"
+                                    onclick="document.getElementById('edit-util-coins').value=0">
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions" style="margin-top:20px;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('modal-editar-utilizador')">Cancelar</button>
+                    <button type="submit" id="btn-submit-edit-util" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== MODAL DETALHES UTILIZADOR ========== -->
+    <div id="modal-detalhes-utilizador" class="modal">
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header">
+                <h2>Detalhes do Utilizador</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-detalhes-utilizador')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <!-- Cabeçalho do perfil -->
+            <div
+                style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg-secondary);border-radius:10px;margin-bottom:18px;">
+                <img id="det-util-avatar" src="" alt="Avatar"
+                    style="width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-color);">
+                <div>
+                    <div id="det-util-nome" style="font-size:1.15rem;font-weight:700;color:var(--text-color);"></div>
+                    <div id="det-util-email" style="font-size:0.82rem;color:var(--text-secondary);margin-top:2px;">
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:6px;">
+                        <span id="det-util-role-badge"
+                            style="font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:12px;"></span>
+                        <span id="det-util-pontos"
+                            style="font-size:0.8rem;color:var(--primary-color);font-weight:600;"></span>
+                        <span id="det-util-coins" style="font-size:0.8rem;color:#f59e0b;font-weight:600;"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- Medalhas -->
+            <div style="margin-bottom:16px;">
+                <h3
+                    style="font-size:0.9rem;font-weight:700;color:var(--text-color);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                    <i data-lucide="award" style="width:15px;height:15px;color:#f59e0b;"></i> Medalhas
+                    <span id="det-util-medalhas-count"
+                        style="font-size:0.78rem;color:var(--text-secondary);font-weight:400;"></span>
+                </h3>
+                <div id="det-util-medalhas-lista"
+                    style="display:flex;flex-wrap:wrap;gap:8px;max-height:120px;overflow-y:auto;"></div>
+            </div>
+            <!-- Progresso recente -->
+            <div>
+                <h3
+                    style="font-size:0.9rem;font-weight:700;color:var(--text-color);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                    <i data-lucide="activity" style="width:15px;height:15px;color:var(--primary-color);"></i> Últimas
+                    Atividades
+                </h3>
+                <div id="det-util-progresso-lista"
+                    style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;"></div>
+            </div>
         </div>
     </div>
 
@@ -691,7 +924,7 @@
                     btnVideo.style.cursor = btnVideo.disabled ? 'not-allowed' : 'pointer';
                 }
             }
-            
+
             // Lógica do Guia Interativo
             const containerPerguntas = document.getElementById('perguntas-guia-container');
             if (containerPerguntas && selectTipo) {
@@ -925,10 +1158,10 @@
                         const op1 = document.getElementById(`guia-op-${i}-1`).value.trim();
                         const op2 = document.getElementById(`guia-op-${i}-2`).value.trim();
                         const op3 = document.getElementById(`guia-op-${i}-3`).value.trim();
-                        
+
                         const opcoesArray = [op0, op1, op2];
                         if (op3) opcoesArray.push(op3);
-                        
+
                         const rChecked = document.querySelector(`input[name="guia-correta-${i}"]:checked`);
                         const corretaIndex = rChecked ? rChecked.value : "0";
 
@@ -1500,6 +1733,294 @@
                 }
             } catch (e) {
                 alert("Erro de comunicação com o servidor.");
+            }
+        }
+
+        // ==========================================
+        // 5. GESTÃO DE UTILIZADORES
+        // ==========================================
+        let allUtilizadores = [];
+        let currentPageUtil = 1;
+        const itemsPerPageUtil = 15;
+
+        const roleCores = {
+            admin: { bg: 'rgba(139,92,246,0.15)', color: '#8b5cf6', label: '⚡ Admin' },
+            professor: { bg: 'rgba(59,130,246,0.15)', color: '#3b82f6', label: '🎓 Professor' },
+            aluno: { bg: 'rgba(16,185,129,0.15)', color: '#10b981', label: '🦸 Aluno' }
+        };
+
+        function roleBadgeHtml(role) {
+            const r = roleCores[role] || { bg: 'rgba(100,116,139,0.15)', color: '#64748b', label: role };
+            return `<span style="background:${r.bg};color:${r.color};padding:3px 10px;border-radius:12px;font-size:0.73rem;font-weight:700;">${r.label}</span>`;
+        }
+
+        function avatarSrc(u) {
+            const raw = u.foto_upload || u.foto_google || u.foto_perfil || 'default_avatar.png';
+            // Se for URL externa (http) ou path absoluto (/), usa direto; senão, prefixamos com /img/
+            if (raw.startsWith('http') || raw.startsWith('/')) return raw;
+            return '/img/' + raw;
+        }
+
+        async function carregarUtilizadores() {
+            try {
+                const res = await fetch('/api/gestao/utilizadores');
+                if (!res.ok) {
+                    const err = await res.json();
+                    console.error('Erro do servidor:', err.error);
+                    document.getElementById('utilizadores-tbody').innerHTML =
+                        `<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:24px;">Erro ao carregar utilizadores: ${err.error}</td></tr>`;
+                    return;
+                }
+                allUtilizadores = await res.json();
+                renderUtilizadores();
+            } catch (e) {
+                console.error('Erro ao carregar utilizadores', e);
+            }
+        }
+
+        function resetPaginacaoUtilizadores() {
+            currentPageUtil = 1;
+            renderUtilizadores();
+        }
+
+        function mudarPaginaUtilizadores(delta) {
+            currentPageUtil += delta;
+            renderUtilizadores();
+        }
+
+        function renderUtilizadores() {
+            const termo = (document.getElementById('search-utilizador').value || '').toLowerCase().trim();
+            const roleFilter = document.getElementById('filter-role').value;
+
+            let lista = [...allUtilizadores];
+            if (roleFilter !== 'todos') lista = lista.filter(u => u.role === roleFilter);
+            if (termo) lista = lista.filter(u =>
+                u.nome.toLowerCase().includes(termo) || u.email.toLowerCase().includes(termo)
+            );
+
+            // Ordenação: admin → professor → aluno, depois por nome
+            const roleOrder = { admin: 0, professor: 1, aluno: 2 };
+            lista.sort((a, b) => {
+                const diff = (roleOrder[a.role] ?? 9) - (roleOrder[b.role] ?? 9);
+                return diff !== 0 ? diff : a.nome.localeCompare(b.nome, 'pt');
+            });
+            const total = lista.length;
+            const totalPags = Math.max(1, Math.ceil(total / itemsPerPageUtil));
+            if (currentPageUtil > totalPags) currentPageUtil = totalPags;
+            if (currentPageUtil < 1) currentPageUtil = 1;
+
+            const slice = lista.slice((currentPageUtil - 1) * itemsPerPageUtil, currentPageUtil * itemsPerPageUtil);
+
+            document.getElementById('utilizadores-count-badge').textContent = `${total} utilizador(es)`;
+            document.getElementById('page-info-util').textContent = `Pág ${currentPageUtil} de ${totalPags}`;
+            document.getElementById('btn-prev-util').disabled = (currentPageUtil === 1);
+            document.getElementById('btn-next-util').disabled = (currentPageUtil === totalPags);
+
+            let html = '';
+            if (slice.length === 0) {
+                html = `<tr><td colspan="7" style="text-align:center;color:var(--text-secondary);padding:24px;">Nenhum utilizador encontrado.</td></tr>`;
+            } else {
+                slice.forEach(u => {
+                    const turmeNome = u.turma_nome
+                        ? u.turma_nome
+                        : '<span style="color:var(--text-secondary);font-style:italic;">—</span>';
+                    html += `
+                    <tr>
+                        <td>
+                            <img src="${avatarSrc(u)}" alt="Avatar"
+                                referrerpolicy="no-referrer"
+                                style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border-color);"
+                                onerror="this.src='/img/default_avatar.png'">
+                        </td>
+                        <td><strong>${u.nome}</strong></td>
+                        <td style="font-size:0.83rem;color:var(--text-secondary);">${u.email}</td>
+                        <td>${roleBadgeHtml(u.role)}</td>
+                        <td><span style="font-weight:600;color:var(--primary-color);">${u.pontos_totais || 0} pts</span></td>
+                        <td style="font-size:0.83rem;">${turmeNome}</td>
+                        <td>
+                            <div style="display:flex;gap:5px;align-items:center;">
+                                <button type="button" class="btn-edit" onclick="abrirEdicaoUtilizador('${u.id_utilizador}')" title="Editar">
+                                    <i data-lucide="edit-3" style="width:15px;height:15px;"></i>
+                                </button>
+                                <button type="button" class="btn-edit" onclick="verDetalhesUtilizador('${u.id_utilizador}')" title="Ver Detalhes"
+                                    style="background:rgba(16,185,129,0.1);color:#10b981;border:1px solid #10b981;">
+                                    <i data-lucide="eye" style="width:15px;height:15px;"></i>
+                                </button>
+                                <button type="button" class="btn-danger" onclick="eliminarUtilizador('${u.id_utilizador}', '${u.nome.replace(/'/g, "\\'")}', '${u.role}')" title="Eliminar">
+                                    <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('utilizadores-tbody').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function abrirEdicaoUtilizador(id) {
+            const u = allUtilizadores.find(x => x.id_utilizador === id);
+            if (!u) return;
+
+            document.getElementById('edit-util-id').value = id;
+            document.getElementById('edit-util-nome').value = u.nome;
+            document.getElementById('edit-util-role').value = u.role;
+            document.getElementById('edit-util-pontos').value = u.pontos_totais || 0;
+            document.getElementById('edit-util-coins').value = u.coins || 0;
+            document.getElementById('edit-util-avatar').src = avatarSrc(u);
+            document.getElementById('edit-util-avatar').referrerPolicy = 'no-referrer';
+            document.getElementById('edit-util-email-preview').textContent = u.email;
+
+            const r = roleCores[u.role] || {};
+            document.getElementById('edit-util-role-badge-preview').style.color = r.color || '#64748b';
+            document.getElementById('edit-util-role-badge-preview').textContent = r.label || u.role;
+
+            openModal('modal-editar-utilizador');
+            lucide.createIcons();
+        }
+
+        async function guardarEdicaoUtilizador(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-util-id').value;
+            const btn = document.getElementById('btn-submit-edit-util');
+            btn.textContent = 'A guardar...';
+            btn.disabled = true;
+
+            const pontosVal = parseInt(document.getElementById('edit-util-pontos').value);
+            const coinsVal = parseInt(document.getElementById('edit-util-coins').value);
+
+            const payload = {
+                nome: document.getElementById('edit-util-nome').value,
+                role: document.getElementById('edit-util-role').value,
+                pontos_totais: isNaN(pontosVal) ? undefined : pontosVal,
+                coins: isNaN(coinsVal) ? undefined : coinsVal
+            };
+
+            try {
+                const res = await fetch(`/api/gestao/utilizadores/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    closeModal('modal-editar-utilizador');
+                    await carregarUtilizadores();
+                    mostrarSucesso('Utilizador atualizado com sucesso!');
+                } else {
+                    const err = await res.json();
+                    alert('Erro: ' + (err.error || 'Desconhecido'));
+                }
+            } catch (ex) {
+                alert('Erro de comunicação.');
+            } finally {
+                btn.textContent = 'Guardar';
+                btn.disabled = false;
+            }
+        }
+
+        async function resetarPontosUtilizador(id, nome) {
+            const ok = await confirmarAcao(`Tens a certeza que queres resetar os pontos e coins de "${nome}" para 0?`);
+            if (!ok) return;
+            try {
+                const res = await fetch(`/api/gestao/utilizadores/${id}/resetar-pontos`, { method: 'PUT' });
+                if (res.ok) {
+                    closeModal('modal-editar-utilizador');
+                    await carregarUtilizadores();
+                    mostrarSucesso(`Pontos e coins de "${nome}" resetados a zero.`);
+                } else {
+                    alert('Erro ao resetar pontos.');
+                }
+            } catch (ex) {
+                alert('Erro de comunicação.');
+            }
+        }
+
+        async function verDetalhesUtilizador(id) {
+            openModal('modal-detalhes-utilizador');
+            document.getElementById('det-util-medalhas-lista').innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">A carregar...</span>';
+            document.getElementById('det-util-progresso-lista').innerHTML = '<span style="color:var(--text-secondary);font-size:0.85rem;">A carregar...</span>';
+
+            try {
+                const res = await fetch(`/api/gestao/utilizadores/${id}`);
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+                    document.getElementById('det-util-medalhas-lista').innerHTML =
+                        `<span style="color:#ef4444;">Erro: ${err.error}</span>`;
+                    return;
+                }
+                const u = await res.json();
+
+                const r = roleCores[u.role] || { bg: '#eee', color: '#333', label: u.role };
+                document.getElementById('det-util-avatar').src = avatarSrc(u);
+                document.getElementById('det-util-avatar').referrerPolicy = 'no-referrer';
+                document.getElementById('det-util-nome').textContent = u.nome;
+                document.getElementById('det-util-email').textContent = u.email;
+                document.getElementById('det-util-pontos').textContent = `⭐ ${u.pontos_totais || 0} XP`;
+                document.getElementById('det-util-coins').textContent = `🪙 ${u.coins || 0} Coins`;
+
+                const badge = document.getElementById('det-util-role-badge');
+                badge.textContent = r.label;
+                badge.style.background = r.bg;
+                badge.style.color = r.color;
+
+                // Medalhas
+                const medList = document.getElementById('det-util-medalhas-lista');
+                const medCount = document.getElementById('det-util-medalhas-count');
+                const medalhas = u.medalhas || [];
+                medCount.textContent = `(${medalhas.length})`;
+                if (medalhas.length === 0) {
+                    medList.innerHTML = '<span style="color:var(--text-secondary);font-size:0.82rem;font-style:italic;">Sem medalhas ainda.</span>';
+                } else {
+                    medList.innerHTML = medalhas.map(m => {
+                        const nome = m.medalha ? m.medalha.nome : '?';
+                        const desc = m.medalha ? m.medalha.descricao : '';
+                        return `<div title="${desc}" style="padding:5px 10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:0.78rem;font-weight:600;color:#d97706;">
+                            🏅 ${nome}
+                        </div>`;
+                    }).join('');
+                }
+
+                // Progresso recente
+                const progList = document.getElementById('det-util-progresso-lista');
+                const progresso = u.progresso || [];
+                if (progresso.length === 0) {
+                    progList.innerHTML = '<span style="color:var(--text-secondary);font-size:0.82rem;font-style:italic;">Sem atividade registada.</span>';
+                } else {
+                    progList.innerHTML = progresso.map(p => {
+                        const data = p.data_realizacao ? new Date(p.data_realizacao).toLocaleDateString('pt-PT') : '?';
+                        const titulo = p.atividade ? p.atividade.titulo : 'Atividade';
+                        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg-secondary);border-radius:7px;font-size:0.82rem;">
+                            <span style="color:var(--text-color);">📋 ${titulo}</span>
+                            <span style="color:var(--primary-color);font-weight:600;">${p.pontos_obtidos || 0} pts <span style="color:var(--text-secondary);font-weight:400;margin-left:6px;">${data}</span></span>
+                        </div>`;
+                    }).join('');
+                }
+
+                lucide.createIcons();
+            } catch (ex) {
+                console.error('Erro ao carregar detalhes', ex);
+            }
+        }
+
+        async function eliminarUtilizador(id, nome, role) {
+            if (role === 'admin') {
+                const ok = await confirmarAcao(`⚠️ ATENÇÃO: Estás prestes a eliminar um ADMIN ("${nome}"). Esta ação é irreversível. Confirmas?`);
+                if (!ok) return;
+            }
+            const ok2 = await confirmarAcao(`Eliminar PERMANENTEMENTE o utilizador "${nome}"? Esta ação apaga a conta de autenticação e todos os dados associados.`);
+            if (!ok2) return;
+
+            try {
+                const res = await fetch(`/api/gestao/utilizadores/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await carregarUtilizadores();
+                    mostrarSucesso(`Utilizador "${nome}" eliminado permanentemente.`);
+                } else {
+                    const err = await res.json();
+                    alert('Erro ao eliminar: ' + (err.error || 'Desconhecido'));
+                }
+            } catch (ex) {
+                alert('Erro de comunicação com o servidor.');
             }
         }
 

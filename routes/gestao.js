@@ -441,6 +441,145 @@ module.exports = (supabase) => {
     });
 
 
+    // ==========================================================
+    // GESTÃO DE UTILIZADORES
+    // ==========================================================
+
+    // Lista todos os utilizadores com informação básica
+    router.get('/utilizadores', verificarAdmin, async (req, res) => {
+        try {
+            const { data, error } = await supabase
+                .from('utilizador')
+                .select('id_utilizador, nome, email, role, pontos_totais, foto_perfil, coins, id_turma')
+                .order('nome', { ascending: true });
+            if (error) throw error;
+
+            // Para cada utilizador com turma, busca o nome da turma
+            if (data && data.length > 0) {
+                const idsComTurma = [...new Set(data.filter(u => u.id_turma).map(u => u.id_turma))];
+                if (idsComTurma.length > 0) {
+                    const { data: turmas } = await supabase
+                        .from('turma')
+                        .select('id_turma, nome')
+                        .in('id_turma', idsComTurma);
+                    if (turmas) {
+                        const turmaMap = {};
+                        turmas.forEach(t => { turmaMap[t.id_turma] = t.nome; });
+                        data.forEach(u => { u.turma_nome = u.id_turma ? (turmaMap[u.id_turma] || null) : null; });
+                    }
+                }
+            }
+
+            res.json(data || []);
+        } catch (err) {
+            console.error('Erro ao listar utilizadores:', err);
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // Devolve os detalhes completos de um utilizador (medalhas + progresso)
+    router.get('/utilizadores/:id', verificarAdmin, async (req, res) => {
+        try {
+            const { data: user, error: userErr } = await supabase
+                .from('utilizador')
+                .select('id_utilizador, nome, email, role, pontos_totais, foto_perfil, foto_google, foto_upload, coins, id_turma')
+                .eq('id_utilizador', req.params.id)
+                .single();
+
+            if (userErr || !user) return res.status(404).json({ error: 'Utilizador n\u00e3o encontrado.' });
+
+            // Nome da turma separado (sem join PostgREST para evitar erros de FK)
+            if (user.id_turma) {
+                const { data: turmaData } = await supabase
+                    .from('turma').select('nome').eq('id_turma', user.id_turma).single();
+                user.turma_nome = turmaData ? turmaData.nome : null;
+            }
+
+            // Medalhas conquistadas
+            const { data: medalhas } = await supabase
+                .from('utilizador_medalha')
+                .select('data_conquista, medalha(nome, descricao, pontos_necessarios)')
+                .eq('id_utilizador', req.params.id)
+                .order('data_conquista', { ascending: false });
+
+            // Estatísticas de progresso
+            const { data: progressoStats } = await supabase
+                .from('progresso')
+                .select('pontos_obtidos, respostas_corretas, total_perguntas, data_realizacao, atividade(titulo, tipo)')
+                .eq('id_utilizador', req.params.id)
+                .order('data_realizacao', { ascending: false })
+                .limit(10);
+
+            user.medalhas = medalhas || [];
+            user.progresso = progressoStats || [];
+            user.total_quizzes = user.progresso.length;
+
+            res.json(user);
+        } catch (err) {
+            console.error('Erro ao carregar detalhe do utilizador:', err);
+            res.status(500).json({ error: 'Erro ao carregar dados do utilizador.' });
+        }
+    });
+
+    // Atualiza nome, role e/ou valores de pontos/coins de um utilizador
+    router.put('/utilizadores/:id', verificarAdmin, async (req, res) => {
+        const { nome, role, pontos_totais, coins } = req.body;
+        const rolesValidas = ['aluno', 'professor', 'admin'];
+
+        if (role && !rolesValidas.includes(role)) {
+            return res.status(400).json({ error: 'Role inválida.' });
+        }
+        if (pontos_totais !== undefined && (isNaN(pontos_totais) || pontos_totais < 0)) {
+            return res.status(400).json({ error: 'Valor de pontos inválido.' });
+        }
+        if (coins !== undefined && (isNaN(coins) || coins < 0)) {
+            return res.status(400).json({ error: 'Valor de coins inválido.' });
+        }
+
+        const updateData = {};
+        if (nome && nome.trim() !== '') updateData.nome = nome.trim();
+        if (role) updateData.role = role;
+        if (pontos_totais !== undefined) updateData.pontos_totais = parseInt(pontos_totais);
+        if (coins !== undefined) updateData.coins = parseInt(coins);
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ error: 'Nenhum dado para atualizar.' });
+        }
+
+        const { error } = await supabase
+            .from('utilizador')
+            .update(updateData)
+            .eq('id_utilizador', req.params.id);
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Utilizador atualizado com sucesso!' });
+    });
+
+    // Zera os pontos totais e coins de um utilizador
+    router.put('/utilizadores/:id/resetar-pontos', verificarAdmin, async (req, res) => {
+        const { error } = await supabase
+            .from('utilizador')
+            .update({ pontos_totais: 0, coins: 0 })
+            .eq('id_utilizador', req.params.id);
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Pontos e coins resetados a zero.' });
+    });
+
+    // Elimina permanentemente um utilizador do auth e da base de dados (cascade)
+    router.delete('/utilizadores/:id', verificarAdmin, async (req, res) => {
+        try {
+            // Usa o Admin SDK para apagar do auth — o CASCADE na FK apaga o perfil e tudo ligado automaticamente
+            const { error } = await supabase.auth.admin.deleteUser(req.params.id);
+            if (error) throw error;
+            res.json({ message: 'Utilizador eliminado permanentemente de todo o sistema.' });
+        } catch (err) {
+            console.error('Erro ao eliminar utilizador:', err);
+            res.status(500).json({ error: 'Erro ao eliminar o utilizador.' });
+        }
+    });
+
+
     // Devolve as categorias e dificuldades unicas existentes, para preencher os filtros dinamicamente
     router.get('/opcoes-quiz', async (req, res) => {
         try {
