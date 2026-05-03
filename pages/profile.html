@@ -721,10 +721,10 @@
                 }));
 
                 // Normalizar partidas do CiberTermo
-                // data_jogo é 'YYYY-MM-DD' — usar T12:00:00 para evitar problemas de fuso
+                // data_jogo é 'YYYY-MM-DD' - usar T12:00:00 para evitar problemas de fuso
                 const listaTermo = termoJogos.map(j => ({
                     tipo: 'termo',
-                    titulo: `CiberTermo — ${j.tamanho_palavra} letras`,
+                    titulo: `CiberTermo - ${j.tamanho_palavra} letras`,
                     descricao: `${j.tentativas} tentativa${j.tentativas !== 1 ? 's' : ''} · +${j.moedas_ganhas} CC`,
                     pontos: j.pontos_ganhos,
                     data: new Date(j.data_jogo + 'T12:00:00')

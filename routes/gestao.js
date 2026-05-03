@@ -569,7 +569,7 @@ module.exports = (supabase) => {
     // Elimina permanentemente um utilizador do auth e da base de dados (cascade)
     router.delete('/utilizadores/:id', verificarAdmin, async (req, res) => {
         try {
-            // Usa o Admin SDK para apagar do auth — o CASCADE na FK apaga o perfil e tudo ligado automaticamente
+            // Usa o Admin SDK para apagar do auth - o CASCADE na FK apaga o perfil e tudo ligado automaticamente
             const { error } = await supabase.auth.admin.deleteUser(req.params.id);
             if (error) throw error;
             res.json({ message: 'Utilizador eliminado permanentemente de todo o sistema.' });
