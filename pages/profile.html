@@ -700,37 +700,67 @@
         // ATIVIDADE RECENTE & ESTATÍSTICAS DO UTILIZADOR
         // ==========================================
         async function carregarAtividadeRecente() {
+            const contentor = document.querySelector('.profile-activity');
             try {
-                const response = await fetch('/api/recent-activity');
-                if (!response.ok) throw new Error('Falha ao obter atividades');
-                const atividades = await response.json();
-                const contentor = document.querySelector('.profile-activity');
+                // Buscar quizzes/jogos e CiberTermo em paralelo
+                const [resAtiv, resTermo] = await Promise.all([
+                    fetch('/api/recent-activity'),
+                    fetch('/api/termo-history')
+                ]);
 
-                if (atividades.length === 0) {
+                const atividades = resAtiv.ok ? await resAtiv.json() : [];
+                const termoJogos = resTermo.ok ? await resTermo.json() : [];
+
+                // Normalizar atividades de quiz/jogo
+                const listaQuizzes = atividades.map(act => ({
+                    tipo: 'quiz',
+                    titulo: `${act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo'}: ${act.atividade.titulo}`,
+                    descricao: act.total_perguntas ? `${act.respostas_corretas}/${act.total_perguntas} corretas` : 'Concluído',
+                    pontos: act.pontos_obtidos,
+                    data: new Date(act.data_realizacao)
+                }));
+
+                // Normalizar partidas do CiberTermo
+                // data_jogo é 'YYYY-MM-DD' — usar T12:00:00 para evitar problemas de fuso
+                const listaTermo = termoJogos.map(j => ({
+                    tipo: 'termo',
+                    titulo: `CiberTermo — ${j.tamanho_palavra} letras`,
+                    descricao: `${j.tentativas} tentativa${j.tentativas !== 1 ? 's' : ''} · +${j.moedas_ganhas} CC`,
+                    pontos: j.pontos_ganhos,
+                    data: new Date(j.data_jogo + 'T12:00:00')
+                }));
+
+                // Juntar, ordenar do mais recente, pegar os 5 primeiros
+                const tudo = [...listaQuizzes, ...listaTermo]
+                    .sort((a, b) => b.data - a.data)
+                    .slice(0, 5);
+
+                if (tudo.length === 0) {
                     contentor.innerHTML = '<p style="color: var(--text-secondary); padding: 10px;">Ainda não tens atividades registadas.</p>';
                     return;
                 }
 
-                contentor.innerHTML = atividades.map(act => {
-                    const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
-                    const dataRealizacao = new Date(act.data_realizacao).toLocaleDateString('pt-PT');
-                    let textoDescricao = act.total_perguntas ? `${act.respostas_corretas}/${act.total_perguntas} corretas` : 'Concluído';
+                contentor.innerHTML = tudo.map(item => {
+                    const dataFmt = item.data.toLocaleDateString('pt-PT');
+                    const pillTermo = item.tipo === 'termo'
+                        ? `<span style="display:inline-block; font-size:0.72rem; font-weight:700; background:rgba(99,102,241,0.12); color:#6366f1; padding:1px 7px; border-radius:99px; margin-right:5px; vertical-align:middle;">CiberTermo</span>`
+                        : '';
 
                     return `
                         <div class="profile-activity-item">
                             <div>
-                                <div class="profile-activity-title">${tipoNome}: ${act.atividade.titulo}</div>
-                                <div class="profile-activity-desc">${textoDescricao}</div>
+                                <div class="profile-activity-title">${pillTermo}${item.titulo}</div>
+                                <div class="profile-activity-desc">${item.descricao}</div>
                             </div>
                             <div class="profile-activity-right">
-                                <div class="profile-activity-points">+${act.pontos_obtidos} pts</div>
-                                <div class="profile-activity-time">${dataRealizacao}</div>
+                                <div class="profile-activity-points">+${item.pontos} pts</div>
+                                <div class="profile-activity-time">${dataFmt}</div>
                             </div>
                         </div>
                     `;
                 }).join('');
             } catch (error) {
-                console.error("Erro ao carregar histórico:", error);
+                console.error("Erro ao carregar atividade recente:", error);
             }
         }
 

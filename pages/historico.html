@@ -11,6 +11,86 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
+    <style>
+        .hist-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color, rgba(0,0,0,0.1));
+            padding-bottom: 0;
+        }
+        .hist-tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            border-radius: 0;
+            transition: color 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hist-tab-btn.active {
+            color: var(--primary-color, #3b82f6);
+            border-bottom-color: var(--primary-color, #3b82f6);
+        }
+        .hist-tab-btn:hover:not(.active) {
+            color: var(--text-color);
+        }
+        .hist-panel { display: none; }
+        .hist-panel.active { display: block; }
+
+        /* CiberTermo history item — espelha .profile-activity-item para dark mode automático */
+        .termo-hist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+            transition: background-color 0.2s;
+        }
+        .termo-hist-item:hover { background: #f3f4f6; }
+
+        /* Dark mode — igual ao .profile-activity-item */
+        body.dark-mode .termo-hist-item       { background-color: #0f172a !important; }
+        body.dark-mode .termo-hist-item:hover { background-color: #1e293b !important; }
+        body.dark-mode .termo-hist-title      { color: #f1f5f9 !important; }
+        body.dark-mode .termo-hist-meta       { color: #94a3b8 !important; }
+        body.dark-mode .termo-hist-date       { color: #64748b !important; }
+        body.dark-mode .termo-hist-icon       { background: rgba(99,102,241,0.22) !important; }
+
+        /* Tabs dark mode */
+        body.dark-mode .hist-tabs                       { border-bottom-color: #334155; }
+        body.dark-mode .hist-tab-btn                    { color: #94a3b8; }
+        body.dark-mode .hist-tab-btn.active             { color: #60a5fa; border-bottom-color: #60a5fa; }
+        body.dark-mode .hist-tab-btn:hover:not(.active) { color: #f1f5f9; }
+
+        .termo-hist-left { display: flex; align-items: center; gap: 14px; }
+        .termo-hist-icon {
+            width: 42px; height: 42px; border-radius: 10px;
+            background: rgba(99, 102, 241, 0.12);
+            display: flex; align-items: center; justify-content: center;
+            color: #6366f1; flex-shrink: 0;
+        }
+        .termo-hist-title  { font-weight: 700; font-size: 1rem; color: #0f172a; }
+        .termo-hist-meta   { font-size: 0.85rem; color: #4b5563; margin-top: 2px; }
+        .termo-hist-right  { text-align: right; flex-shrink: 0; }
+        .termo-hist-points { font-weight: 800; color: #10b981; font-size: 1.05rem; }
+        .termo-hist-date   { font-size: 0.82rem; color: #6b7280; margin-top: 2px; }
+        .termo-hist-attempts {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.8rem; font-weight: 700;
+            background: rgba(99,102,241,0.1); color: #6366f1;
+            padding: 2px 8px; border-radius: 99px; margin-top: 3px;
+        }
+    </style>
 </head>
 <body class="site-body">
     <div id="global-loader">
@@ -30,8 +110,28 @@
         </div>
 
         <div class="profile-card">
-            <div id="historico-container" class="profile-activity">
-                <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico...</p>
+            <!-- Separadores -->
+            <div class="hist-tabs" id="hist-tabs">
+                <button class="hist-tab-btn active" data-tab="quizzes" onclick="trocarTab('quizzes', this)">
+                    <i data-lucide="layout-list" style="width:16px;height:16px;"></i> Quizzes &amp; Jogos
+                </button>
+                <button class="hist-tab-btn" data-tab="cibertermo" onclick="trocarTab('cibertermo', this)">
+                    <i data-lucide="keyboard" style="width:16px;height:16px;"></i> CiberTermo
+                </button>
+            </div>
+
+            <!-- Painel Quizzes -->
+            <div class="hist-panel active" id="panel-quizzes">
+                <div id="historico-container" class="profile-activity">
+                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico...</p>
+                </div>
+            </div>
+
+            <!-- Painel CiberTermo -->
+            <div class="hist-panel" id="panel-cibertermo">
+                <div id="termo-historico-container">
+                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico do CiberTermo...</p>
+                </div>
             </div>
         </div>
 
@@ -39,6 +139,13 @@
 
     <script>
         lucide.createIcons();
+
+        function trocarTab(tab, btn) {
+            document.querySelectorAll('.hist-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.hist-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('panel-' + tab).classList.add('active');
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             // 1. Verificar se estamos a ver o histórico de outra pessoa
@@ -48,14 +155,20 @@
             // 2. Atualizar o Botão Voltar
             const btnVoltar = document.getElementById('btn-voltar-perfil');
             if (targetId) {
-                btnVoltar.href = `profile?id=${targetId}`; // Volta para o perfil da pessoa
+                btnVoltar.href = `profile?id=${targetId}`;
             } else {
-                btnVoltar.href = `profile`; // Volta para o teu perfil
+                btnVoltar.href = `profile`;
             }
 
-            // 3. Escolher o endpoint certo para pedir à base de dados
+            // 3. Se for perfil público, esconder o tab do CiberTermo (não temos endpoint público para isso)
+            if (targetId) {
+                document.querySelector('[data-tab="cibertermo"]').style.display = 'none';
+            }
+
+            // 4. Escolher o endpoint certo para os quizzes
             const endpoint = targetId ? `/api/history/${targetId}` : `/api/history`;
 
+            // --- Carregar Quizzes & Jogos ---
             try {
                 const response = await fetch(endpoint);
                 const container = document.getElementById('historico-container');
@@ -65,7 +178,6 @@
                     return;
                 }
                 
-                // Se o backend nos disser que o perfil é privado e não podemos ver o histórico
                 if (response.status === 403) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 40px;">
@@ -83,40 +195,109 @@
 
                 if (!atividades || atividades.length === 0) {
                     container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">Ainda não há atividades registadas.</p>';
-                    return;
+                } else {
+                    atividades.forEach(act => {
+                        const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
+                        const dataRealizacao = new Date(act.data_realizacao);
+                        const opcoesData = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' };
+                        const textoData = dataRealizacao.toLocaleDateString('pt-PT', opcoesData);
+
+                        let textoDescricao = 'Concluído';
+                        if (act.respostas_corretas !== null && act.total_perguntas !== null && act.total_perguntas > 0) {
+                            textoDescricao = `${act.respostas_corretas}/${act.total_perguntas} corretas`;
+                        }
+
+                        const itemHTML = `
+                            <div class="profile-activity-item">
+                                <div>
+                                    <div class="profile-activity-title" style="font-size: 1.1rem;">${tipoNome}: ${act.atividade.titulo}</div>
+                                    <div class="profile-activity-desc" style="font-size: 0.95rem;">${textoDescricao}</div>
+                                </div>
+                                <div class="profile-activity-right" style="text-align: right;">
+                                    <div class="profile-activity-points" style="font-size: 1.1rem;">+${act.pontos_obtidos} pts</div>
+                                    <div class="profile-activity-time">${textoData}</div>
+                                </div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', itemHTML);
+                    });
                 }
-
-                atividades.forEach(act => {
-                    const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
-                    const dataRealizacao = new Date(act.data_realizacao);
-                    
-                    const opcoesData = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' };
-                    const textoData = dataRealizacao.toLocaleDateString('pt-PT', opcoesData);
-
-                    let textoDescricao = 'Concluído';
-                    if (act.respostas_corretas !== null && act.total_perguntas !== null && act.total_perguntas > 0) {
-                        textoDescricao = `${act.respostas_corretas}/${act.total_perguntas} corretas`;
-                    }
-
-                    const itemHTML = `
-                        <div class="profile-activity-item">
-                            <div>
-                                <div class="profile-activity-title" style="font-size: 1.1rem;">${tipoNome}: ${act.atividade.titulo}</div>
-                                <div class="profile-activity-desc" style="font-size: 0.95rem;">${textoDescricao}</div>
-                            </div>
-                            <div class="profile-activity-right" style="text-align: right;">
-                                <div class="profile-activity-points" style="font-size: 1.1rem;">+${act.pontos_obtidos} pts</div>
-                                <div class="profile-activity-time">${textoData}</div>
-                            </div>
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', itemHTML);
-                });
 
             } catch (error) {
                 console.error("Erro ao carregar o histórico:", error);
                 document.getElementById('historico-container').innerHTML = '<p style="color: var(--error); text-align: center; padding: 20px;">Erro ao carregar as atividades.</p>';
             }
+
+            // --- Carregar Histórico do CiberTermo (só para o próprio utilizador) ---
+            if (!targetId) {
+                try {
+                    const termoRes = await fetch('/api/termo-history');
+                    const termoContainer = document.getElementById('termo-historico-container');
+
+                    if (!termoRes.ok) {
+                        termoContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">Não foi possível carregar o histórico do CiberTermo.</p>';
+                        return;
+                    }
+
+                    const termoJogos = await termoRes.json();
+
+                    if (!termoJogos || termoJogos.length === 0) {
+                        termoContainer.innerHTML = `
+                            <div style="text-align: center; padding: 40px 20px;">
+                                <i data-lucide="keyboard" style="width: 48px; height: 48px; color: #6366f1; opacity: 0.4; margin-bottom: 15px;"></i>
+                                <h3 style="margin-bottom: 8px; color: var(--text-color);">Ainda sem jogos CiberTermo</h3>
+                                <p style="color: var(--text-secondary); margin-bottom: 20px;">Completa o desafio diário para ver o teu histórico aqui!</p>
+                                <a href="cibertermo" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="play" style="width:16px;height:16px;"></i> Jogar Agora
+                                </a>
+                            </div>
+                        `;
+                        lucide.createIcons();
+                        return;
+                    }
+
+                    termoContainer.innerHTML = '';
+                    termoJogos.forEach(jogo => {
+                        // data_jogo é 'YYYY-MM-DD' (DATE no PostgreSQL)
+                        const dataObj = new Date(jogo.data_jogo + 'T00:00:00');
+                        const textoData = dataObj.toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' });
+                        const tentativas = jogo.tentativas;
+
+                        const itemHTML = `
+                            <div class="termo-hist-item">
+                                <div class="termo-hist-left">
+                                    <div class="termo-hist-icon">
+                                        <i data-lucide="keyboard" style="width:20px;height:20px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="termo-hist-title">CiberTermo — ${jogo.tamanho_palavra} letras</div>
+                                        <div class="termo-hist-meta">
+                                            <span class="termo-hist-attempts">
+                                                <i data-lucide="refresh-cw" style="width:11px;height:11px;"></i>
+                                                ${tentativas} tentativa${tentativas !== 1 ? 's' : ''}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="termo-hist-right">
+                                    <div class="termo-hist-points">+${jogo.pontos_ganhos} pts</div>
+                                    <div class="termo-hist-date">${textoData}</div>
+                                    <div style="font-size: 0.8rem; color: #f59e0b; margin-top: 2px; font-weight: 600;">+${jogo.moedas_ganhas} CC</div>
+                                </div>
+                            </div>
+                        `;
+                        termoContainer.insertAdjacentHTML('beforeend', itemHTML);
+                    });
+
+                    lucide.createIcons();
+
+                } catch (err) {
+                    console.error("Erro ao carregar histórico CiberTermo:", err);
+                    document.getElementById('termo-historico-container').innerHTML = '<p style="color: var(--error); text-align: center; padding: 20px;">Erro ao carregar o histórico do CiberTermo.</p>';
+                }
+            }
+
+            lucide.createIcons();
         });
     </script>
 </body>

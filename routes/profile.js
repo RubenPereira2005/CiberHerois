@@ -245,6 +245,20 @@ module.exports = (supabase) => {
         } catch (error) { res.status(500).json({ error: 'Erro ao carregar historico.' }); }
     });
 
+    // Devolve o historico do CiberTermo do utilizador autenticado
+    router.get('/termo-history', async (req, res) => {
+        if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
+        try {
+            const { data, error } = await supabase
+                .from('cibertermo_historico')
+                .select('data_jogo, tamanho_palavra, tentativas, pontos_ganhos, moedas_ganhas')
+                .eq('id_utilizador', req.session.userId)
+                .order('data_jogo', { ascending: false });
+            if (error) throw error;
+            res.json(data || []);
+        } catch (error) { res.status(500).json({ error: 'Erro ao carregar historico do CiberTermo.' }); }
+    });
+
     // Devolve o historico de um perfil publico, sujeito as definicoes de privacidade desse utilizador
     router.get('/history/:id', async (req, res) => {
         if (!req.session.userId) return res.status(401).json({ error: 'Utilizador nao autenticado' });
@@ -388,11 +402,18 @@ module.exports = (supabase) => {
             // Visibilidade da ofensiva (sequencia diaria)
             if (data.priv_ofensiva) {
                 const { data: progresso } = await supabase.from('progresso').select('data_realizacao').eq('id_utilizador', id);
+                const { data: termoHist } = await supabase.from('cibertermo_historico').select('data_jogo').eq('id_utilizador', id);
                 let ofensiva = 0;
-                if (progresso && progresso.length > 0) {
-                    const diasJogados = [...new Set(progresso.map(p => {
-                        const d = new Date(p.data_realizacao); d.setHours(0, 0, 0, 0); return d.getTime();
-                    }))];
+
+                const diasTermo = (termoHist || []).map(t => {
+                    const d = new Date(t.data_jogo + 'T00:00:00'); d.setHours(0, 0, 0, 0); return d.getTime();
+                });
+                const diasProgresso = (progresso || []).map(p => {
+                    const d = new Date(p.data_realizacao); d.setHours(0, 0, 0, 0); return d.getTime();
+                });
+                const diasJogados = [...new Set([...diasProgresso, ...diasTermo])];
+
+                if (diasJogados.length > 0) {
                     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
                     const ontem = new Date(hoje); ontem.setDate(ontem.getDate() - 1);
                     let tempoCheck = hoje.getTime();

@@ -38,10 +38,23 @@ module.exports = (supabase) => {
                 .select('respostas_corretas, total_perguntas, data_realizacao, atividade(tipo)')
                 .eq('id_utilizador', req.session.userId);
 
+            // Buscar datas do CiberTermo para incluir na streak
+            const { data: termoHistorico } = await supabase
+                .from('cibertermo_historico')
+                .select('data_jogo')
+                .eq('id_utilizador', req.session.userId);
+
             let totalQuizzes = 0;
             let totalCorretas = 0;
             let totalRespostas = 0;
             let ofensiva = 0;
+
+            // Recolher dias do CiberTermo (data_jogo é DATE: 'YYYY-MM-DD')
+            const diasTermo = (termoHistorico || []).map(t => {
+                const d = new Date(t.data_jogo + 'T00:00:00'); // forçar hora local midnight
+                d.setHours(0, 0, 0, 0);
+                return d.getTime();
+            });
 
             if (!erroProgresso && progresso && progresso.length > 0) {
                 const quizzes = progresso.filter(p => p.atividade && p.atividade.tipo === 'quiz');
@@ -52,12 +65,13 @@ module.exports = (supabase) => {
                     if (p.total_perguntas !== null) totalRespostas += p.total_perguntas;
                 });
 
-                // Calculo da ofensiva: conta os dias consecutivos jogados ate hoje
-                const diasJogados = [...new Set(progresso.map(p => {
+                // Dias de progresso (quizzes/jogos) + dias do CiberTermo, sem duplicados
+                const diasProgresso = progresso.map(p => {
                     const d = new Date(p.data_realizacao);
                     d.setHours(0, 0, 0, 0);
                     return d.getTime();
-                }))];
+                });
+                const diasJogados = [...new Set([...diasProgresso, ...diasTermo])];
 
                 const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
                 const ontem = new Date(hoje); ontem.setDate(ontem.getDate() - 1);
@@ -83,6 +97,35 @@ module.exports = (supabase) => {
                             tempoCheck = diaAnterior.getTime();
                         } else {
                             break; 
+                        }
+                    }
+                }
+            } else if (diasTermo.length > 0) {
+                // Utilizador sem quizzes mas com jogos do CiberTermo
+                const diasJogados = [...new Set(diasTermo)];
+                const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                const ontem = new Date(hoje); ontem.setDate(ontem.getDate() - 1);
+                let tempoCheck = hoje.getTime();
+
+                if (diasJogados.includes(tempoCheck)) {
+                    ofensiva = 1;
+                    tempoCheck = ontem.getTime();
+                } else if (diasJogados.includes(ontem.getTime())) {
+                    ofensiva = 1;
+                    const anteontem = new Date(ontem);
+                    anteontem.setDate(anteontem.getDate() - 1);
+                    tempoCheck = anteontem.getTime();
+                }
+
+                if (ofensiva > 0) {
+                    while (true) {
+                        if (diasJogados.includes(tempoCheck)) {
+                            ofensiva++;
+                            const diaAnterior = new Date(tempoCheck);
+                            diaAnterior.setDate(diaAnterior.getDate() - 1);
+                            tempoCheck = diaAnterior.getTime();
+                        } else {
+                            break;
                         }
                     }
                 }
