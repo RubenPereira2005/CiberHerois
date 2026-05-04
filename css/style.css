@@ -406,7 +406,7 @@ body.site-body {
   color: #fff !important;
 }
 
-.icon-sm svg {
+.icon-sm, .icon-sm svg {
   width: 20px;
   height: 20px;
   color: #fff !important;
@@ -415,12 +415,17 @@ body.site-body {
   fill: none !important;
 }
 
-.icon-lg {
+.icon-lg, .icon-lg svg {
   width: 64px;
   height: 64px;
   color: #ffffff !important;
   fill: none !important;
   stroke-width: 1.5;
+}
+
+.white {
+  color: #fff !important;
+  stroke: #fff !important;
 }
 
 /* Main / quizzes page */
@@ -519,6 +524,7 @@ body.site-body {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
 }
 
 .card-icon.color-blue {

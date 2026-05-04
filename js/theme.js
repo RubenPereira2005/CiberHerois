@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (toggleBtn) {
             const isCurrentlyDark = body.classList.contains('dark-mode');
             window.setTheme(isCurrentlyDark ? 'light' : 'dark');
+            toggleBtn.blur(); // Remove o foco para evitar que o "Enter" no jogo mude o tema acidentalmente
         }
     });
 
