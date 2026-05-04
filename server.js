@@ -84,6 +84,11 @@ app.use((req, res, next) => {
         return res.redirect('/404');
     }
 
+    if (cleanPath === '/professor-stats' && req.session.role !== 'professor' && req.session.role !== 'admin') {
+        logger.warn(`[403] Acesso negado a /professor-stats - ${req.session.userName} (${req.session.role})`);
+        return res.redirect('/404');
+    }
+
     next();
 });
 

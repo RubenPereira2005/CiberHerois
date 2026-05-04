@@ -444,5 +444,252 @@ module.exports = (supabase) => {
         }
     });
 
+    // ==========================================================
+    // ESTATÍSTICAS DO PROFESSOR
+    // ==========================================================
+
+    // Lista as turmas do professor (para o seletor da página de stats)
+    router.get('/stats/turmas', verificarProfessor, async (req, res) => {
+        try {
+            const { data: user } = await supabase
+                .from('utilizador')
+                .select('role')
+                .eq('id_utilizador', req.session.userId)
+                .single();
+
+            let turmas;
+            if (user && user.role === 'admin') {
+                // Admin vê todas as turmas
+                const { data } = await supabase
+                    .from('turma')
+                    .select('id_turma, nome, ano_letivo, escola(nome)')
+                    .order('nome');
+                turmas = data || [];
+            } else {
+                // Professor vê apenas as suas turmas
+                const { data } = await supabase
+                    .from('turma')
+                    .select('id_turma, nome, ano_letivo, escola(nome)')
+                    .eq('id_professor', req.session.userId)
+                    .order('nome');
+                turmas = data || [];
+            }
+            res.json(turmas);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    });
+
+    // Estatísticas detalhadas dos alunos de uma turma com filtro de período
+    router.get('/stats/turma/:id', verificarProfessor, async (req, res) => {
+        const idTurma = req.params.id;
+        const periodo = req.query.periodo || 'sempre'; // 'semana' | 'mes' | 'ano' | 'sempre'
+
+        try {
+            // Verificar acesso à turma
+            const { data: turmaData } = await supabase
+                .from('turma')
+                .select('id_professor, nome, ano_letivo')
+                .eq('id_turma', idTurma)
+                .single();
+
+            if (!turmaData) return res.status(404).json({ error: 'Turma não encontrada.' });
+
+            // Admin pode ver qualquer turma; professor apenas as suas
+            const { data: authUser } = await supabase
+                .from('utilizador')
+                .select('role')
+                .eq('id_utilizador', req.session.userId)
+                .single();
+
+            const isAdmin = authUser && authUser.role === 'admin';
+            if (!isAdmin && turmaData.id_professor !== req.session.userId) {
+                return res.status(403).json({ error: 'Acesso negado a esta turma.' });
+            }
+
+            // Calcular a data de início do período
+            let dataInicio = null;
+            const agora = new Date();
+            if (periodo === 'semana') {
+                dataInicio = new Date(agora);
+                dataInicio.setDate(agora.getDate() - 7);
+            } else if (periodo === 'mes') {
+                dataInicio = new Date(agora);
+                dataInicio.setMonth(agora.getMonth() - 1);
+            } else if (periodo === 'ano') {
+                dataInicio = new Date(agora);
+                dataInicio.setFullYear(agora.getFullYear() - 1);
+            }
+
+            // Buscar alunos da turma
+            const { data: alunos, error: alunosErr } = await supabase
+                .from('utilizador')
+                .select('id_utilizador, nome, pontos_totais, foto_perfil')
+                .eq('id_turma', idTurma)
+                .eq('role', 'aluno')
+                .order('pontos_totais', { ascending: false });
+
+            if (alunosErr) throw alunosErr;
+
+            if (!alunos || alunos.length === 0) {
+                return res.json({
+                    turma: turmaData,
+                    alunos: [],
+                    resumo: { total_alunos: 0, media_precisao: 0, total_quizzes: 0, melhor_aluno: null }
+                });
+            }
+
+            const ids = alunos.map(a => a.id_utilizador);
+
+            // Buscar progresso de quizzes no período
+            let progressoQuery = supabase
+                .from('progresso')
+                .select('id_utilizador, respostas_corretas, total_perguntas, data_realizacao, atividade(tipo)')
+                .in('id_utilizador', ids);
+
+            if (dataInicio) {
+                progressoQuery = progressoQuery.gte('data_realizacao', dataInicio.toISOString());
+            }
+
+            const { data: progresso } = await progressoQuery;
+
+            // Buscar jogos CiberTermo no período
+            let termoQuery = supabase
+                .from('cibertermo_historico')
+                .select('id_utilizador, data_jogo')
+                .in('id_utilizador', ids);
+
+            if (dataInicio) {
+                termoQuery = termoQuery.gte('data_jogo', dataInicio.toISOString().split('T')[0]);
+            }
+
+            const { data: termoHistorico } = await termoQuery;
+
+            // Agrupar dados por aluno
+            const progressoMap = {};
+            const termoMap = {};
+
+            (progresso || []).forEach(p => {
+                if (!progressoMap[p.id_utilizador]) progressoMap[p.id_utilizador] = [];
+                progressoMap[p.id_utilizador].push(p);
+            });
+
+            (termoHistorico || []).forEach(t => {
+                if (!termoMap[t.id_utilizador]) termoMap[t.id_utilizador] = [];
+                termoMap[t.id_utilizador].push(t);
+            });
+
+            // Calcular nível
+            function calcularNivel(pts) {
+                let nivel = 1, base = 0, step = 200;
+                while (pts >= base + step) { base += step; nivel++; step = Math.floor(step * 1.5); }
+                return nivel;
+            }
+
+            // Calcular streak de dias consecutivos
+            function calcularStreak(diasProgresso, diasTermo) {
+                const diasUnicos = [...new Set([...diasProgresso, ...diasTermo])].sort((a, b) => b - a);
+                if (diasUnicos.length === 0) return 0;
+
+                const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                const ontem = new Date(hoje); ontem.setDate(hoje.getDate() - 1);
+
+                let streak = 0;
+                let tempoCheck;
+
+                if (diasUnicos.includes(hoje.getTime())) {
+                    streak = 1; tempoCheck = ontem.getTime();
+                } else if (diasUnicos.includes(ontem.getTime())) {
+                    streak = 1;
+                    const ante = new Date(ontem); ante.setDate(ontem.getDate() - 1);
+                    tempoCheck = ante.getTime();
+                } else {
+                    return 0;
+                }
+
+                while (diasUnicos.includes(tempoCheck)) {
+                    streak++;
+                    const d = new Date(tempoCheck); d.setDate(d.getDate() - 1);
+                    tempoCheck = d.getTime();
+                }
+                return streak;
+            }
+
+            // Montar dados por aluno
+            const alunosStats = alunos.map(aluno => {
+                const progAluno = progressoMap[aluno.id_utilizador] || [];
+                const termoAluno = termoMap[aluno.id_utilizador] || [];
+
+                const quizzes = progAluno.filter(p => p.atividade && p.atividade.tipo === 'quiz');
+                const totalQuizzes = quizzes.length;
+                let totalCorretas = 0, totalPerguntas = 0;
+                quizzes.forEach(q => {
+                    totalCorretas += q.respostas_corretas || 0;
+                    totalPerguntas += q.total_perguntas || 0;
+                });
+                const precisao = totalPerguntas > 0 ? Math.round((totalCorretas / totalPerguntas) * 100) : 0;
+                const erradas = totalPerguntas - totalCorretas;
+
+                // Última atividade
+                const datasProgresso = progAluno.map(p => new Date(p.data_realizacao).getTime());
+                const datasTermo = termoAluno.map(t => new Date(t.data_jogo + 'T00:00:00').getTime());
+                const todasDatas = [...datasProgresso, ...datasTermo].sort((a, b) => b - a);
+                const ultimaAtividade = todasDatas.length > 0 ? new Date(todasDatas[0]).toISOString() : null;
+
+                // Streak
+                const diasProg = datasProgresso.map(d => { const dt = new Date(d); dt.setHours(0,0,0,0); return dt.getTime(); });
+                const diasTermo = datasTermo.map(d => { const dt = new Date(d); dt.setHours(0,0,0,0); return dt.getTime(); });
+                const streak = calcularStreak(diasProg, diasTermo);
+
+                // Avatar
+                let avatar = '/img/default_avatar.png';
+                if (aluno.foto_perfil) {
+                    if (aluno.foto_perfil.startsWith('http')) avatar = aluno.foto_perfil;
+                    else if (aluno.foto_perfil.startsWith('upload-')) avatar = `/img/uploads/${aluno.foto_perfil}`;
+                    else avatar = `/img/${aluno.foto_perfil}`;
+                }
+
+                return {
+                    id_utilizador: aluno.id_utilizador,
+                    nome: aluno.nome,
+                    avatar,
+                    pontos: aluno.pontos_totais || 0,
+                    nivel: calcularNivel(aluno.pontos_totais || 0),
+                    total_quizzes: totalQuizzes,
+                    respostas_corretas: totalCorretas,
+                    respostas_erradas: erradas,
+                    total_perguntas: totalPerguntas,
+                    precisao,
+                    streak,
+                    ultima_atividade: ultimaAtividade
+                };
+            });
+
+            // Calcular resumo
+            const totalQuizzesGlobal = alunosStats.reduce((acc, a) => acc + a.total_quizzes, 0);
+            const alunosAtivos = alunosStats.filter(a => a.total_quizzes > 0 || a.streak > 0).length;
+            const mediaPrec = alunosStats.length > 0
+                ? Math.round(alunosStats.reduce((acc, a) => acc + a.precisao, 0) / alunosStats.length)
+                : 0;
+            const melhorAluno = alunosStats.length > 0 ? alunosStats[0] : null; // já ordenado por pontos
+
+            res.json({
+                turma: turmaData,
+                alunos: alunosStats,
+                resumo: {
+                    total_alunos: alunos.length,
+                    alunos_ativos: alunosAtivos,
+                    media_precisao: mediaPrec,
+                    total_quizzes: totalQuizzesGlobal,
+                    melhor_aluno: melhorAluno ? { nome: melhorAluno.nome, pontos: melhorAluno.pontos } : null
+                }
+            });
+
+        } catch (err) {
+            console.error("Erro nas stats do professor:", err);
+            res.status(500).json({ error: err.message });
+        }
+    });
+
     return router;
 };

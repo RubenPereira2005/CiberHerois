@@ -1094,3 +1094,165 @@ body.dark-mode .user-card-name {
 body.dark-mode .diff-reward-box {
     background: rgba(255, 255, 255, 0.05) !important;
 }
+
+
+/* =========================================
+   LEADERBOARD - DARK MODE
+   ========================================= */
+
+body.dark-mode .lb-filter-bar {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .lb-pill {
+    background: #334155;
+    color: #94a3b8;
+    border-color: transparent;
+}
+
+body.dark-mode .lb-pill:hover {
+    border-color: #818cf8;
+    color: #818cf8;
+    background: rgba(129, 140, 248, 0.1);
+}
+
+body.dark-mode .lb-pill.active {
+    background: #6366f1;
+    color: #ffffff;
+    border-color: #6366f1;
+}
+
+body.dark-mode .lb-turma-select {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+body.dark-mode .ranking-item {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .ranking-item:hover {
+    border-color: #6366f1;
+}
+
+body.dark-mode .ranking-item.top-1 {
+    background: linear-gradient(135deg, rgba(234,179,8,0.10) 0%, #1e293b 60%);
+}
+
+body.dark-mode .ranking-item.top-2 {
+    background: linear-gradient(135deg, rgba(148,163,184,0.10) 0%, #1e293b 60%);
+}
+
+body.dark-mode .ranking-item.top-3 {
+    background: linear-gradient(135deg, rgba(205,124,58,0.10) 0%, #1e293b 60%);
+}
+
+body.dark-mode .ranking-item.is-me {
+    background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, #1e293b 60%);
+}
+
+body.dark-mode .ranking-avatar {
+    border-color: #475569;
+}
+
+body.dark-mode .ranking-name {
+    color: #f1f5f9;
+}
+
+body.dark-mode .lb-skeleton-item {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+}
+
+body.dark-mode .lb-empty {
+    color: #64748b;
+}
+
+
+/* =========================================
+   PROFESSOR STATS - DARK MODE
+   ========================================= */
+
+body.dark-mode .stats-controls {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .stats-select {
+    background: #334155;
+    border-color: #475569;
+    color: #f1f5f9;
+}
+
+body.dark-mode .stats-select:focus {
+    border-color: #10b981;
+}
+
+body.dark-mode .stat-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+body.dark-mode .stat-card-value {
+    color: #f1f5f9;
+}
+
+body.dark-mode .stat-card-label {
+    color: #64748b;
+}
+
+body.dark-mode .stats-table-wrap {
+    border-color: #334155;
+}
+
+body.dark-mode .stats-table th {
+    background: #0f172a;
+    color: #64748b;
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .stats-table td {
+    border-bottom-color: #1e293b;
+    color: #e2e8f0;
+}
+
+body.dark-mode .stats-table tbody tr:hover {
+    background: #334155;
+}
+
+body.dark-mode .aluno-nome {
+    color: #f1f5f9;
+}
+
+body.dark-mode .aluno-nivel {
+    color: #64748b;
+}
+
+body.dark-mode .aluno-avatar {
+    border-color: #475569;
+}
+
+body.dark-mode .precisao-bar-bg {
+    background: #334155;
+}
+
+body.dark-mode .streak-badge.zero {
+    background: #334155;
+    color: #64748b;
+}
+
+body.dark-mode .date-pill {
+    color: #64748b;
+}
+
+body.dark-mode .stats-empty {
+    color: #475569;
+}
+
+body.dark-mode .skeleton-row {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+}

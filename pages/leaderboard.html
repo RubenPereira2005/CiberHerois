@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaderboard - CiberHeróis</title>
+    <meta name="description" content="Ranking dos melhores CiberHeróis — filtra por turma ou vê o ranking global.">
     <link rel="icon" type="image/x-icon" href="img/favicon.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
@@ -11,6 +12,158 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
+    <style>
+        /* === LEADERBOARD FILTER PILLS === */
+        .lb-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            padding: 16px 20px;
+            background: var(--bg-card, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 14px;
+        }
+        .lb-filter-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        .lb-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        .lb-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: var(--bg-secondary, #f8fafc);
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .lb-pill:hover {
+            border-color: var(--primary-color, #6366f1);
+            color: var(--primary-color, #6366f1);
+            background: rgba(99,102,241,0.07);
+            transform: translateY(-1px);
+        }
+        .lb-pill.active {
+            background: var(--primary-color, #6366f1);
+            color: #ffffff;
+            border-color: var(--primary-color, #6366f1);
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+        }
+        .lb-pill-icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Admin dropdown */
+        .lb-turma-select {
+            flex: 1;
+            max-width: 280px;
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .lb-turma-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* === RANKING ITEMS === */
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            background: var(--bg-card, #ffffff);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.22s ease;
+            animation: rankFadeIn 0.35s ease both;
+        }
+        @keyframes rankFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .ranking-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary-color, #6366f1);
+            box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+        }
+        .ranking-item.top-1 { border-color: #eab308; background: linear-gradient(135deg, rgba(234,179,8,0.08) 0%, var(--bg-card) 60%); }
+        .ranking-item.top-2 { border-color: #94a3b8; background: linear-gradient(135deg, rgba(148,163,184,0.08) 0%, var(--bg-card) 60%); }
+        .ranking-item.top-3 { border-color: #cd7c3a; background: linear-gradient(135deg, rgba(205,124,58,0.08) 0%, var(--bg-card) 60%); }
+        .ranking-item.is-me  { border-color: var(--primary-color, #6366f1); background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, var(--bg-card) 60%); }
+
+        .ranking-left { display: flex; align-items: center; gap: 14px; }
+        .ranking-pos  { font-size: 1.4rem; min-width: 36px; text-align: center; font-weight: 700; }
+        .ranking-avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+        .ranking-name { font-weight: 700; font-size: 0.95rem; color: var(--text-color); }
+        .ranking-level { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+        .ranking-points { font-weight: 800; font-size: 1.05rem; color: var(--primary-color, #6366f1); }
+
+        /* Transition overlay */
+        .lb-skeleton {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .lb-skeleton-item {
+            height: 76px;
+            border-radius: 14px;
+            background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-secondary) 50%, var(--bg-card) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer { to { background-position: -200% 0; } }
+
+        .lb-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-secondary);
+        }
+        .lb-empty i { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
+
+        @media (max-width: 600px) {
+            .lb-filter-bar { flex-direction: column; align-items: flex-start; }
+            .ranking-item { padding: 12px 14px; }
+            .ranking-avatar { width: 38px; height: 38px; }
+        }
+    </style>
 </head>
 <body class="site-body">
     <div id="global-loader">
@@ -19,17 +172,35 @@
     </div>
 
     <div id="includedContent"></div>
-    
-    <div class="auth-container profile-main"  style="max-width: 800px;">
+
+    <div class="auth-container profile-main" style="max-width: 820px;">
         <div class="profile-card">
-            <div  style="text-align: center; margin-bottom: 30px;">
-                <i data-lucide="award"  style="width: 48px; height: 48px; color: #eab308; margin-bottom: 10px;"></i>
-                <h1  style="color: var(--text-color); margin: 0;">Hall of Fame</h1>
-                <p  style="color: var(--text-secondary); margin-top: 5px;">Os CiberHeróis com mais pontos acumulados</p>
+            <!-- Header -->
+            <div style="text-align: center; margin-bottom: 28px;">
+                <i data-lucide="award" style="width: 52px; height: 52px; color: #eab308; margin-bottom: 10px;"></i>
+                <h1 style="color: var(--text-color); margin: 0; font-size: 1.8rem;">Hall of Fame</h1>
+                <p style="color: var(--text-secondary); margin-top: 6px;">Os CiberHeróis com mais pontos acumulados</p>
             </div>
 
+            <!-- Filter Bar -->
+            <div class="lb-filter-bar" id="filter-bar" style="display:none;">
+                <span class="lb-filter-label"><i data-lucide="filter" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:4px;"></i>Filtrar:</span>
+                <div class="lb-pills" id="lb-pills-container"></div>
+                <!-- Admin dropdown (hidden by default) -->
+                <select class="lb-turma-select" id="lb-admin-select" style="display:none;" onchange="onAdminSelectChange(this)">
+                    <option value="">🌍 Global</option>
+                </select>
+            </div>
+
+            <!-- Ranking Container -->
             <div id="ranking-container" class="ranking-list">
-                <p  style="text-align: center; color: var(--text-secondary); padding: 20px;">A carregar os melhores heróis...</p>
+                <div class="lb-skeleton">
+                    <div class="lb-skeleton-item"></div>
+                    <div class="lb-skeleton-item"></div>
+                    <div class="lb-skeleton-item"></div>
+                    <div class="lb-skeleton-item"></div>
+                    <div class="lb-skeleton-item"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -37,57 +208,151 @@
     <script>
         lucide.createIcons();
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        let currentTurmaId = null;
+        let userRole = null;
+
+        // ---- Carregar turmas disponíveis e construir filtros ----
+        async function carregarFiltros() {
             try {
-                const response = await fetch('/api/leaderboard');
-                if (!response.ok) {
-                    if(response.status === 401) window.location.href = 'index';
+                const res = await fetch('/api/leaderboard/turmas');
+                if (!res.ok) {
+                    if (res.status === 401) { window.location.href = 'index'; return; }
+                    throw new Error('Falha ao carregar turmas');
+                }
+                const { turmas, role } = await res.json();
+                userRole = role;
+
+                const filterBar = document.getElementById('filter-bar');
+
+                if (role === 'admin' && turmas.length > 0) {
+                    // Admin: mostra um dropdown com todas as turmas
+                    const sel = document.getElementById('lb-admin-select');
+                    turmas.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.id_turma;
+                        opt.textContent = t.nome;
+                        sel.appendChild(opt);
+                    });
+                    document.getElementById('lb-pills-container').style.display = 'none';
+                    sel.style.display = 'block';
+                    filterBar.style.display = 'flex';
+                } else if (turmas.length > 0) {
+                    // Aluno / Professor: mostra pills
+                    const container = document.getElementById('lb-pills-container');
+                    // Pill Global
+                    const globalPill = criarPill('🌍', 'Global', null, true);
+                    container.appendChild(globalPill);
+                    // Pills de turma
+                    turmas.forEach(t => {
+                        const pill = criarPill('👥', t.nome, t.id_turma, false);
+                        container.appendChild(pill);
+                    });
+                    filterBar.style.display = 'flex';
+                }
+                // Se não há turmas, a filter bar fica escondida (apenas global)
+
+            } catch (e) {
+                console.warn("Sem turmas para filtrar, a mostrar apenas global.", e);
+            }
+        }
+
+        function criarPill(emoji, texto, turmaId, isActive) {
+            const pill = document.createElement('button');
+            pill.className = 'lb-pill' + (isActive ? ' active' : '');
+            pill.dataset.turmaId = turmaId || '';
+            pill.innerHTML = `${emoji} ${texto}`;
+            pill.addEventListener('click', () => selecionarFiltro(turmaId, pill));
+            return pill;
+        }
+
+        function selecionarFiltro(turmaId, pillEl) {
+            // Desativar todas as pills
+            document.querySelectorAll('.lb-pill').forEach(p => p.classList.remove('active'));
+            pillEl.classList.add('active');
+            currentTurmaId = turmaId;
+            carregarRanking(turmaId);
+        }
+
+        function onAdminSelectChange(sel) {
+            currentTurmaId = sel.value || null;
+            carregarRanking(currentTurmaId);
+        }
+
+        // ---- Carregar ranking ----
+        async function carregarRanking(turmaId = null) {
+            const container = document.getElementById('ranking-container');
+            // Skeleton
+            container.innerHTML = `<div class="lb-skeleton">
+                ${'<div class="lb-skeleton-item"></div>'.repeat(5)}
+            </div>`;
+
+            try {
+                const url = turmaId ? `/api/leaderboard?turma_id=${turmaId}` : '/api/leaderboard';
+                const res = await fetch(url);
+                if (!res.ok) {
+                    if (res.status === 401) { window.location.href = 'index'; return; }
+                    if (res.status === 403) {
+                        container.innerHTML = `<div class="lb-empty"><i data-lucide="lock"></i><p>Não tens acesso a esta turma.</p></div>`;
+                        lucide.createIcons();
+                        return;
+                    }
                     throw new Error('Falha ao obter ranking');
                 }
 
-                const ranking = await response.json();
-                const container = document.getElementById('ranking-container');
+                const ranking = await res.json();
                 container.innerHTML = '';
 
                 if (ranking.length === 0) {
-                    container.innerHTML = '<p  style="text-align: center; color: var(--text-secondary);">Ainda não há jogadores pontuados.</p>';
+                    container.innerHTML = `<div class="lb-empty">
+                        <i data-lucide="users"></i>
+                        <p>Ainda não há jogadores pontuados${turmaId ? ' nesta turma' : ''}.</p>
+                    </div>`;
+                    lucide.createIcons();
                     return;
                 }
 
-                ranking.forEach(user => {
-                    // Lógica visual para destacar o Top 3
+                ranking.forEach((user, idx) => {
                     let posVisual = `#${user.posicao}`;
                     let classTop = '';
-                    
                     if (user.posicao === 1) { posVisual = '🥇'; classTop = 'top-1'; }
                     if (user.posicao === 2) { posVisual = '🥈'; classTop = 'top-2'; }
                     if (user.posicao === 3) { posVisual = '🥉'; classTop = 'top-3'; }
-
                     const classIsMe = user.eOUtilizador ? 'is-me' : '';
 
-                    const itemHTML = `
-                        <a href="profile?id=${user.id_utilizador}" class="ranking-item ${classTop} ${classIsMe}" style="display: flex; text-decoration: none; color: inherit; width: 100%;">
-                            <div class="ranking-left">
-                                <div class="ranking-pos">${posVisual}</div>
-                                <img src="${user.avatar}" alt="Avatar" class="ranking-avatar" referrerpolicy="no-referrer">
-                                <div class="ranking-info">
-                                    <span class="ranking-name">${user.nome} ${user.eOUtilizador ? '(Tu)' : ''}</span>
-                                    <span class="ranking-level">Nível ${user.nivel}</span>
-                                </div>
+                    const item = document.createElement('a');
+                    item.href = `profile?id=${user.id_utilizador}`;
+                    item.className = `ranking-item ${classTop} ${classIsMe}`;
+                    item.style.animationDelay = `${idx * 0.06}s`;
+                    item.innerHTML = `
+                        <div class="ranking-left">
+                            <div class="ranking-pos">${posVisual}</div>
+                            <img src="${user.avatar}" alt="Avatar" class="ranking-avatar" referrerpolicy="no-referrer" onerror="this.src='/img/default_avatar.png'">
+                            <div class="ranking-info">
+                                <div class="ranking-name">${user.nome}${user.eOUtilizador ? ' <span style="font-size:0.75rem;font-weight:500;opacity:0.7;">(Tu)</span>' : ''}</div>
+                                <div class="ranking-level">Nível ${user.nivel}</div>
                             </div>
-                            <div class="ranking-right">
-                                <span class="ranking-points">${user.pontos} pts</span>
-                            </div>
-                        </a>
+                        </div>
+                        <div class="ranking-right">
+                            <span class="ranking-points">${user.pontos.toLocaleString('pt-PT')} pts</span>
+                        </div>
                     `;
-                    container.insertAdjacentHTML('beforeend', itemHTML);
+                    container.appendChild(item);
                 });
 
             } catch (error) {
                 console.error("Erro ao carregar Leaderboard:", error);
-                document.getElementById('ranking-container').innerHTML = 
-                    '<p  style="text-align: center; color: var(--error);">Não foi possível carregar a Leaderboard.</p>';
+                container.innerHTML = `<div class="lb-empty">
+                    <i data-lucide="alert-triangle" style="color:#ef4444;"></i>
+                    <p style="color:#ef4444;">Não foi possível carregar a Leaderboard.</p>
+                </div>`;
+                lucide.createIcons();
             }
+        }
+
+        // ---- Init ----
+        document.addEventListener('DOMContentLoaded', async () => {
+            await carregarFiltros();
+            await carregarRanking(null);
         });
     </script>
 </body>
