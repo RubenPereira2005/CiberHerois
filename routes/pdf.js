@@ -137,12 +137,22 @@ module.exports = (supabase) => {
             return res.status(404).send('Erro: Recurso não encontrado.');
         }
 
-        const browser = await puppeteer.launch({ 
-            headless: "new",
-            args: ['--no-sandbox', '--disable-setuid-sandbox'] 
-        });
-
+        let browser;
         try {
+            // Configuração otimizada para o Render e ambientes Cloud
+            browser = await puppeteer.launch({
+                headless: true,
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-accelerated-2d-canvas',
+                    '--no-first-run',
+                    '--no-zygote',
+                    '--disable-gpu'
+                ]
+            });
+
             const page = await browser.newPage();
             
             if (isPhysicalFile) {
@@ -201,10 +211,16 @@ module.exports = (supabase) => {
             res.send(pdfBuffer);
 
         } catch (error) {
-            if (browser) await browser.close();
-            console.error('[PDF Error]:', error.message);
-            res.status(500).send('Erro ao processar o PDF.');
+            console.error('[PDF Error Detail]:', error);
+            if (browser) {
+                try { await browser.close(); } catch (e) { /* ignore */ }
+            }
+            res.status(500).json({ 
+                erro: 'Erro ao processar o PDF.', 
+                detalhe: process.env.NODE_ENV === 'production' ? 'Erro interno no servidor' : error.message 
+            });
         }
+
     });
 
     return router;
