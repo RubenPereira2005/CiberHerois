@@ -119,10 +119,29 @@ module.exports = (supabase) => {
         </html>`;
     };
 
+    let _browser;
+
+    // Singleton para o browser
+    const getBrowser = async () => {
+        if (_browser && _browser.connected) return _browser;
+        _browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--disable-gpu'
+            ]
+        });
+        _browser.on('disconnected', () => { _browser = null; });
+        return _browser;
+    };
+
     router.get('/download/:pageName', async (req, res) => {
         const pageName = req.params.pageName;
-        
-        // 1. Identificar se é um ficheiro físico antigo
         const absolutePath = path.resolve(__dirname, '../pages', `${pageName}.html`);
         const isPhysicalFile = fs.existsSync(absolutePath);
         
@@ -137,90 +156,57 @@ module.exports = (supabase) => {
             return res.status(404).send('Erro: Recurso não encontrado.');
         }
 
-        let browser;
+        let page;
         try {
-            // Configuração otimizada para o Render e ambientes Cloud
-            browser = await puppeteer.launch({
-                headless: true,
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-accelerated-2d-canvas',
-                    '--no-first-run',
-                    '--no-zygote',
-                    '--disable-gpu'
-                ]
+            const browser = await getBrowser();
+            page = await browser.newPage();
+            
+            // Intercetar pedidos para ignorar media pesada
+            await page.setRequestInterception(true);
+            page.on('request', (request) => {
+                if (['image', 'font', 'media'].includes(request.resourceType())) {
+                    request.abort();
+                } else {
+                    request.continue();
+                }
             });
 
-            const page = await browser.newPage();
-            
             if (isPhysicalFile) {
-                // PÁGINAS MANUAIS: Lê a página HTML e limpa-a brutalmente via CSS
-                await page.goto(`file://${absolutePath}`, { waitUntil: ['networkidle0', 'domcontentloaded'], timeout: 30000 });
-                
-                // Remove o Javascript dos ícones para eles nem tentarem renderizar
+                await page.goto(`file://${absolutePath}`, { waitUntil: 'load', timeout: 20000 });
                 await page.evaluate(() => {
-                    const scripts = document.querySelectorAll('script');
-                    scripts.forEach(s => s.remove());
+                    document.querySelectorAll('script').forEach(s => s.remove());
                 });
-
-                // Injeta um CSS que esconde tudo o que não seja texto e formata como um Documento
                 await page.addStyleTag({ content: `
-                    body, .site-body { background: white !important; color: black !important; font-family: Arial, sans-serif !important; }
-                    * { box-shadow: none !important; border-radius: 0 !important; }
-                    
-                    /* ESCONDE TUDO O QUE FOR VISUAL */
-                    svg, i, img, .icon-24, .icon-32, .resource-header-icon, .resource-meta, 
-                    .auth-navbar, .resource-buttons, .resource-back-link, .resource-cta-box, 
-                    #global-loader, .toast-container, .game-banner, .suggestion-section { 
-                        display: none !important; 
-                    }
-                    
-                    /* FORMATAÇÃO DE DOCUMENTO DE TEXTO */
-                    .auth-container, .resource-detail-container { margin: 0 !important; padding: 0 !important; max-width: none !important; border: none !important; }
-                    .resource-header { text-align: left !important; border-bottom: 2px solid #10b981 !important; padding-bottom: 15px !important; margin-bottom: 30px !important; }
-                    .resource-category { color: #10b981 !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 12px !important; margin: 0 0 5px 0 !important; }
-                    h1, .resource-title { font-size: 28px !important; color: #111 !important; margin: 0 0 10px 0 !important; }
-                    .resource-section { border: none !important; padding: 0 !important; margin-bottom: 30px !important; page-break-inside: avoid; }
-                    h2 { font-size: 20px !important; color: #222 !important; border-bottom: 1px solid #eee !important; padding-bottom: 5px !important; margin-bottom: 15px !important; }
-                    p, li { font-size: 14px !important; line-height: 1.6 !important; text-align: justify !important; color: #333 !important; }
+                    body { background: white !important; color: black !important; font-family: Arial, sans-serif !important; padding: 20px !important; }
+                    svg, i, img, .auth-navbar, .resource-buttons, .resource-back-link, .toast-container, #global-loader { display: none !important; }
+                    h1 { color: #111 !important; border-bottom: 2px solid #10b981 !important; padding-bottom: 10px !important; }
+                    p, li { font-size: 14px !important; line-height: 1.6 !important; color: #333 !important; }
                 `});
             } else {
-                // PÁGINAS DA BD: Usa o Template puro definido acima
                 const htmlContent = buildPDFTemplate(recursoDB);
-                await page.setContent(htmlContent, { waitUntil: ['networkidle0'] });
+                await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
             }
 
-            await page.emulateMediaType('screen');
-
-            // Geração do PDF com margens de Documento padrão (2cm)
             const pdfBuffer = await page.pdf({
                 format: 'A4',
                 printBackground: true,
-                margin: { top: '2cm', right: '2cm', bottom: '2cm', left: '2cm' }
+                margin: { top: '1.5cm', right: '1.5cm', bottom: '1.5cm', left: '1.5cm' }
             });
 
-            await browser.close();
+            await page.close();
 
             res.set({
                 'Content-Type': 'application/pdf',
                 'Content-Disposition': `attachment; filename=CiberHerois_${pageName.replace('.html', '')}.pdf`,
+                'Cache-Control': 'public, max-age=3600'
             });
 
             res.send(pdfBuffer);
-
         } catch (error) {
-            console.error('[PDF Error Detail]:', error);
-            if (browser) {
-                try { await browser.close(); } catch (e) { /* ignore */ }
-            }
-            res.status(500).json({ 
-                erro: 'Erro ao processar o PDF.', 
-                detalhe: process.env.NODE_ENV === 'production' ? 'Erro interno no servidor' : error.message 
-            });
+            console.error('[PDF Error]:', error);
+            if (page) await page.close().catch(() => {});
+            res.status(500).json({ erro: 'Erro ao gerar PDF.', detalhe: error.message });
         }
-
     });
 
     return router;
