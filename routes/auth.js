@@ -184,5 +184,50 @@ module.exports = (supabase) => {
         }
     });
 
+    // --- MUDAR PALAVRA-PASSE ---
+    router.post('/change-password', async (req, res) => {
+        if (!req.session.userId) {
+            return res.status(401).json({ error: 'Sessão expirada. Faz login novamente.' });
+        }
+
+        const { currentPassword, newPassword } = req.body;
+        const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+        try {
+            // Primeiro, verificar a palavra-passe atual tentando fazer login
+            const { data: userData } = await supabase.from('utilizador').select('email').eq('id_utilizador', req.session.userId).single();
+            if (!userData) return res.status(404).json({ error: 'Utilizador não encontrado.' });
+
+            const authClient = getAuthClient();
+            const { error: verifyError } = await authClient.auth.signInWithPassword({
+                email: userData.email,
+                password: currentPassword
+            });
+
+            if (verifyError) {
+                return res.status(401).json({ error: 'Palavra-passe atual incorreta.' });
+            }
+
+            // Se a palavra-passe atual estiver correta, atualizar para a nova
+            const { error: updateError } = await authClient.auth.updateUser({ password: newPassword });
+
+            if (updateError) {
+                logger.error(`[500] Erro ao atualizar palavra-passe: ${updateError.message}`);
+                return res.status(500).json({ error: 'Erro ao atualizar palavra-passe.' });
+            }
+
+            logger.info(`[200] Palavra-passe alterada com sucesso: ${userData.email} | IP: ${userIp}`);
+            res.status(200).json({ 
+                success: true, 
+                message: 'Palavra-passe alterada com sucesso! Serás desconectado por segurança.',
+                logout: true
+            });
+
+        } catch (e) {
+            logger.error(`[500] Erro inesperado na mudança de palavra-passe: ${e.message}`);
+            res.status(500).json({ error: 'Erro interno no servidor.' });
+        }
+    });
+
     return router;
 };

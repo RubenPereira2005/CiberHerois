@@ -116,11 +116,30 @@
                     <form id="security-form" class="settings-form">
                         <div class="form-group">
                             <label class="form-label">Palavra-passe Atual</label>
-                            <input type="password" class="form-input" placeholder="••••••••">
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="current-password" placeholder="••••••••">
+                                <button type="button" onclick="toggleVisibility('current-password')" class="password-toggle-btn">
+                                    <i data-lucide="eye" class="icon-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nova Palavra-passe</label>
-                            <input type="password" class="form-input" placeholder="Nova palavra-passe">
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="new-password" placeholder="Nova palavra-passe">
+                                <button type="button" onclick="toggleVisibility('new-password')" class="password-toggle-btn">
+                                    <i data-lucide="eye" class="icon-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar Nova Palavra-passe</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="confirm-password" placeholder="Repete a nova palavra-passe">
+                                <button type="button" onclick="toggleVisibility('confirm-password')" class="password-toggle-btn">
+                                    <i data-lucide="eye" class="icon-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -141,9 +160,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn btn-primary"
-                                onclick="alert('Esta funcionalidade de mudar a password por aqui requer configuração extra no backend.')">Atualizar
-                                Protocolos</button>
+                            <button type="button" class="btn btn-primary" id="change-password-btn">Mudar Palavra-passe</button>
                         </div>
                     </form>
                 </section>
@@ -311,6 +328,7 @@
     <script>
         lucide.createIcons();
 
+        // 🟢 VARIÁVEL DE CONTROLO DO BANNER 🟢
         let isMfaMission = false;
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -353,7 +371,7 @@
             const shouldHighlightMFA = sessionStorage.getItem('highlightMFA');
             
             if (shouldHighlightMFA === 'true') {
-                isMfaMission = true;
+                isMfaMission = true; // 🚨 Apanha se o utilizador clicou no banner!
             }
 
             if (shouldHighlightMFA === 'true' && initialTab === 'security') {
@@ -511,6 +529,66 @@
                 });
             }
 
+            // --- MUDAR PALAVRA-PASSE ---
+            const changePasswordBtn = document.getElementById('change-password-btn');
+            if (changePasswordBtn) {
+                changePasswordBtn.addEventListener('click', async () => {
+                    const currentPassword = document.getElementById('current-password').value;
+                    const newPassword = document.getElementById('new-password').value;
+
+                    const confirmPassword = document.getElementById('confirm-password').value;
+
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        alert('Preenche todos os campos de palavra-passe.');
+                        return;
+                    }
+
+                    if (newPassword.length < 6) {
+                        alert('A nova palavra-passe deve ter pelo menos 6 caracteres.');
+                        return;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        alert('A nova palavra-passe e a confirmação não coincidem.');
+                        return;
+                    }
+
+                    const originalText = changePasswordBtn.innerText;
+                    changePasswordBtn.innerText = "A alterar...";
+                    changePasswordBtn.disabled = true;
+
+                    try {
+                        const response = await fetch('/api/change-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ currentPassword, newPassword })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            alert(data.message);
+                            document.getElementById('current-password').value = '';
+                            document.getElementById('new-password').value = '';
+                            document.getElementById('confirm-password').value = '';
+
+                            if (data.logout) {
+                                setTimeout(() => {
+                                    window.fazerLogout();
+                                }, 3000);
+                            }
+                        } else {
+                            alert(data.error || 'Erro ao alterar palavra-passe.');
+                        }
+                    } catch (error) {
+                        alert('Erro de comunicação com o servidor.');
+                    } finally {
+                        changePasswordBtn.innerText = originalText;
+                        changePasswordBtn.disabled = false;
+                    }
+                });
+            }
+
             // --- APAGAR CONTA ---
             if (btnDelete) {
                 btnDelete.addEventListener('click', async () => {
@@ -545,6 +623,12 @@
             window.addEventListener('themeChanged', (e) => {
                 syncThemeRadios();
             });
+
+            window.toggleVisibility = function(inputId) {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+                input.type = input.type === 'password' ? 'text' : 'password';
+            };
 
             // ==========================================
             // LÓGICA INTELIGENTE DE PRIVACIDADE DO PERFIL
