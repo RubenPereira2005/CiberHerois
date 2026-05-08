@@ -1621,6 +1621,7 @@ body.index-body {
 .login-wrapper {
   width: 100%;
   max-width: 420px;
+  margin: 0 auto;
 }
 
 .login-box {
@@ -1656,6 +1657,7 @@ body.index-body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  text-align: left;
 }
 
 .form-group {
@@ -1772,6 +1774,16 @@ body.index-body {
 
 .link-highlight:hover {
   color: #1d4ed8;
+}
+
+/* Toast positioning for login pages */
+.login-page .toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  transform: translateX(120%);
+  margin: 0;
 }
 
 /* Resource-detail Page */
