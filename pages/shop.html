@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="preloader.css">
     <link rel="stylesheet" href="shop.css">
+    <link rel="stylesheet" href="popup_modal.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="theme.js"></script>
     <script src="global-init.js"></script>
@@ -61,6 +62,25 @@
                 </div>
         </section>
 
+    </div>
+
+    <!-- Modal de Confirmação de Compra -->
+    <div id="modal-compra" class="modal">
+        <div class="modal-content" style="max-width: 420px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 15px; color: #f59e0b;">
+                <i data-lucide="shopping-cart" style="width: 48px; height: 48px;"></i>
+            </div>
+            <h2 style="margin-bottom: 8px;">Confirmar Compra</h2>
+            <p id="texto-modal-compra" style="margin: 16px 0; color: var(--text-secondary); line-height: 1.6;"></p>
+            <div class="modal-actions" style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 15px; flex-wrap: nowrap;">
+                <button type="button" class="btn btn-secondary" id="btn-cancelar-compra">Cancelar</button>
+                <button type="button" class="btn" id="btn-confirmar-compra"
+                    style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-color: #d97706; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i data-lucide="circle-dollar-sign" style="width:16px;height:16px;"></i>
+                    Comprar
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -159,14 +179,47 @@
             }
         }
 
+        // Utilitário: abre o modal de confirmação de compra e devolve uma Promise
+        function confirmarCompra(nomeItem, preco) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modal-compra');
+                const texto = document.getElementById('texto-modal-compra');
+                const btnConfirmar = document.getElementById('btn-confirmar-compra');
+                const btnCancelar = document.getElementById('btn-cancelar-compra');
+
+                texto.innerHTML = `Queres mesmo gastar <strong>${preco} CiberCoins</strong> para comprar o item <strong>"${nomeItem}"</strong>?`;
+                modal.classList.add('active');
+                lucide.createIcons();
+
+                // Clona os botões para remover listeners antigos
+                const novoBtnConfirmar = btnConfirmar.cloneNode(true);
+                const novoBtnCancelar = btnCancelar.cloneNode(true);
+                btnConfirmar.parentNode.replaceChild(novoBtnConfirmar, btnConfirmar);
+                btnCancelar.parentNode.replaceChild(novoBtnCancelar, btnCancelar);
+                lucide.createIcons();
+
+                novoBtnConfirmar.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                    resolve(true);
+                });
+                novoBtnCancelar.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                    resolve(false);
+                });
+            });
+        }
+
         // Função para comprar avatar na loja
         async function comprarItem(idItem, preco, nomeItem) {
             if (saldoAtual < preco) {
-                alert(`❌ Não tens CiberCoins suficientes!\nPrecisas de ${preco} moedas, mas só tens ${saldoAtual}. Faz mais quizzes!`);
+                if (typeof showGlobalToast === 'function') {
+                    showGlobalToast(`Não tens CiberCoins suficientes! Precisas de ${preco} CC, mas só tens ${saldoAtual}.`, 'error');
+                }
                 return;
             }
 
-            if (confirm(`Queres mesmo gastar ${preco} CiberCoins para comprar o "${nomeItem}"?`)) {
+            const confirmado = await confirmarCompra(nomeItem, preco);
+            if (confirmado) {
                 try {
                     const response = await fetch('/api/shop/comprar', {
                         method: 'POST',
@@ -177,20 +230,26 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        alert(`🎉 Compra efetuada com sucesso! O avatar foi adicionado ao teu inventário.`);
+                        if (typeof showGlobalToast === 'function') {
+                            showGlobalToast('🎉 Compra efetuada! O item foi adicionado ao teu inventário.', 'success');
+                        }
                         
-                        // --- O SEGREDO ESTÁ AQUI: REFRESH SILENCIOSO ---
-                        await carregarLoja(); // Atualiza as grelhas da loja e o saldo grande
+                        // --- REFRESH SILENCIOSO ---
+                        await carregarLoja();
                         
                         if (typeof window.atualizarHeaderGlobal === 'function') {
-                            await window.atualizarHeaderGlobal(); // Atualiza as moedas na Navbar de cima
+                            await window.atualizarHeaderGlobal();
                         }
                     } else {
-                        alert(`Erro: ${data.error}`);
+                        if (typeof showGlobalToast === 'function') {
+                            showGlobalToast(`Erro: ${data.error}`, 'error');
+                        }
                     }
                 } catch (error) {
                     console.error("Erro ao comprar:", error);
-                    alert("Erro de comunicação com o servidor.");
+                    if (typeof showGlobalToast === 'function') {
+                        showGlobalToast('Erro de comunicação com o servidor.', 'error');
+                    }
                 }
             }
         }
@@ -206,13 +265,14 @@
 
                 if (response.ok) {
                     // --- REFRESH SILENCIOSO DOS BOTÕES ---
-                    // Isto vai fazer com que o avatar escolhido passe a dizer "Em Uso" e o antigo passe a "Equipar"
                     await carregarLoja(); 
-                    
-                    // Um pequeno alerta para o utilizador perceber que resultou
-                    alert("👕 Avatar equipado com sucesso!");
+                    if (typeof showGlobalToast === 'function') {
+                        showGlobalToast('👕 Avatar equipado com sucesso!', 'success');
+                    }
                 } else {
-                    alert("Erro ao equipar o avatar.");
+                    if (typeof showGlobalToast === 'function') {
+                        showGlobalToast('Erro ao equipar o avatar.', 'error');
+                    }
                 }
             } catch (error) {
                 console.error("Erro:", error);
@@ -246,9 +306,13 @@
 
                 if (response.ok) {
                     await carregarLoja(); 
-                    alert("✨ Moldura equipada com sucesso!");
+                    if (typeof showGlobalToast === 'function') {
+                        showGlobalToast('✨ Moldura equipada com sucesso!', 'success');
+                    }
                 } else {
-                    alert("Erro ao equipar a moldura.");
+                    if (typeof showGlobalToast === 'function') {
+                        showGlobalToast('Erro ao equipar a moldura.', 'error');
+                    }
                 }
             } catch (error) {
                 console.error("Erro:", error);
