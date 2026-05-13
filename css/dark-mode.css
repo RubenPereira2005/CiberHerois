@@ -51,6 +51,18 @@ body.dark-mode .feature-card {
     border: 1px solid #334155 !important;
 }
 
+/* General Buttons */
+body.dark-mode .btn-secondary {
+    background: #334155 !important;
+    color: #f1f5f9 !important;
+    border-color: #475569 !important;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background: #475569 !important;
+    color: #ffffff !important;
+}
+
 /* Textos */
 body.dark-mode .page-title,
 body.dark-mode .card-title,
