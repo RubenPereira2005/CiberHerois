@@ -2028,6 +2028,18 @@ body.index-body {
   background: #e5e7eb;
 }
 
+.quiz-option-seq.correct {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #166534 !important;
+}
+
+.quiz-option-seq.incorrect {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
 #next-btn {
   background: #2563eb;
   color: #fff;

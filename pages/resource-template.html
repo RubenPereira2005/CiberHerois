@@ -211,7 +211,7 @@
                             <div id="question-display" style="margin-bottom: 15px;"></div>
                             <div id="options-display"></div>
                             <div id="quiz-feedback"></div>
-                            <button id="next-btn" class="btn hidden" style="margin-top: 15px; background-color: var(--color-${corDinamica}); color: white; border: none;">Próxima Pergunta</button>
+                            <button id="next-btn" class="btn hidden" style="margin-top: 15px;">Próxima Pergunta</button>
                         </div>
                     </div>`;
 
@@ -297,7 +297,7 @@
                     this.style.display = 'none';
                     const hintContainer = document.getElementById('ia-hint-container');
 
-                    hintContainer.innerHTML = `<div style="display: flex; align-items: center; gap: 8px;"><i data-lucide="loader" class="spin-animation"></i> A pedir dica ao mentor...</div>`;
+                    hintContainer.innerHTML = `<div style="display: flex; align-items: center; gap: 8px;"><i data-lucide="loader" class="spin-icon"></i> A pedir dica ao mentor...</div>`;
                     lucide.createIcons();
 
                     try {
@@ -337,7 +337,7 @@
                     <i data-lucide="award" style="width: 64px; height: 64px; color: var(--color-${corDinamica}); margin-bottom: 15px;"></i>
                     <h3>🎉 Guia Concluído!</h3>
                     <p style="font-size: 1.1rem; margin: 10px 0;">Acertaste <strong>${score}</strong> de ${miniQuestions.length} perguntas.</p>
-                    <p id="saving-score-msg" style="color: var(--text-secondary);"><i data-lucide="loader" class="spin-animation" style="width:16px;"></i> A guardar os teus pontos...</p>
+                    <p id="saving-score-msg" style="color: var(--text-secondary);"><i data-lucide="loader" class="spin-icon" style="width:16px;"></i> A guardar os teus pontos...</p>
                 </div>
             `;
             lucide.createIcons();
