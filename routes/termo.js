@@ -201,7 +201,7 @@ module.exports = (supabase) => {
         try {
             const wordOfDay = getWordOfTheDay();
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             const prompt = `Assume a persona de "Ciber-Mentor", um professor especialista em Cibersegurança.
             Descreve didaticamente, em tom de "Sabias que...?", o conceito sobre a palavra/sigla: "${wordOfDay}".

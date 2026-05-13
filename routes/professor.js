@@ -439,7 +439,7 @@ module.exports = (supabase) => {
 
         try {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-3.0-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             const prompt = `És um professor de cibersegurança a criar um quiz.
             A tua tarefa é gerar 3 opções de resposta curtas e diretas para a seguinte pergunta: "${pergunta}".
