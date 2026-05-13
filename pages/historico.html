@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +17,10 @@
             display: flex;
             gap: 8px;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--border-color, rgba(0,0,0,0.1));
+            border-bottom: 2px solid var(--border-color, rgba(0, 0, 0, 0.1));
             padding-bottom: 0;
         }
+
         .hist-tab-btn {
             background: none;
             border: none;
@@ -35,15 +37,23 @@
             align-items: center;
             gap: 8px;
         }
+
         .hist-tab-btn.active {
             color: var(--primary-color, #3b82f6);
             border-bottom-color: var(--primary-color, #3b82f6);
         }
+
         .hist-tab-btn:hover:not(.active) {
             color: var(--text-color);
         }
-        .hist-panel { display: none; }
-        .hist-panel.active { display: block; }
+
+        .hist-panel {
+            display: none;
+        }
+
+        .hist-panel.active {
+            display: block;
+        }
 
         /* CiberTermo history item - espelha .profile-activity-item para dark mode automático */
         .termo-hist-item {
@@ -56,42 +66,148 @@
             background: #f8fafc;
             transition: background-color 0.2s;
         }
-        .termo-hist-item:hover { background: #f3f4f6; }
+
+        .termo-hist-item:hover {
+            background: #f3f4f6;
+        }
 
         /* Dark mode - igual ao .profile-activity-item */
-        body.dark-mode .termo-hist-item       { background-color: #0f172a !important; }
-        body.dark-mode .termo-hist-item:hover { background-color: #1e293b !important; }
-        body.dark-mode .termo-hist-title      { color: #f1f5f9 !important; }
-        body.dark-mode .termo-hist-meta       { color: #94a3b8 !important; }
-        body.dark-mode .termo-hist-date       { color: #64748b !important; }
-        body.dark-mode .termo-hist-icon       { background: rgba(99,102,241,0.22) !important; }
+        body.dark-mode .termo-hist-item {
+            background-color: #0f172a !important;
+        }
+
+        body.dark-mode .termo-hist-item:hover {
+            background-color: #1e293b !important;
+        }
+
+        body.dark-mode .termo-hist-title {
+            color: #f1f5f9 !important;
+        }
+
+        body.dark-mode .termo-hist-meta {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .termo-hist-date {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .termo-hist-icon {
+            background: rgba(99, 102, 241, 0.22) !important;
+        }
 
         /* Tabs dark mode */
-        body.dark-mode .hist-tabs                       { border-bottom-color: #334155; }
-        body.dark-mode .hist-tab-btn                    { color: #94a3b8; }
-        body.dark-mode .hist-tab-btn.active             { color: #60a5fa; border-bottom-color: #60a5fa; }
-        body.dark-mode .hist-tab-btn:hover:not(.active) { color: #f1f5f9; }
-
-        .termo-hist-left { display: flex; align-items: center; gap: 14px; }
-        .termo-hist-icon {
-            width: 42px; height: 42px; border-radius: 10px;
-            background: rgba(99, 102, 241, 0.12);
-            display: flex; align-items: center; justify-content: center;
-            color: #6366f1; flex-shrink: 0;
+        body.dark-mode .hist-tabs {
+            border-bottom-color: #334155;
         }
-        .termo-hist-title  { font-weight: 700; font-size: 1rem; color: #0f172a; }
-        .termo-hist-meta   { font-size: 0.85rem; color: #4b5563; margin-top: 2px; }
-        .termo-hist-right  { text-align: right; flex-shrink: 0; }
-        .termo-hist-points { font-weight: 800; color: #10b981; font-size: 1.05rem; }
-        .termo-hist-date   { font-size: 0.82rem; color: #6b7280; margin-top: 2px; }
+
+        body.dark-mode .hist-tab-btn {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .hist-tab-btn.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+
+        body.dark-mode .hist-tab-btn:hover:not(.active) {
+            color: #f1f5f9;
+        }
+
+        .termo-hist-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .termo-hist-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6366f1;
+            flex-shrink: 0;
+        }
+
+        .termo-hist-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0f172a;
+        }
+
+        .termo-hist-meta {
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-top: 2px;
+        }
+
+        .termo-hist-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .termo-hist-points {
+            font-weight: 800;
+            color: #10b981;
+            font-size: 1.05rem;
+        }
+
+        .termo-hist-date {
+            font-size: 0.82rem;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
         .termo-hist-attempts {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 0.8rem; font-weight: 700;
-            background: rgba(99,102,241,0.1); color: #6366f1;
-            padding: 2px 8px; border-radius: 99px; margin-top: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            padding: 2px 8px;
+            border-radius: 99px;
+            margin-top: 3px;
+        }
+        .btn-voltar-bolinha {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: #e2e8f0;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .btn-voltar-bolinha:hover {
+            background: #cbd5e1;
+            color: #0f172a;
+            transform: scale(1.05);
+        }
+        
+        body.dark-mode .btn-voltar-bolinha {
+            background: #1e293b;
+            color: #94a3b8;
+            border-color: #334155;
+        }
+
+        body.dark-mode .btn-voltar-bolinha:hover {
+            background: #334155;
+            color: #f1f5f9;
         }
     </style>
 </head>
+
 <body class="site-body">
     <div id="global-loader">
         <div class="loader-logo">Ciber<span>Heróis</span></div>
@@ -101,10 +217,10 @@
     <div id="includedContent"></div>
 
     <div class="auth-container profile-main" style="max-width: 800px;">
-        
+
         <div style="margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
-            <a href="profile" id="btn-voltar-perfil" class="btn btn-secondary" style="display: flex; justify-content: center; align-items: center; width: 45px; height: 45px; padding: 0; border-radius: 50%; flex-shrink: 0; overflow: hidden;">
-                <i data-lucide="arrow-left" style="min-width: 22px; min-height: 22px;"></i>
+            <a href="profile" id="btn-voltar-perfil" class="btn-voltar-bolinha">
+                <i data-lucide="arrow-left" style="width: 22px; height: 22px;"></i>
             </a>
             <h1 style="color: var(--text-color); margin: 0; font-size: 1.8rem;">Histórico de Atividades</h1>
         </div>
@@ -123,14 +239,16 @@
             <!-- Painel Quizzes -->
             <div class="hist-panel active" id="panel-quizzes">
                 <div id="historico-container" class="profile-activity">
-                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico...</p>
+                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico...
+                    </p>
                 </div>
             </div>
 
             <!-- Painel CiberTermo -->
             <div class="hist-panel" id="panel-cibertermo">
                 <div id="termo-historico-container">
-                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico do CiberTermo...</p>
+                    <p style="color: var(--text-secondary); text-align: center; padding: 20px;">A carregar histórico do
+                        CiberTermo...</p>
                 </div>
             </div>
         </div>
@@ -177,7 +295,7 @@
                     window.location.href = 'index';
                     return;
                 }
-                
+
                 if (response.status === 403) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 40px;">
@@ -199,7 +317,7 @@
                     atividades.forEach(act => {
                         const tipoNome = act.atividade.tipo === 'quiz' ? 'Quiz' : 'Jogo';
                         const dataRealizacao = new Date(act.data_realizacao);
-                        const opcoesData = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' };
+                        const opcoesData = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
                         const textoData = dataRealizacao.toLocaleDateString('pt-PT', opcoesData);
 
                         let textoDescricao = 'Concluído';
@@ -301,4 +419,5 @@
         });
     </script>
 </body>
+
 </html>
