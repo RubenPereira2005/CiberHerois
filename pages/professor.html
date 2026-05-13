@@ -82,7 +82,7 @@
                     <i data-lucide="sun" class="auth-navbar-icon"></i>
                 </button>
                 <a href="professor-stats" class="auth-navbar-btn" title="Estatísticas das Turmas">
-                    <i data-lucide="chart-column-big" class="auth-navbar-icon"></i>
+                    <i data-lucide="bar-chart-2" class="auth-navbar-icon"></i>
                 </a>
                 <a href="profile" class="auth-navbar-btn" title="Ver Perfil">
                     <i data-lucide="user" class="auth-navbar-icon"></i>
@@ -230,6 +230,15 @@
                     <label>Ano Letivo (Ex: 2023/2024)</label>
                     <input type="text" id="turma-ano" class="form-input" required placeholder="Escreve o ano letivo">
                 </div>
+                <div class="form-group">
+                    <label>Escola Associada</label>
+                    <select id="turma-escola" class="form-input" required>
+                        <option value="">A carregar escolas...</option>
+                    </select>
+                    <button type="button" onclick="abrirCriarEscolaProfessor('turma-escola')" style="margin-top:6px;font-size:0.8rem;padding:4px 10px;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid #10b981;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                        <i data-lucide="plus" style="width:13px;height:13px;"></i> A escola não está na lista? Criar nova
+                    </button>
+                </div>
                 <div class="modal-actions" style="margin-top: 20px;">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-turma')">Cancelar</button>
@@ -257,11 +266,48 @@
                     <label>Ano Letivo</label>
                     <input type="text" id="edit-turma-ano" class="form-input" required>
                 </div>
+                <div class="form-group">
+                    <label>Escola Associada</label>
+                    <select id="edit-turma-escola" class="form-input" required>
+                        <option value="">A carregar escolas...</option>
+                    </select>
+                    <button type="button" onclick="abrirCriarEscolaProfessor('edit-turma-escola')" style="margin-top:6px;font-size:0.8rem;padding:4px 10px;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid #10b981;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+                        <i data-lucide="plus" style="width:13px;height:13px;"></i> A escola não está na lista? Criar nova
+                    </button>
+                </div>
                 <div class="modal-actions" style="margin-top: 20px;">
                     <button type="button" class="btn btn-secondary"
                         onclick="closeModal('modal-editar-turma')">Cancelar</button>
                     <button type="submit" id="btn-submit-edit-turma"
                         class="btn btn-primary theme-green">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== MODAL NOVA ESCOLA (PROFESSOR) ========== -->
+    <div id="modal-nova-escola-prof" class="modal" style="z-index: 9999 !important;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>🏫 Criar Nova Escola</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-nova-escola-prof')"><i data-lucide="x"></i></button>
+            </div>
+            <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">A escola será criada e automaticamente selecionada no formulário.</p>
+            <form id="form-nova-escola-prof" onsubmit="submeterNovaEscolaProfessor(event)">
+                <input type="hidden" id="escola-destino-select">
+                <div class="form-group">
+                    <label>Nome da Escola <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="prof-escola-nome" class="form-input" required placeholder="Ex: Escola Básica de Cascais">
+                </div>
+                <div class="form-group">
+                    <label>Localização <span style="color:var(--text-secondary);font-weight:400;font-size:0.82rem;">(opcional)</span></label>
+                    <input type="text" id="prof-escola-loc" class="form-input" placeholder="Ex: Cascais, Lisboa...">
+                </div>
+                <div class="modal-actions" style="margin-top:20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-nova-escola-prof')">Cancelar</button>
+                    <button type="submit" id="btn-submit-escola-prof" class="btn btn-primary theme-green">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Criar e Selecionar
+                    </button>
                 </div>
             </form>
         </div>
@@ -498,6 +544,9 @@
         let currentPageQuizzes = 1;
         const itemsPerPageQuizzes = 15;
 
+        // Lista de escolas carregada do servidor
+        let listaEscolas = [];
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.gestao-tab').forEach(t => t.classList.remove('active'));
@@ -594,6 +643,8 @@
                 turmas.forEach(t => {
                     const nomeEscola = t.escola ? t.escola.nome : 'Escola não definida';
                     const codigoAcesso = t.codigo_acesso ? t.codigo_acesso : 'N/A';
+                    // id_escola pode vir embutido via join ou via campo direto
+                    const idEscola = t.id_escola || (t.escola ? t.escola.id_escola : null) || '';
                     tbody.innerHTML += `
                         <tr>
                             <td><strong>#${t.id_turma}</strong></td>
@@ -602,7 +653,7 @@
                             <td>${t.ano_letivo}</td>
                             <td><span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 15px; font-weight: bold; letter-spacing: 1px; color: var(--text-color);">${codigoAcesso}</span></td>
                             <td>
-                                <button type="button" class="btn-edit" onclick="abrirEdicaoTurma(${t.id_turma}, '${t.nome}', '${t.ano_letivo}')" title="Editar Turma" style="margin-right: 8px;"><i data-lucide="edit" style="width: 16px; height: 16px;"></i> Editar</button>
+                                <button type="button" class="btn-edit" onclick="abrirEdicaoTurma(${t.id_turma}, '${t.nome}', '${t.ano_letivo}', '${idEscola}')" title="Editar Turma" style="margin-right: 8px;"><i data-lucide="edit" style="width: 16px; height: 16px;"></i> Editar</button>
                                 <button type="button" class="btn-edit" onclick="verAlunosTurma(${t.id_turma})" title="Ver Alunos"><i data-lucide="users" style="width: 16px; height: 16px;"></i> Ver Alunos</button>
                             </td>
                         </tr>
@@ -612,12 +663,23 @@
             } catch (error) { console.error("Erro ao carregar turmas:", error); }
         }
 
-        function prepararNovaTurma() { document.getElementById('form-turma').reset(); openModal('modal-turma'); }
+        function prepararNovaTurma() {
+            document.getElementById('form-turma').reset();
+            // Preenche o dropdown de escolas
+            const sel = document.getElementById('turma-escola');
+            sel.innerHTML = '<option value="" disabled selected>-- Seleciona a Escola --</option>' +
+                listaEscolas.map(e => `<option value="${e.id_escola}">${e.nome}${e.localizacao ? ' (' + e.localizacao + ')' : ''}</option>`).join('');
+            openModal('modal-turma');
+        }
 
         async function salvarTurma(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-submit-turma'); btn.textContent = 'A guardar...'; btn.disabled = true;
-            const payload = { nome: document.getElementById('turma-nome').value, ano_letivo: document.getElementById('turma-ano').value };
+            const payload = {
+                nome: document.getElementById('turma-nome').value,
+                ano_letivo: document.getElementById('turma-ano').value,
+                id_escola: document.getElementById('turma-escola').value
+            };
             try {
                 const res = await fetch('/api/professor/turmas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 let data = await res.json();
@@ -627,10 +689,15 @@
             finally { btn.textContent = 'Guardar Turma'; btn.disabled = false; }
         }
 
-        function abrirEdicaoTurma(id, nome, ano) {
+        function abrirEdicaoTurma(id, nome, ano, idEscola) {
             document.getElementById('edit-turma-id').value = id;
             document.getElementById('edit-turma-nome').value = nome;
             document.getElementById('edit-turma-ano').value = ano;
+            // Preenche o dropdown de escolas e pré-seleciona a escola atual
+            const sel = document.getElementById('edit-turma-escola');
+            sel.innerHTML = '<option value="" disabled>-- Seleciona a Escola --</option>' +
+                listaEscolas.map(e => `<option value="${e.id_escola}">${e.nome}${e.localizacao ? ' (' + e.localizacao + ')' : ''}</option>`).join('');
+            if (idEscola) sel.value = idEscola;
             openModal('modal-editar-turma');
         }
 
@@ -638,7 +705,11 @@
             e.preventDefault();
             const id = document.getElementById('edit-turma-id').value;
             const btn = document.getElementById('btn-submit-edit-turma'); btn.textContent = 'A guardar...'; btn.disabled = true;
-            const payload = { nome: document.getElementById('edit-turma-nome').value, ano_letivo: document.getElementById('edit-turma-ano').value };
+            const payload = {
+                nome: document.getElementById('edit-turma-nome').value,
+                ano_letivo: document.getElementById('edit-turma-ano').value,
+                id_escola: document.getElementById('edit-turma-escola').value
+            };
             try {
                 const res = await fetch(`/api/professor/turmas/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (res.ok) { closeModal('modal-editar-turma'); carregarTurmas(); mostrarSucesso('As informações do esquadrão foram atualizadas!'); }
@@ -1399,8 +1470,73 @@
             }
         }
 
+        // ==========================================
+        // LÓGICA DE ESCOLA (PROFESSOR - CRIAR INLINE)
+        // ==========================================
+        // selectDestino: id do <select> que deve ser preenchido após criar a escola
+        function abrirCriarEscolaProfessor(selectDestino) {
+            document.getElementById('form-nova-escola-prof').reset();
+            document.getElementById('escola-destino-select').value = selectDestino;
+            openModal('modal-nova-escola-prof');
+        }
+
+        async function submeterNovaEscolaProfessor(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-escola-prof');
+            btn.textContent = 'A criar...'; btn.disabled = true;
+
+            const payload = {
+                nome: document.getElementById('prof-escola-nome').value,
+                localizacao: document.getElementById('prof-escola-loc').value
+            };
+
+            try {
+                const res = await fetch('/api/professor/escolas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (res.ok && data.escola) {
+                    // Adiciona a nova escola à lista em memória
+                    listaEscolas.push(data.escola);
+
+                    // Atualiza ambos os dropdowns de escola nos modais de turma
+                    const opcoesHtml = '<option value="" disabled>-- Seleciona a Escola --</option>' +
+                        listaEscolas.map(esc => `<option value="${esc.id_escola}">${esc.nome}${esc.localizacao ? ' (' + esc.localizacao + ')' : ''}</option>`).join('');
+
+                    ['turma-escola', 'edit-turma-escola'].forEach(id => {
+                        const sel = document.getElementById(id);
+                        if (sel) sel.innerHTML = opcoesHtml;
+                    });
+
+                    // Pré-seleciona no dropdown de destino
+                    const destino = document.getElementById(document.getElementById('escola-destino-select').value);
+                    if (destino) destino.value = data.escola.id_escola;
+
+                    closeModal('modal-nova-escola-prof');
+                    mostrarSucesso(`Escola "${data.escola.nome}" criada e selecionada!`);
+                } else {
+                    alert('Erro: ' + (data.error || 'Não foi possível criar a escola.'));
+                }
+            } catch (err) {
+                alert('Erro de comunicação com o servidor.');
+            } finally {
+                btn.innerHTML = '<i data-lucide="plus" style="width:14px;height:14px;"></i> Criar e Selecionar';
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
         // --- INICIALIZAÇÃO DA PÁGINA ---
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Carrega escolas primeiro para estarem prontas quando se abrir o modal
+            try {
+                const resEsc = await fetch('/api/professor/escolas');
+                listaEscolas = await resEsc.json();
+            } catch (e) { console.error('Erro ao carregar escolas:', e); }
+
             carregarTurmas();
             carregarRecursos();
             carregarQuizzes();

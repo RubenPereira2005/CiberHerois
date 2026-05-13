@@ -33,32 +33,54 @@ module.exports = (supabase) => {
     // ==========================================
 
     router.get('/turmas', verificarProfessor, async (req, res) => {
-        const { data, error } = await supabase.from('turma').select('id_turma, nome, ano_letivo, codigo_acesso, escola (nome)').eq('id_professor', req.session.userId).order('id_turma', { ascending: false });
+        const { data, error } = await supabase.from('turma').select('id_turma, nome, ano_letivo, codigo_acesso, id_escola, escola (nome)').eq('id_professor', req.session.userId).order('id_turma', { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
         res.json(data || []);
     });
 
     router.post('/turmas', verificarProfessor, async (req, res) => {
-        const { nome, ano_letivo } = req.body;
+        const { nome, ano_letivo, id_escola } = req.body;
         try {
-            const { data: escolas } = await supabase.from('escola').select('id_escola').limit(1);
-            const id_escola = (escolas && escolas.length > 0) ? escolas[0].id_escola : null;
-            if (!id_escola) return res.status(400).json({ error: 'Nenhuma escola registada no sistema.' });
+            let escolaId = id_escola;
+            // Se não foi fornecida uma escola, tenta usar a primeira disponível (fallback)
+            if (!escolaId) {
+                const { data: escolas } = await supabase.from('escola').select('id_escola').limit(1);
+                escolaId = (escolas && escolas.length > 0) ? escolas[0].id_escola : null;
+            }
+            if (!escolaId) return res.status(400).json({ error: 'Nenhuma escola registada no sistema.' });
 
             const codigo_acesso = gerarCodigoAcesso();
-            const { data, error } = await supabase.from('turma').insert([{ nome, ano_letivo, id_escola, id_professor: req.session.userId, codigo_acesso }]).select();
+            const { data, error } = await supabase.from('turma').insert([{ nome, ano_letivo, id_escola: escolaId, id_professor: req.session.userId, codigo_acesso }]).select();
             if (error) throw error;
             res.json({ message: 'Turma criada!', turma: data[0] });
         } catch (err) { res.status(500).json({ error: 'Erro interno ao criar turma.' }); }
     });
 
     router.put('/turmas/:id', verificarProfessor, async (req, res) => {
-        const { nome, ano_letivo } = req.body;
+        const { nome, ano_letivo, id_escola } = req.body;
         try {
-            const { error } = await supabase.from('turma').update({ nome, ano_letivo }).eq('id_turma', req.params.id).eq('id_professor', req.session.userId);
+            const updateData = { nome, ano_letivo };
+            if (id_escola) updateData.id_escola = id_escola;
+            const { error } = await supabase.from('turma').update(updateData).eq('id_turma', req.params.id).eq('id_professor', req.session.userId);
             if (error) throw error;
             res.json({ message: 'Turma atualizada com sucesso!' });
         } catch (error) { res.status(500).json({ error: error.message }); }
+    });
+
+    // Lista todas as escolas disponíveis para o professor escolher
+    router.get('/escolas', verificarProfessor, async (req, res) => {
+        const { data, error } = await supabase.from('escola').select('*').order('nome');
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data || []);
+    });
+
+    // Professor pode criar uma escola caso a sua não exista ainda
+    router.post('/escolas', verificarProfessor, async (req, res) => {
+        const { nome, localizacao } = req.body;
+        if (!nome || !nome.trim()) return res.status(400).json({ error: 'O nome da escola é obrigatório.' });
+        const { data, error } = await supabase.from('escola').insert([{ nome: nome.trim(), localizacao: localizacao ? localizacao.trim() : null }]).select().single();
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Escola criada!', escola: data });
     });
 
     router.get('/turmas/:id/alunos', verificarProfessor, async (req, res) => {

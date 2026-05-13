@@ -62,7 +62,7 @@ module.exports = (supabase) => {
                 texto_pergunta: p.texto_pergunta,
                 pontos_pergunta: 10
             }]).select('id_pergunta').single();
-            
+
             if (errP) continue;
 
             const opcoesToInsert = p.opcoes.map((op, idx) => ({
@@ -105,7 +105,7 @@ module.exports = (supabase) => {
     router.get('/resources/:id', async (req, res) => {
         const { data, error } = await supabase.from('materialpedagogico').select('*').eq('id_material', req.params.id).single();
         if (error || !data) return res.status(404).json({ error: 'Não encontrado' });
-        
+
         if (data.tipo === 'guia-interativo') {
             const slug = data.url_conteudo.replace('resource-', '');
             const categoria = 'guia-' + slug;
@@ -114,10 +114,10 @@ module.exports = (supabase) => {
                 .eq('atividade.categoria', categoria)
                 .eq('atividade.tipo', 'miniquiz')
                 .order('id_pergunta', { ascending: true });
-            
+
             if (perguntas) {
                 data.perguntas = perguntas.map(p => {
-                    if (p.opcao_resposta) p.opcao_resposta.sort((a,b) => a.id_opcao - b.id_opcao);
+                    if (p.opcao_resposta) p.opcao_resposta.sort((a, b) => a.id_opcao - b.id_opcao);
                     return {
                         texto_pergunta: p.texto_pergunta,
                         opcoes: p.opcao_resposta
@@ -141,7 +141,7 @@ module.exports = (supabase) => {
         }]);
 
         if (error) return res.status(500).json({ error: error.message });
-        
+
         if (tipoMinusculo === 'guia-interativo' && perguntas) {
             try {
                 await syncInteractiveGuide(url_conteudo, perguntas, id_professor, titulo);
@@ -159,7 +159,7 @@ module.exports = (supabase) => {
 
         const seccoesStr = JSON.stringify(seccoes);
         const tipoMinusculo = tipo.toLowerCase();
-        
+
         // Vamos obter o id_professor a partir da base de dados (ou usar req.session.userId se for dono)
         // No painel gestao (admin), o admin pode editar recursos de outros, por isso lemos o id_professor do recurso
         const { data: recData } = await supabase.from('materialpedagogico').select('id_professor').eq('id_material', id).single();
@@ -171,15 +171,15 @@ module.exports = (supabase) => {
             }).eq('id_material', id);
 
             if (error) return res.status(500).json({ error: error.message });
-            
+
             if (tipoMinusculo === 'guia-interativo' && perguntas) {
                 await syncInteractiveGuide(url_conteudo, perguntas, id_prof, titulo);
             }
 
             res.json({ message: 'Recurso atualizado!' });
-        } catch (err) { 
+        } catch (err) {
             console.error(err);
-            res.status(500).json({ error: "Erro ao atualizar recurso." }); 
+            res.status(500).json({ error: "Erro ao atualizar recurso." });
         }
     });
 
@@ -396,12 +396,16 @@ module.exports = (supabase) => {
     });
 
     router.post('/turmas', verificarAdmin, async (req, res) => {
-        const { nome, ano_letivo, id_professor } = req.body;
+        const { nome, ano_letivo, id_professor, id_escola } = req.body;
         try {
-            const { data: escolas } = await supabase.from('escola').select('id_escola').limit(1);
-            const id_escola = (escolas && escolas.length > 0) ? escolas[0].id_escola : null;
-            if (!id_escola) return res.status(400).json({ error: 'Nenhuma escola registada.' });
-            const { error } = await supabase.from('turma').insert([{ nome, ano_letivo, id_escola, id_professor, codigo_acesso: gerarCodigoAcesso() }]);
+            let escolaId = id_escola;
+            // Se não foi fornecida uma escola, tenta usar a primeira disponível (fallback)
+            if (!escolaId) {
+                const { data: escolas } = await supabase.from('escola').select('id_escola').limit(1);
+                escolaId = (escolas && escolas.length > 0) ? escolas[0].id_escola : null;
+            }
+            if (!escolaId) return res.status(400).json({ error: 'Nenhuma escola registada.' });
+            const { error } = await supabase.from('turma').insert([{ nome, ano_letivo, id_escola: escolaId, id_professor, codigo_acesso: gerarCodigoAcesso() }]);
             if (error) throw error;
             res.json({ message: 'Turma criada!' });
         } catch (err) { res.status(500).json({ error: 'Erro interno.' }); }
@@ -438,6 +442,28 @@ module.exports = (supabase) => {
         const { data, error } = await supabase.from('escola').select('*').order('nome');
         if (error) return res.status(500).json({ error: error.message });
         res.json(data || []);
+    });
+
+    router.post('/escolas', verificarAdmin, async (req, res) => {
+        const { nome, localizacao } = req.body;
+        if (!nome || !nome.trim()) return res.status(400).json({ error: 'O nome da escola é obrigatório.' });
+        const { error } = await supabase.from('escola').insert([{ nome: nome.trim(), localizacao: localizacao ? localizacao.trim() : null }]);
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Escola criada com sucesso!' });
+    });
+
+    router.put('/escolas/:id', verificarAdmin, async (req, res) => {
+        const { nome, localizacao } = req.body;
+        if (!nome || !nome.trim()) return res.status(400).json({ error: 'O nome da escola é obrigatório.' });
+        const { error } = await supabase.from('escola').update({ nome: nome.trim(), localizacao: localizacao ? localizacao.trim() : null }).eq('id_escola', req.params.id);
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Escola atualizada!' });
+    });
+
+    router.delete('/escolas/:id', verificarAdmin, async (req, res) => {
+        const { error } = await supabase.from('escola').delete().eq('id_escola', req.params.id);
+        if (error) return res.status(500).json({ error: error.message });
+        res.json({ message: 'Escola apagada!' });
     });
 
 

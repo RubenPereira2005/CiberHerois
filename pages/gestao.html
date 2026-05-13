@@ -139,6 +139,7 @@
             <button class="gestao-tab active" onclick="switchTab('recursos')">Tabela de Recursos</button>
             <button class="gestao-tab" onclick="switchTab('quizzes')">Tabela de Quizzes</button>
             <button class="gestao-tab" onclick="switchTab('turmas')">Tabela de Turmas</button>
+            <button class="gestao-tab" onclick="switchTab('escolas'); carregarEscolas();">Escolas</button>
             <button class="gestao-tab"
                 onclick="switchTab('utilizadores'); carregarUtilizadores();">Utilizadores</button>
         </div>
@@ -246,6 +247,28 @@
                         </tr>
                     </thead>
                     <tbody id="turmas-admin-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== TAB ESCOLAS ==================== -->
+        <div id="tab-escolas" class="tab-content">
+            <div class="gestao-actions-top">
+                <button class="btn btn-primary" onclick="prepararNovaEscola()">
+                    <i data-lucide="plus"></i> Criar Nova Escola
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="gestao-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome da Escola</th>
+                            <th>Localização</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="escolas-tbody"></tbody>
                 </table>
             </div>
         </div>
@@ -688,6 +711,61 @@
                     style="text-align: center; color: var(--text-secondary); display: none; margin-top: 20px; font-style: italic;">
                     Não existem alunos neste esquadrão.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL CRIAR ESCOLA ========== -->
+    <div id="modal-criar-escola" class="modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h2>Criar Nova Escola</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-criar-escola')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="form-criar-escola" onsubmit="salvarNovaEscola(event)">
+                <div class="form-group">
+                    <label>Nome da Escola <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="nova-escola-nome" class="form-input" required placeholder="Ex: Escola Secundária de Lisboa">
+                </div>
+                <div class="form-group">
+                    <label>Localização <span style="color:var(--text-secondary);font-weight:400;font-size:0.82rem;">(opcional)</span></label>
+                    <input type="text" id="nova-escola-loc" class="form-input" placeholder="Ex: Lisboa, Porto...">
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-criar-escola')">Cancelar</button>
+                    <button type="submit" id="btn-submit-nova-escola" class="btn btn-primary">
+                        <i data-lucide="plus" style="width:15px;height:15px;"></i> Criar Escola
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== MODAL EDITAR ESCOLA ========== -->
+    <div id="modal-editar-escola" class="modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h2>Editar Escola</h2>
+                <button type="button" class="close-modal-btn" onclick="closeModal('modal-editar-escola')">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="form-editar-escola" onsubmit="salvarEdicaoEscola(event)">
+                <input type="hidden" id="edit-escola-id">
+                <div class="form-group">
+                    <label>Nome da Escola <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="edit-escola-nome" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Localização <span style="color:var(--text-secondary);font-weight:400;font-size:0.82rem;">(opcional)</span></label>
+                    <input type="text" id="edit-escola-loc" class="form-input">
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-editar-escola')">Cancelar</button>
+                    <button type="submit" id="btn-submit-edit-escola" class="btn btn-primary">Guardar Alterações</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -2059,6 +2137,141 @@
             document.getElementById('texto-sucesso').textContent = mensagem;
             openModal('modal-sucesso');
             lucide.createIcons();
+        }
+
+        // ==========================================
+        // 5. LÓGICA DE ESCOLAS (ADMIN)
+        // ==========================================
+        async function carregarEscolas() {
+            try {
+                const res = await fetch('/api/gestao/escolas');
+                const escolas = await res.json();
+                const tbody = document.getElementById('escolas-tbody');
+                tbody.innerHTML = '';
+
+                if (!escolas || escolas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-secondary);">Nenhuma escola registada. Cria a primeira!</td></tr>';
+                    return;
+                }
+
+                escolas.forEach(e => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>#${e.id_escola}</strong></td>
+                            <td><strong>${e.nome}</strong></td>
+                            <td>${e.localizacao ? `<span style="color:var(--text-secondary);font-size:0.88rem;">${e.localizacao}</span>` : '<span style="color:var(--text-secondary);font-style:italic;font-size:0.82rem;">—</span>'}</td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="abrirEdicaoEscola(${e.id_escola}, '${e.nome.replace(/'/g, "\\'")}', '${(e.localizacao || '').replace(/'/g, "\\'")}')" title="Editar" style="margin-right:5px;">
+                                    <i data-lucide="edit-3" style="width:16px;height:16px;"></i>
+                                </button>
+                                <button type="button" class="btn-danger" onclick="apagarEscola(${e.id_escola}, '${e.nome.replace(/'/g, "\\'")}')" title="Apagar">
+                                    <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Erro ao carregar escolas:', err);
+            }
+        }
+
+        function prepararNovaEscola() {
+            document.getElementById('form-criar-escola').reset();
+            openModal('modal-criar-escola');
+        }
+
+        async function salvarNovaEscola(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-nova-escola');
+            btn.textContent = 'A criar...'; btn.disabled = true;
+
+            const payload = {
+                nome: document.getElementById('nova-escola-nome').value,
+                localizacao: document.getElementById('nova-escola-loc').value
+            };
+
+            try {
+                const res = await fetch('/api/gestao/escolas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeModal('modal-criar-escola');
+                    carregarEscolas();
+                    // Recarrega também a lista de escolas usada nos formulários de turmas
+                    carregarDadosFormulariosTurma();
+                    mostrarSucesso('Escola criada com sucesso!');
+                } else {
+                    alert('Erro: ' + (data.error || 'Não foi possível criar a escola.'));
+                }
+            } catch (err) {
+                alert('Erro de comunicação com o servidor.');
+            } finally {
+                btn.innerHTML = '<i data-lucide="plus" style="width:15px;height:15px;"></i> Criar Escola';
+                btn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        function abrirEdicaoEscola(id, nome, localizacao) {
+            document.getElementById('edit-escola-id').value = id;
+            document.getElementById('edit-escola-nome').value = nome;
+            document.getElementById('edit-escola-loc').value = localizacao || '';
+            openModal('modal-editar-escola');
+        }
+
+        async function salvarEdicaoEscola(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-escola-id').value;
+            const btn = document.getElementById('btn-submit-edit-escola');
+            btn.textContent = 'A guardar...'; btn.disabled = true;
+
+            const payload = {
+                nome: document.getElementById('edit-escola-nome').value,
+                localizacao: document.getElementById('edit-escola-loc').value
+            };
+
+            try {
+                const res = await fetch(`/api/gestao/escolas/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    closeModal('modal-editar-escola');
+                    carregarEscolas();
+                    carregarDadosFormulariosTurma();
+                    mostrarSucesso('Escola atualizada com sucesso!');
+                } else {
+                    const data = await res.json();
+                    alert('Erro: ' + (data.error || 'Não foi possível atualizar.'));
+                }
+            } catch (err) {
+                alert('Erro de comunicação com o servidor.');
+            } finally {
+                btn.textContent = 'Guardar Alterações'; btn.disabled = false;
+            }
+        }
+
+        async function apagarEscola(id, nome) {
+            const confirmado = await confirmarAcao(`Tem a certeza que quer apagar a escola "${nome}"? As turmas associadas perderão a ligação à escola.`);
+            if (!confirmado) return;
+            try {
+                const res = await fetch(`/api/gestao/escolas/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    carregarEscolas();
+                    carregarDadosFormulariosTurma();
+                    mostrarSucesso('Escola apagada!');
+                } else {
+                    const data = await res.json();
+                    alert('Erro: ' + (data.error || 'Não foi possível apagar.'));
+                }
+            } catch (err) {
+                alert('Erro de comunicação.');
+            }
         }
 
         // ==========================================
